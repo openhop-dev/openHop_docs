@@ -21,8 +21,8 @@
   --sl-color-accent-high: #60a5fa;
   --sl-color-white: #ffffff;
 
-  --sl-content-width: 58rem;
-  --sl-sidebar-width: 19rem;
+  --sl-content-width: 62rem;
+  --sl-sidebar-width: 18rem;
 }
 
 /* ─── Base surface + ambient orbs ────────────────────────────────────────── */
@@ -303,7 +303,7 @@ dialog {
 /* ─── Home page cards grid ───────────────────────────────────────────────── */
 .home-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
   margin: 2.5rem 0 0;
 }
@@ -391,6 +391,50 @@ dialog {
   font-size: 0.825rem;
   font-weight: 500;
   color: #60a5fa;
+}
+
+/* ─── Large-screen layout tuning ──────────────────────────────────────────── */
+@media (min-width: 90rem) {
+  :root,
+  :root[data-theme='light'],
+  :root[data-theme='dark'] {
+    --sl-content-width: 70rem;
+  }
+
+  [data-has-hero] .hero {
+    max-width: 76rem;
+  }
+
+  [data-has-sidebar][data-has-toc] .main-pane {
+    width: auto;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .right-sidebar-container {
+    width: clamp(16rem, 18vw, 21rem);
+    flex: 0 0 clamp(16rem, 18vw, 21rem);
+  }
+
+  .right-sidebar {
+    width: clamp(16rem, 18vw, 21rem);
+  }
+}
+
+@media (min-width: 120rem) {
+  :root,
+  :root[data-theme='light'],
+  :root[data-theme='dark'] {
+    --sl-content-width: 78rem;
+  }
+
+  [data-has-hero] .hero {
+    max-width: 84rem;
+  }
+
+  .home-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 /* ─── Responsive ─────────────────────────────────────────────────────────── */
