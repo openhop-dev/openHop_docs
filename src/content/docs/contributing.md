@@ -10,6 +10,7 @@ This site is markdown-first. Adding a page should be simple.
 1. Create a `.md` file under one of these directories:
    - `src/content/docs/projects/pymc-core/`
    - `src/content/docs/projects/pymc-repeater/`
+   - `src/content/docs/projects/pymc-ha-integration/`
 2. Add frontmatter:
 
 ```md
@@ -47,5 +48,6 @@ Current first-release sections:
 
 - pyMC_core
 - pyMC_Repeater
+- pyMC_HA_Integration
 
 Additional project sections can be added later using the same directory pattern.
