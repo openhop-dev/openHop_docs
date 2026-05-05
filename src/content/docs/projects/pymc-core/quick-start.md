@@ -1,5 +1,5 @@
 ---
-title: pyMC_core Quick Start
+title: pyMC Core Quick Start
 description: Install pyMC_core and bootstrap a basic local node runtime.
 ---
 

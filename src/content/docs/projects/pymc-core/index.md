@@ -1,5 +1,5 @@
 ---
-title: pyMC_core Overview
+title: pyMC Core Overview
 description: Foundation library docs for Python-based MeshCore networking.
 ---
 

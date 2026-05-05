@@ -19,4 +19,4 @@ This guide will cover:
 - Urban vs rural deployment considerations
 - Network capacity planning
 
-For now, see [Hardware Setup](Hardware-Setup.md) and [config-file.md](config-file.md).
+For now, see [Hardware Setup](/projects/pymc-repeater/hardware-setup/) and [Configuration Reference](/projects/pymc-repeater/config-file/).

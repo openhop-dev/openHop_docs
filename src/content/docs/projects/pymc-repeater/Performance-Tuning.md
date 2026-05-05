@@ -19,4 +19,4 @@ This guide will cover:
 - Power consumption optimization
 - Benchmarking and testing methods
 
-For now, see [config-file.md](config-file.md) for configuration options.
+For now, see [Configuration Reference](/projects/pymc-repeater/config-file/) for configuration options.

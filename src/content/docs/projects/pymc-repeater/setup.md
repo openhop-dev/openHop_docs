@@ -1,12 +1,12 @@
 ---
-title: pyMC_Repeater Setup
-description: Install and run pyMC_Repeater on a Raspberry Pi-class host.
+title: pyMC Repeater Setup
+description: Install and run pyMC_Repeater on supported hosts.
 ---
 
 ## Before you begin
 
-- Enable SPI on your host.
-- Confirm radio wiring and model support.
+- Decide whether the host will use `sx1262`, `sx1262_ch341`, or `kiss`.
+- Confirm hardware or serial device access.
 - Ensure Python and Git are available.
 
 ## Install from source
@@ -17,22 +17,22 @@ cd pyMC_Repeater
 sudo ./manage.sh
 ```
 
-The installer configures service user, paths, and interactive radio setup.
-
-## Service operations
+## Reconfigure radio mode later
 
 ```bash
-sudo systemctl status pymc-repeater
-sudo journalctl -u pymc-repeater -f
+sudo bash setup-radio-config.sh /etc/pymc_repeater
+sudo systemctl restart pymc-repeater
 ```
 
 ## Dashboard
 
-After startup, access:
+After startup:
 
 `http://<repeater-ip>:8000`
 
-## Notes
+## Next pages
 
-- KISS modem mode is available through configuration.
-- See the other pages in this docs site for deeper platform-specific procedures.
+- [Installation](/projects/pymc-repeater/installation/)
+- [Hardware Setup](/projects/pymc-repeater/hardware-setup/)
+- [KISS Setup](/projects/pymc-repeater/kiss-setup/)
+- [Configuration Reference](/projects/pymc-repeater/config-file/)

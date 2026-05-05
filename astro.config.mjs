@@ -8,7 +8,40 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'pyMC Docs',
-			description: 'Documentation hub for pyMC_core and pyMC_Repeater',
+			description: 'Documentation hub for pyMC Core, pyMC Repeater, and pyMC HA Integration',
+			head: [
+				{
+					tag: 'script',
+					content: `(() => {
+	const markExternalLinks = () => {
+		document.querySelectorAll('a[href]').forEach((link) => {
+			const href = link.getAttribute('href');
+			if (!href || href.startsWith('#') || href.startsWith('/') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) return;
+
+			try {
+				const url = new URL(href, window.location.href);
+				if (url.origin === window.location.origin) return;
+
+				link.target = '_blank';
+				const rel = new Set((link.getAttribute('rel') || '').split(/\\s+/).filter(Boolean));
+				rel.add('noopener');
+				rel.add('noreferrer');
+				link.setAttribute('rel', [...rel].join(' '));
+			} catch {}
+		});
+	};
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', markExternalLinks, { once: true });
+	} else {
+		markExternalLinks();
+	}
+})();`,
+				},
+			],
+			components: {
+				SocialIcons: './src/components/SocialIcons.astro',
+			},
 			logo: {
 				light: './src/assets/pymc-logo.png',
 				dark: './src/assets/pymc-logo.png',
@@ -26,12 +59,16 @@ export default defineConfig({
 					label: 'Projects',
 					items: [
 						{
-							label: 'pyMC_core',
+							label: 'pyMC Core',
 							autogenerate: { directory: 'projects/pymc-core' },
 						},
 						{
-							label: 'pyMC_Repeater',
+							label: 'pyMC Repeater',
 							autogenerate: { directory: 'projects/pymc-repeater' },
+						},
+						{
+							label: 'pyMC HA Integration',
+							autogenerate: { directory: 'projects/pymc-ha-integration' },
 						},
 					],
 				},

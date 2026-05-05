@@ -19,4 +19,4 @@ This guide will cover:
 - Configuration management via web UI
 - Security and authentication
 
-For now, see the `web_server` section in [config-file.md](config-file.md).
+For now, see the `web` section in [Configuration Reference](/projects/pymc-repeater/config-file/#web).

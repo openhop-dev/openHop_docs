@@ -18,4 +18,4 @@ This guide will cover:
 - Key rotation and management
 - Performance impact considerations
 
-For now, see the `transport_keys` section in [config-file.md](config-file.md).
+There is no dedicated `transport_keys` block in the current repo config example. For now, start with the mesh controls in [Configuration Reference](/projects/pymc-repeater/config-file/#mesh) such as `unscoped_flood_allow`, `path_hash_mode`, and `loop_detect`.

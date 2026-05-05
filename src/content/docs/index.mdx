@@ -1,6 +1,6 @@
 ---
 title: pyMC Documentation
-description: Central documentation hub for pyMC_core and pyMC_Repeater.
+description: Central documentation hub for pyMC_core, pyMC_Repeater, and the Home Assistant integration.
 template: splash
 hero:
   tagline: Meshcore reimplemented in python.
@@ -11,6 +11,10 @@ hero:
       variant: primary
     - text: pyMC_Repeater
       link: /projects/pymc-repeater/
+      icon: right-arrow
+      variant: primary
+    - text: pyMC_HA_Integration
+      link: /projects/pymc-ha-integration/
       icon: right-arrow
       variant: primary
 ---
@@ -48,6 +52,26 @@ hero:
   <div class="home-card__body">
     <div class="home-card__title">pyMC_Repeater</div>
     <div class="home-card__desc">Always-on repeater daemon with web dashboard, MQTT, and LetsMesh integration. Runs on Pi-class hardware.</div>
+    <div class="home-card__links">
+      <span>Installation →</span>
+    </div>
+  </div>
+</a>
+
+<a href="/projects/pymc-ha-integration/" class="home-card">
+  <div class="home-card__icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 12h4"></path>
+      <path d="M16 12h4"></path>
+      <path d="M12 4v4"></path>
+      <path d="M12 16v4"></path>
+      <rect x="7" y="7" width="10" height="10" rx="2"></rect>
+      <circle cx="12" cy="12" r="1.5"></circle>
+    </svg>
+  </div>
+  <div class="home-card__body">
+    <div class="home-card__title">pyMC_HA_Integration</div>
+    <div class="home-card__desc">Home Assistant integration for pyMC_Repeater with config-flow setup, telemetry entities, controls, and service actions.</div>
     <div class="home-card__links">
       <span>Installation →</span>
     </div>

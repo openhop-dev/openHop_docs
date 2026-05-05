@@ -19,5 +19,5 @@ This guide will cover:
 - Common first-boot issues
 
 For now, see:
-- [Installation Guide](Installation.md)
-- [Troubleshooting Guide](Troubleshooting.md)
+- [Installation Guide](/projects/pymc-repeater/installation/)
+- [Troubleshooting Guide](/projects/pymc-repeater/troubleshooting/)

@@ -206,17 +206,23 @@ sudo ufw allow 8000/tcp
 ip add
 ```
 
-### LetsMesh Not Connecting
+### LetsMesh / MQTT Broker Publishing Problems
 
 **Symptoms:** No status updates on LetsMesh dashboard
 
 **Check configuration:**
 ```yaml
-letsmesh:
-  enabled: true
-  iata_code: "NYC"  # Set your location code
-  broker_index: 0   # 0=EU, 1=US
+mqtt_brokers:
+  iata_code: "NYC"
   status_interval: 60
+  brokers:
+    - name: "LetsMesh"
+      host: "mqtt-us-v1.letsmesh.net"
+      port: 443
+      transport: "websockets"
+      audience: "mqtt-us-v1.letsmesh.net"
+      use_jwt_auth: true
+      enabled: true
 ```
 
 **Verify internet connectivity:**
@@ -232,19 +238,22 @@ journalctl -u pymc-repeater | grep -i letsmesh
 
 **Common errors:**
 
-1. **JWT token errors** - Fixed in v1.0.5+
-2. **Wrong broker** - Check `broker_index`
+1. **JWT or auth errors** - Recheck `audience`, TLS, and endpoint details
+2. **Wrong endpoint** - Recheck the broker host and transport
 3. **Network blocked** - Check firewall for port 443
 
 ### MQTT Not Publishing
 
 **Check configuration:**
 ```yaml
-storage:
-  mqtt:
-    enabled: true
-    broker: "localhost"
-    port: 1883
+mqtt_brokers:
+  brokers:
+    - name: "Local MQTT"
+      host: "localhost"
+      port: 1883
+      transport: "tcp"
+      format: "mqtt"
+      enabled: true
 ```
 
 **Test MQTT broker:**
@@ -503,7 +512,7 @@ When reporting issues on [GitHub](https://github.com/rightup/pyMC_Repeater/issue
 
 ## Additional Resources
 
-- [Configuration Reference](config-file)
-- [Hardware Setup](hardware-setup)
+- [Configuration Reference](/projects/pymc-repeater/config-file/)
+- [Hardware Setup](/projects/pymc-repeater/hardware-setup/)
 - [GitHub Issues](https://github.com/rightup/pyMC_Repeater/issues)
 - [GitHub Discussions](https://github.com/rightup/pyMC_Repeater/discussions)
