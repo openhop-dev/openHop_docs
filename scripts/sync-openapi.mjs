@@ -8,8 +8,8 @@ const sourceSpec = resolve(docsRoot, '../pyMC_Repeater/repeater/web/openapi.yaml
 const targetSpec = resolve(docsRoot, 'public/openapi/repeater.yaml');
 
 if (!existsSync(sourceSpec)) {
-  console.error(`OpenAPI source file not found: ${sourceSpec}`);
-  process.exit(1);
+  console.warn(`OpenAPI source file not found, skipping sync: ${sourceSpec}`);
+  process.exit(0);
 }
 
 mkdirSync(dirname(targetSpec), { recursive: true });
