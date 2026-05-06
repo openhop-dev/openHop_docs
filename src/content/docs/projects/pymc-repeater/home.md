@@ -39,4 +39,4 @@ This section tracks the current local `pyMC_Repeater` repo rather than the older
 
 - [pyMC Repeater repository](https://github.com/pyMC-dev/pyMC_Repeater)
 - [pyMC Core](https://github.com/pyMC-dev/pyMC_core)
-- [MeshCore](https://github.com/rightup/MeshCore)
+- [MeshCore](https://github.com/meshcore-dev/MeshCore)
