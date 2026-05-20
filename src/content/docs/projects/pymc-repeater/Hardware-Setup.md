@@ -5,11 +5,14 @@ description: Supported pyMC Repeater hardware and radio backend notes.
 
 # Hardware Setup Guide
 
-pyMC Repeater supports more than just a Raspberry Pi with a GPIO-connected SX1262. The current repo supports three backend classes:
+pyMC Repeater supports more than just a Raspberry Pi with a GPIO-connected SX1262. The current repo supports five active backend classes plus a no-radio mode:
 
 - Native `sx1262` over Linux SPI and host GPIO
 - `sx1262_ch341` over a CH341 USB-SPI adapter
 - `kiss` using a serial KISS TNC instead of GPIO radio control
+- `pymc_usb` using a USB-CDC modem running `pymc_usb` firmware
+- `pymc_tcp` using a network modem running `pymc_usb` firmware
+- `null` or `none` when you want the daemon without RF hardware
 
 ## Supported hardware families
 
@@ -25,7 +28,7 @@ The repo currently includes radio presets for:
 - Generic SX1262 / E22-class boards
 - CH341 USB-SPI + SX1262 combinations
 
-For non-GPIO serial radios, use [KISS Setup](/projects/pymc-repeater/kiss-setup/).
+For non-GPIO modem-style transports, use [KISS Setup](/projects/pymc-repeater/kiss-setup/) or [pyMC USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/).
 
 ## Backend selection
 
@@ -40,6 +43,10 @@ Supported values:
 - `sx1262`
 - `sx1262_ch341`
 - `kiss`
+- `pymc_usb`
+- `pymc_tcp`
+- `null`
+- `none`
 
 ## Native SX1262 wiring
 
@@ -108,6 +115,50 @@ For a common E22 mapping, the repo README uses:
 | Busy | 4 |
 | IRQ | 6 |
 
+## pyMC USB modem hosts
+
+When `radio_type: pymc_usb` is selected:
+
+- the modem presents itself as a USB-CDC serial device such as `/dev/ttyACM0`
+- the modem firmware handles the LoRa radio
+- the repeater still owns node behavior, API, dashboard, MQTT, GPS, and identities
+
+Minimal transport block:
+
+```yaml
+radio_type: pymc_usb
+
+pymc_usb:
+  port: "/dev/ttyACM0"
+  baudrate: 921600
+  lbt_enabled: true
+  lbt_max_attempts: 5
+```
+
+## pyMC TCP modem hosts
+
+When `radio_type: pymc_tcp` is selected:
+
+- the modem runs on another board and exposes a TCP service over LAN, Wi-Fi, or Ethernet
+- the helper writes a placeholder host until you replace it
+- the modem host or mDNS name is set under `pymc_tcp.host`
+
+Minimal transport block:
+
+```yaml
+radio_type: pymc_tcp
+
+pymc_tcp:
+  host: "pymc-3e2834.local"
+  port: 5055
+  token: ""
+  connect_timeout: 5.0
+  lbt_enabled: true
+  lbt_max_attempts: 5
+```
+
+If you do not have RF hardware on this host at all, use `radio_type: null` and skip modem sections entirely.
+
 ## Board-specific notes
 
 ### uConsole
@@ -119,6 +170,7 @@ For a common E22 mapping, the repo README uses:
 
 - Often require `use_dio3_tcxo: true`
 - Some also require `use_dio2_rf: true`
+- Some newer presets also require `use_gpiod_backend: true` and `gpio_chip: 1`
 
 ### Waveshare SPI HAT
 
@@ -161,14 +213,16 @@ sudo bash setup-radio-config.sh /etc/pymc_repeater
 
 That helper now supports:
 
-- selecting `sx1262` vs `kiss`
+- selecting `sx1262`, `sx1262_ch341`, `kiss`, `pymc_usb`, `pymc_tcp`, or `null`
 - applying current radio presets
 - writing KISS serial settings
+- writing pyMC USB and pyMC TCP transport settings
 - writing hardware-specific pin maps
 
 ## Related pages
 
 - [Installation](/projects/pymc-repeater/installation/)
 - [Configuration Reference](/projects/pymc-repeater/config-file/)
+- [pyMC USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/)
 - [KISS Setup](/projects/pymc-repeater/kiss-setup/)
 - [Troubleshooting](/projects/pymc-repeater/troubleshooting/)

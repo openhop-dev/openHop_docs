@@ -1,6 +1,6 @@
 ---
 title: pyMC Documentation
-description: Central documentation hub for pyMC Core, pyMC Repeater, and the Home Assistant integration.
+description: Central documentation hub for pyMC Core, pyMC Repeater, the Home Assistant integration, and the Home Assistant add-on.
 template: splash
 hero:
   tagline: MeshCore reimplemented in Python.
@@ -15,6 +15,10 @@ hero:
       variant: primary
     - text: pyMC HA Integration
       link: /projects/pymc-ha-integration/
+      icon: right-arrow
+      variant: primary
+    - text: pyMC HA Add-on
+      link: /projects/pymc-ha-addon/
       icon: right-arrow
       variant: primary
 ---
@@ -51,7 +55,7 @@ hero:
   </div>
   <div class="home-card__body">
     <div class="home-card__title">pyMC Repeater</div>
-    <div class="home-card__desc">Always-on repeater daemon with web dashboard, MQTT, and LetsMesh integration. Runs on Pi-class hardware.</div>
+    <div class="home-card__desc">Always-on repeater daemon with web dashboard, MQTT, sensors, and modern radio backends including KISS, pyMC USB, and pyMC TCP.</div>
     <div class="home-card__links">
       <span>Installation →</span>
     </div>
@@ -74,6 +78,26 @@ hero:
     <div class="home-card__desc">Home Assistant integration for pyMC_Repeater with config-flow setup, telemetry entities, controls, and service actions.</div>
     <div class="home-card__links">
       <span>Installation →</span>
+    </div>
+  </div>
+</a>
+
+<a href="/projects/pymc-ha-addon/" class="home-card">
+  <div class="home-card__icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3v4"></path>
+      <path d="M18 7l-2.8 2.8"></path>
+      <path d="M6 7l2.8 2.8"></path>
+      <rect x="5" y="9" width="14" height="10" rx="2"></rect>
+      <path d="M9 13h6"></path>
+      <path d="M12 10v6"></path>
+    </svg>
+  </div>
+  <div class="home-card__body">
+    <div class="home-card__title">pyMC HA Add-on</div>
+    <div class="home-card__desc">Home Assistant add-on repository for running pyMC Repeater inside HA with dev and main channels, host networking, and hardware-aware access.</div>
+    <div class="home-card__links">
+      <span>Install →</span>
     </div>
   </div>
 </a>

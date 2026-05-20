@@ -12,6 +12,7 @@ Reference for configuring your pyMC Repeater using `config.yaml`, located at `/e
 - [Repeater](#repeater)
 - [Security](#security)
 - [GPS](#gps)
+- [Sensors](#sensors)
 - [Mesh](#mesh)
 - [Identities](#identities)
 - [Radio Backend Selection](#radio-backend-selection)
@@ -35,20 +36,17 @@ Core node identity and daemon behavior.
 
 Friendly name shown in logs, adverts, and the web UI.
 
-```yaml
-repeater:
-  node_name: "mesh-repeater-01"
-```
+### `repeater.mode`
+
+Optional TX mode:
+
+- `forward` repeats traffic normally
+- `monitor` keeps RX and higher-level services active but disables repeat forwarding
+- `no_tx` disables all transmit activity
 
 ### `repeater.latitude` / `repeater.longitude`
 
 Manual coordinates used when you are not advertising a live GPS fix.
-
-```yaml
-repeater:
-  latitude: 40.7128
-  longitude: -74.0060
-```
 
 ### `repeater.identity_file`
 
@@ -154,7 +152,7 @@ Session lifetime before re-authentication is required.
 
 ## GPS
 
-Local GPS receiver support is configured under `gps:` and is new enough that older docs often miss it.
+Local GPS receiver support is configured under `gps:`.
 
 ### `gps.enabled`
 
@@ -215,6 +213,65 @@ Relevant keys:
 - `time_sync_min_offset_seconds`
 - `time_sync_min_valid_year`
 
+## Sensors
+
+The sensor subsystem polls host or I2C data sources and exposes them under `/api/stats`.
+
+### Top-level controls
+
+```yaml
+sensors:
+  enabled: true
+  poll_interval_seconds: 10.0
+  auto_install_packages: true
+  definitions: []
+```
+
+Key fields:
+
+- `enabled`
+- `poll_interval_seconds`
+- `auto_install_packages`
+- `definitions`
+
+### `sensors.definitions`
+
+Each entry defines one sensor instance.
+
+Common keys:
+
+- `type`
+- `name`
+- `enabled`
+- `auto_install_packages`
+- `settings`
+
+The current example config includes these sensor types:
+
+- `hardware_stats`
+- `ina219`
+- `ens210`
+- `shtc3`
+- `waveshare_ups_d`
+
+Example:
+
+```yaml
+sensors:
+  enabled: true
+  definitions:
+    - type: hardware_stats
+      name: system-health
+      enabled: true
+    - type: shtc3
+      name: ambient
+      enabled: true
+      auto_install_packages: false
+      settings:
+        i2c_address: 0x70
+        bus_number: 1
+```
+
 ## Mesh
 
 Mesh-wide forwarding and path encoding behavior.
@@ -252,6 +309,13 @@ Room servers act as independent nodes with their own keys and settings.
 
 Companions expose the MeshCore frame protocol over TCP. One client connects per companion TCP port.
 
+Key companion settings:
+
+- `node_name`
+- `tcp_port`
+- `bind_address`
+- `tcp_timeout`
+
 For key generation and imports, see [Identity Management](/projects/pymc-repeater/identity-management/).
 
 ## Radio Backend Selection
@@ -263,6 +327,10 @@ Supported values in the current repo:
 - `sx1262`
 - `sx1262_ch341`
 - `kiss`
+- `pymc_tcp`
+- `pymc_usb`
+- `null`
+- `none`
 
 ### `radio_type: sx1262`
 
@@ -286,6 +354,60 @@ kiss:
 
 See [KISS Setup](/projects/pymc-repeater/kiss-setup/) for the operational flow.
 
+### `radio_type: pymc_tcp`
+
+Use a `pymc_usb` firmware modem exposed over Wi-Fi or Ethernet.
+
+```yaml
+radio_type: pymc_tcp
+
+pymc_tcp:
+  host: "pymc-3e2834.local"
+  port: 5055
+  token: ""
+  connect_timeout: 5.0
+  lbt_enabled: true
+  lbt_max_attempts: 5
+```
+
+Key fields:
+
+- `host`
+- `port`
+- `token`
+- `connect_timeout`
+- `lbt_enabled`
+- `lbt_max_attempts`
+
+See [pyMC USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/) for the operational flow.
+
+### `radio_type: pymc_usb`
+
+Use a `pymc_usb` firmware modem attached over USB-CDC.
+
+```yaml
+radio_type: pymc_usb
+
+pymc_usb:
+  port: "/dev/ttyACM0"
+  baudrate: 921600
+  lbt_enabled: true
+  lbt_max_attempts: 5
+```
+
+Key fields:
+
+- `port`
+- `baudrate`
+- `lbt_enabled`
+- `lbt_max_attempts`
+
+See [pyMC USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/) for the operational flow.
+
+### `radio_type: null` or `none`
+
+Start the daemon without RF hardware. Use this when you only need dashboard, API, room-server, or companion functionality on the host.
+
 ## CH341 USB-SPI
 
 When `radio_type: sx1262_ch341` is selected, configure the adapter under `ch341:`.
@@ -304,7 +426,7 @@ Notes:
 
 ## Radio Parameters
 
-These values apply to both direct SX1262 hardware and KISS-backed radios unless the modem firmware overrides them.
+These values apply to direct SX1262 hardware and to modem-backed transports unless the modem firmware overrides them.
 
 ```yaml
 radio:
@@ -314,7 +436,6 @@ radio:
   spreading_factor: 8
   coding_rate: 8
   preamble_length: 17
-  sync_word: 13380
   implicit_header: false
 ```
 
@@ -326,7 +447,6 @@ Important keys:
 - `spreading_factor`: LoRa SF
 - `coding_rate`: LoRa coding rate
 - `preamble_length`
-- `sync_word`
 - `implicit_header`
 
 ## SX1262 Hardware
@@ -356,6 +476,8 @@ Notes:
 
 - With `radio_type: sx1262`, pin numbers are normal Linux GPIO numbering for the host
 - With `radio_type: sx1262_ch341`, the same pin fields map to CH341 GPIO numbers
+- `use_gpiod_backend` switches GPIO access to libgpiod-backed numbering on platforms such as Luckfox Pico Ultra
+- `gpio_chip` selects the gpiod chip index when `use_gpiod_backend` is enabled
 - `en_pin` can be used to power-enable some radio boards during initialization
 - `use_dio3_tcxo` and `use_dio2_rf` are needed on some E22 and meshadv-class boards
 
@@ -407,6 +529,7 @@ mqtt_brokers:
 
 Each broker entry supports fields such as:
 
+- `preset`
 - `enabled`
 - `name`
 - `host`
@@ -512,6 +635,54 @@ radio:
   bandwidth: 62500
   spreading_factor: 8
   coding_rate: 8
+```
+
+### pyMC USB modem host
+
+```yaml
+radio_type: pymc_usb
+
+repeater:
+  node_name: "usb-modem-repeater"
+
+pymc_usb:
+  port: "/dev/ttyACM0"
+  baudrate: 921600
+  lbt_enabled: true
+  lbt_max_attempts: 5
+
+radio:
+  frequency: 915000000
+  tx_power: 22
+  bandwidth: 62500
+  spreading_factor: 8
+  coding_rate: 8
+  preamble_length: 16
+```
+
+### pyMC TCP modem host
+
+```yaml
+radio_type: pymc_tcp
+
+repeater:
+  node_name: "tcp-modem-repeater"
+
+pymc_tcp:
+  host: "pymc-3e2834.local"
+  port: 5055
+  token: ""
+  connect_timeout: 5.0
+  lbt_enabled: true
+  lbt_max_attempts: 5
+
+radio:
+  frequency: 915000000
+  tx_power: 22
+  bandwidth: 62500
+  spreading_factor: 8
+  coding_rate: 8
+  preamble_length: 16
 ```
 
 ### CH341 / Proxmox-style host

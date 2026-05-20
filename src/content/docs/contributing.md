@@ -11,6 +11,7 @@ This site is markdown-first. Adding a page should be simple.
    - `src/content/docs/projects/pymc-core/`
    - `src/content/docs/projects/pymc-repeater/`
    - `src/content/docs/projects/pymc-ha-integration/`
+   - `src/content/docs/projects/pymc-ha-addon/`
 2. Add frontmatter:
 
 ```md
@@ -46,8 +47,9 @@ description: One-line summary shown in metadata and previews.
 
 Current first-release sections:
 
-- pyMC_core
-- pyMC_Repeater
-- pyMC_HA_Integration
+- pyMC Core
+- pyMC Repeater
+- pyMC HA Integration
+- pyMC HA Add-on
 
 Additional project sections can be added later using the same directory pattern.

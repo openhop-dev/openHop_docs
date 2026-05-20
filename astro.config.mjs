@@ -8,7 +8,7 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'pyMC Docs',
-			description: 'Documentation hub for pyMC Core, pyMC Repeater, and pyMC HA Integration',
+			description: 'Documentation hub for pyMC Core, pyMC Repeater, pyMC HA Integration, and the pyMC HA Add-on',
 			favicon: '/favicon.png',
 			head: [
 				{
@@ -80,6 +80,10 @@ export default defineConfig({
 						{
 							label: 'pyMC HA Integration',
 							autogenerate: { directory: 'projects/pymc-ha-integration' },
+						},
+						{
+							label: 'pyMC HA Add-on',
+							autogenerate: { directory: 'projects/pymc-ha-addon' },
 						},
 					],
 				},
