@@ -1,10 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap');
 
 /* ─── Tokens ─────────────────────────────────────────────────────────────── */
 :root {
   --sl-font: 'Inter', 'Segoe UI', sans-serif;
   --sl-font-system: 'Inter', 'Segoe UI', sans-serif;
   --sl-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --sl-font-heading: 'Michroma', 'Inter', 'Segoe UI', sans-serif;
 
   --sl-content-width: 62rem;
   --sl-sidebar-width: 18rem;
@@ -244,6 +245,7 @@ div.header {
 }
 
 .site-title {
+  font-family: 'Michroma', 'Inter', 'Segoe UI', sans-serif;
   font-weight: 600;
   letter-spacing: 0.01em;
 }
@@ -358,6 +360,7 @@ div.header {
 .sl-markdown-content h1,
 .sl-markdown-content h2,
 .sl-markdown-content h3 {
+  font-family: 'Michroma', 'Inter', 'Segoe UI', sans-serif;
   letter-spacing: -0.015em;
 }
 
@@ -450,6 +453,7 @@ dialog {
 
 /* Gradient headline */
 [data-has-hero] .hero h1 {
+  font-family: 'Michroma', 'Inter', 'Segoe UI', sans-serif;
   font-size: clamp(2.6rem, 6vw, 4rem);
   font-weight: 700;
   letter-spacing: -0.03em;
@@ -585,6 +589,7 @@ dialog {
 }
 
 .home-card__title {
+  font-family: 'Michroma', 'Inter', 'Segoe UI', sans-serif;
   font-size: 1rem;
   font-weight: 600;
   color: var(--home-card-title);
