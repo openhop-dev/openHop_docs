@@ -1,9 +1,9 @@
 ---
-title: pyMC HA Add-on Overview
-description: Run pyMC Repeater inside Home Assistant using the pyMC HA Add-on repository.
+title: openHop HA Add-on Overview
+description: Run openHop Repeater inside Home Assistant using the openHop HA Add-on repository.
 ---
 
-pyMC HA Add-on packages `pyMC_Repeater` as Home Assistant add-ons so you can run the repeater inside Home Assistant with the same upstream config model and web UI.
+openHop HA Add-on packages `pyMC_Repeater` as Home Assistant add-ons so you can run the repeater inside Home Assistant with the same upstream config model and web UI.
 
 ## What this section covers
 
@@ -14,8 +14,8 @@ pyMC HA Add-on packages `pyMC_Repeater` as Home Assistant add-ons so you can run
 
 ## Useful links
 
-- Project repository: [pyMC HA Add-on](https://github.com/pyMC-dev/pyMC-HA-Add-on)
-- Upstream repeater: [pyMC Repeater](https://github.com/pyMC-dev/pyMC_Repeater)
+- Project repository: [openHop HA Add-on](https://github.com/pyMC-dev/pyMC-HA-Add-on)
+- Upstream repeater: [openHop Repeater](https://github.com/pyMC-dev/pyMC_Repeater)
 
 ## Channels
 

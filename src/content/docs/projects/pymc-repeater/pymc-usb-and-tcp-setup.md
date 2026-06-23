@@ -1,9 +1,9 @@
 ---
-title: pyMC USB/TCP Setup
-description: Configure pyMC Repeater to use a pymc_usb modem over USB-CDC or over TCP.
+title: openHop USB/TCP Setup
+description: Configure openHop Repeater to use a pymc_usb modem over USB-CDC or over TCP.
 ---
 
-# pyMC USB/TCP Setup
+# openHop USB/TCP Setup
 
 Use these modes when the radio hardware is already managed by a modem running `pymc_usb` firmware rather than by local SX1262 GPIO and SPI control.
 
@@ -16,7 +16,7 @@ Both modes keep the repeater in charge of node behavior, the dashboard, API, MQT
 
 The main config file is `/etc/pymc_repeater/config.yaml`.
 
-## pyMC USB over USB-CDC
+## openHop USB over USB-CDC
 
 Minimal config:
 
@@ -46,7 +46,7 @@ id repeater
 
 Make sure the service user can open the USB-CDC device.
 
-## pyMC USB over TCP
+## openHop USB over TCP
 
 Minimal config:
 

@@ -73,4 +73,4 @@ The add-on does not invent a second config model. It passes the normal repeater 
 
 - [Host Access and Storage](/projects/pymc-ha-addon/host-access/)
 - [pyMC Repeater Configuration Reference](/projects/pymc-repeater/config-file/)
-- [pyMC USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/)
+- [openHop USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/)

@@ -1,9 +1,9 @@
 ---
-title: pyMC Core Overview
+title: openHop Core Overview
 description: Foundation library docs for Python-based MeshCore networking.
 ---
 
-pyMC Core is a Python implementation of MeshCore for LoRa mesh networking on Raspberry Pi-class hardware.
+openHop Core is a Python implementation of MeshCore for LoRa mesh networking on Raspberry Pi-class hardware.
 
 ## What this section covers
 
@@ -14,7 +14,7 @@ pyMC Core is a Python implementation of MeshCore for LoRa mesh networking on Ras
 
 ## Useful links
 
-- Project repository: [pyMC Core](https://github.com/pyMC-dev/pyMC_core)
+- Project repository: [openHop Core](https://github.com/pyMC-dev/pyMC_core)
 - PyPI package: [pymc-core](https://pypi.org/project/pymc-core/)
 
 ## Next step

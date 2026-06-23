@@ -1,6 +1,6 @@
 ---
 title: Installation
-description: Install the pyMC Repeater Home Assistant integration with HACS or manually.
+description: Install the openHop Repeater Home Assistant integration with HACS or manually.
 sidebar:
   order: 2
 ---
@@ -17,7 +17,7 @@ sidebar:
    ```
 
 5. Choose `Integration`.
-6. Install `pyMC Repeater`.
+6. Install `openHop Repeater`.
 7. Restart Home Assistant.
 
 ## Manual installation

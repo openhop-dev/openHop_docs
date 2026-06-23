@@ -1,9 +1,9 @@
 ---
 title: Documentation Home
-description: Entry point for current pyMC Repeater docs.
+description: Entry point for current openHop Repeater docs.
 ---
 
-# pyMC Repeater Documentation
+# openHop Repeater Documentation
 
 This section tracks the current local `pyMC_Repeater` repo rather than the older Raspberry Pi only docs set.
 
@@ -12,7 +12,7 @@ This section tracks the current local `pyMC_Repeater` repo rather than the older
 1. [Installation](/projects/pymc-repeater/installation/)
 2. [Hardware Setup](/projects/pymc-repeater/hardware-setup/)
 3. [Configuration Reference](/projects/pymc-repeater/config-file/)
-4. [pyMC USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/)
+4. [openHop USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/)
 5. [KISS Setup](/projects/pymc-repeater/kiss-setup/)
 
 ## Supported deployment styles
@@ -30,19 +30,19 @@ This section tracks the current local `pyMC_Repeater` repo rather than the older
 - GPS receiver support and GPS time sync
 - background sensor plug-ins exposed through `/api/stats`
 - `mqtt_brokers` based publishing
-- pyMC_Glass control-plane integration
+- openHop Glass control-plane integration
 - new hardware presets including uConsole, meshadv, UltraPeater, and UltraPeaterZero
 
 ## Useful pages
 
 - [Configuration Reference](/projects/pymc-repeater/config-file/)
-- [pyMC USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/)
+- [openHop USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/)
 - [LetsMesh Integration](/projects/pymc-repeater/letsmesh-integration/)
 - [Identity Management](/projects/pymc-repeater/identity-management/)
 - [Troubleshooting](/projects/pymc-repeater/troubleshooting/)
 
 ## External resources
 
-- [pyMC Repeater repository](https://github.com/pyMC-dev/pyMC_Repeater)
-- [pyMC Core](https://github.com/pyMC-dev/pyMC_core)
+- [openHop Repeater repository](https://github.com/pyMC-dev/pyMC_Repeater)
+- [openHop Core](https://github.com/pyMC-dev/pyMC_core)
 - [MeshCore](https://github.com/meshcore-dev/MeshCore)
