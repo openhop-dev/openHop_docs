@@ -4,11 +4,11 @@ import starlight from '@astrojs/starlight';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://docs.pymc.dev',
+	site: 'https://docs.openhop.dev',
 	integrations: [
 		starlight({
-			title: 'pyMC Docs',
-			description: 'Documentation hub for pyMC Core, pyMC Repeater, and pyMC HA Integration',
+			title: 'OpenHop Docs',
+			description: 'Documentation hub for the OpenHop ecosystem: Core, Repeater, Home Assistant integration, and add-on projects',
 			favicon: '/favicon.png',
 			head: [
 				{
@@ -54,13 +54,13 @@ export default defineConfig({
 				SocialIcons: './src/components/SocialIcons.astro',
 			},
 			logo: {
-				light: './src/assets/pymc-logo.png',
-				dark: './src/assets/pymc-logo.png',
+				light: './src/assets/openhop-logo.png',
+				dark: './src/assets/openhop-logo.png',
 				replacesTitle: false,
 			},
 			customCss: ['./src/styles/brand.css'],
 			social: [
-				{ icon: 'github', label: 'pyMC on GitHub', href: 'https://github.com/pymc-dev' },
+				{ icon: 'github', label: 'OpenHop on GitHub', href: 'https://github.com/pymc-dev' },
 			],
 			editLink: {
 				baseUrl: 'https://github.com/pyMC-dev/pyMC_docs/edit/main/',
@@ -80,6 +80,10 @@ export default defineConfig({
 						{
 							label: 'pyMC HA Integration',
 							autogenerate: { directory: 'projects/pymc-ha-integration' },
+						},
+						{
+							label: 'pyMC HA Add-on',
+							autogenerate: { directory: 'projects/pymc-ha-addon' },
 						},
 					],
 				},

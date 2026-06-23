@@ -11,6 +11,9 @@ The current `pyMC_Repeater` repo supports several install shapes:
 - CH341 USB-SPI hosts
 - Proxmox LXC deployments using CH341 passthrough
 - KISS modem deployments using a serial TNC
+- `pymc_usb` modem deployments over USB-CDC
+- `pymc_tcp` modem deployments over Wi-Fi or Ethernet
+- no-radio `null` mode for dashboard, API, or companion-only services
 
 The main configuration file is `/etc/pymc_repeater/config.yaml`.
 
@@ -47,7 +50,11 @@ sudo systemctl restart pymc-repeater
 The helper now supports:
 
 - direct `sx1262` hardware
+- `sx1262_ch341` USB-SPI hosts
 - `kiss` modem mode
+- `pymc_usb` USB-CDC modem mode
+- `pymc_tcp` network modem mode
+- `null` mode for no RF hardware
 - hardware presets from `radio-settings.json`
 
 ## KISS modem installs
@@ -60,6 +67,46 @@ For serial TNC deployments:
 4. Make sure the service user can open the serial device.
 
 Start with [KISS Setup](/projects/pymc-repeater/kiss-setup/).
+
+## pyMC USB modem installs
+
+Use this when the radio side is a board running `pymc_usb` firmware and the modem is attached to the repeater host over USB-CDC.
+
+1. Install the repeater normally.
+2. Run `sudo bash setup-radio-config.sh /etc/pymc_repeater`.
+3. Select the `pymc_usb modem (USB-CDC)` hardware option.
+4. Confirm the serial device, usually `/dev/ttyACM0`.
+5. Restart the service and watch logs.
+
+The current helper defaults are:
+
+- `pymc_usb.port: /dev/ttyACM0`
+- `pymc_usb.baudrate: 921600`
+- `pymc_usb.lbt_enabled: true`
+- `pymc_usb.lbt_max_attempts: 5`
+
+Use [pyMC USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/) for the full flow.
+
+## pyMC TCP modem installs
+
+Use this when the radio side is a board running `pymc_usb` firmware and exposing a TCP server over LAN, Wi-Fi, or Ethernet.
+
+1. Install the repeater normally.
+2. Run `sudo bash setup-radio-config.sh /etc/pymc_repeater`.
+3. Select the `pymc_tcp modem (Wi-Fi / Ethernet)` hardware option.
+4. Replace the placeholder host with the modem LAN address or mDNS name.
+5. Restart the service and confirm the repeater connects.
+
+The current helper writes:
+
+- `pymc_tcp.host: REPLACE_WITH_MODEM_HOST`
+- `pymc_tcp.port: 5055`
+- `pymc_tcp.token: ""`
+- `pymc_tcp.connect_timeout: 5.0`
+- `pymc_tcp.lbt_enabled: true`
+- `pymc_tcp.lbt_max_attempts: 5`
+
+Use [pyMC USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/) for the config details.
 
 ## Proxmox LXC with CH341
 
@@ -90,6 +137,10 @@ Dashboard URL:
 http://<repeater-ip>:8000
 ```
 
+## Null mode
+
+`radio_type: null` or `radio_type: none` starts the daemon without RF hardware. This is useful when you only need the dashboard, API, room servers, or companion TCP endpoints on a host.
+
 ## Useful config paths
 
 - Main config: `/etc/pymc_repeater/config.yaml`
@@ -99,6 +150,7 @@ http://<repeater-ip>:8000
 ## Related pages
 
 - [Hardware Setup](/projects/pymc-repeater/hardware-setup/)
+- [pyMC USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/)
 - [KISS Setup](/projects/pymc-repeater/kiss-setup/)
 - [Configuration Reference](/projects/pymc-repeater/config-file/)
 - [Troubleshooting](/projects/pymc-repeater/troubleshooting/)

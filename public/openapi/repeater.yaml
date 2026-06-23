@@ -15,7 +15,7 @@ info:
   version: 1.0.0
   contact:
     name: pyMC Repeater
-    url: https://github.com/pyMC-dev/pyMC_Repeater
+    url: https://github.com/rightup/pyMC_Repeater
 
 servers:
   - url: /api
@@ -434,6 +434,7 @@ paths:
                         type: object
                       raw_attributes:
                         type: object
+                        additionalProperties: true
 
   /gps_stream:
     get:
@@ -475,6 +476,43 @@ paths:
             application/json:
               schema:
                 type: object
+                required: [logs]
+                properties:
+                  logs:
+                    type: array
+                    items:
+                      type: object
+                      required: [message, timestamp, level]
+                      properties:
+                        message:
+                          type: string
+                        timestamp:
+                          type: string
+                          format: date-time
+                        level:
+                          type: string
+                  error:
+                    type: string
+
+  /logs_stream:
+    get:
+      tags: [System]
+      summary: Stream system logs
+      description: Server-Sent Events stream of live system log entries.
+      parameters:
+        - name: since_id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Resume the stream after this log entry id.
+      responses:
+        '200':
+          description: SSE stream
+          content:
+            text/event-stream:
+              schema:
+                type: string
 
   /hardware_stats:
     get:
@@ -526,6 +564,61 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuccessResponse'
+
+  /validate_config:
+    get:
+      tags: [System]
+      summary: Validate config.yaml before restart
+      description: Checks config syntax and required settings for the selected radio type.
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Validation completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      valid:
+                        type: boolean
+                      blocked_restart:
+                        type: boolean
+                      errors:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            path:
+                              type: string
+                            message:
+                              type: string
+                      warnings:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            path:
+                              type: string
+                            message:
+                              type: string
+                      summary:
+                        type: object
+                        properties:
+                          error_count:
+                            type: integer
+                          warning_count:
+                            type: integer
+                      config_path:
+                        type: string
+                      message:
+                        type: string
 
   /openapi:
     get:
@@ -1249,20 +1342,20 @@ paths:
                 type: object
 
   /advert:
-    get:
+    delete:
       tags: [Adverts]
-      summary: Get specific advert
-      description: Retrieve details of a specific advertisement
+      summary: Delete specific advert
+      description: Delete a specific advertisement by ID
       parameters:
         - name: advert_id
           in: query
           required: true
           schema:
             type: integer
-          description: Advert ID to retrieve
+          description: Advert ID to delete
       responses:
         '200':
-          description: Advert details
+          description: Advert deleted
           content:
             application/json:
               schema:
@@ -1340,6 +1433,52 @@ paths:
             application/json:
               schema:
                 type: object
+    put:
+      tags: [Transport Keys]
+      summary: Update transport key
+      description: Update an existing transport encryption key
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      parameters:
+        - name: key_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Key ID to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Updated key name
+                flood_policy:
+                  type: string
+                  enum: [allow, deny]
+                  description: Updated flood policy
+                transport_key:
+                  type: string
+                  description: Updated transport key hex
+                parent_id:
+                  type: integer
+                  nullable: true
+                  description: Updated parent transport key ID
+                last_used:
+                  type: string
+                  format: date-time
+                  description: Updated last-used timestamp in ISO-8601 format
+      responses:
+        '200':
+          description: Key updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
     delete:
       tags: [Transport Keys]
       summary: Delete transport key
@@ -1366,20 +1505,6 @@ paths:
   # Network Policy
   # ============================================================================
   /unscoped_flood_policy:
-    get:
-      tags: [Network Policy]
-      summary: Get unscoped flood policy
-      description: Retrieve current network flood policy configuration
-      security:
-        - BearerAuth: []
-        - ApiKeyAuth: []
-      responses:
-        '200':
-          description: Current policy
-          content:
-            application/json:
-              schema:
-                type: object
     post:
       tags: [Network Policy]
       summary: Update unscoped flood policy
@@ -1415,13 +1540,315 @@ paths:
           application/json:
             schema:
               type: object
+              required: [target_id]
               properties:
-                node_id:
+                target_id:
                   type: string
                   description: Target node identifier
+                timeout:
+                  type: integer
+                  description: Ping timeout in seconds
+                  default: 10
       responses:
         '200':
           description: Ping sent
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    required: [target_id, rtt_ms, snr_db, rssi, path, tag]
+                    properties:
+                      target_id:
+                        type: string
+                      rtt_ms:
+                        type: number
+                      snr_db:
+                        type: number
+                      rssi:
+                        type: number
+                      path:
+                        type: array
+                        items:
+                          type: string
+                      tag:
+                        type: integer
+                      path_hash_mode:
+                        type: integer
+                  message:
+                    type: string
+                  error:
+                    type: string
+
+  /policy:
+    get:
+      tags: [Network Policy]
+      summary: Get policy document
+      description: Returns normalized policy engine configuration and grouped channel hash/pubkey entries.
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Policy document
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      policy_file:
+                        type: string
+                      exists:
+                        type: boolean
+                      policy_engine:
+                        type: object
+                      groups:
+                        type: object
+    post:
+      tags: [Network Policy]
+      summary: Update policy document
+      description: Update policy_engine configuration while preserving or replacing named groups.
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Accepts either root-level policy_engine fields or a nested policy_engine object.
+      responses:
+        '200':
+          description: Policy updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /policy_validate:
+    post:
+      tags: [Network Policy]
+      summary: Validate policy payload
+      description: Validate a policy payload without saving it to disk.
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      valid:
+                        type: boolean
+                      normalized:
+                        type: object
+                      effective:
+                        type: object
+
+  /policy_groups:
+    get:
+      tags: [Network Policy]
+      summary: List policy groups
+      description: List named channel hash and pubkey groups.
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      parameters:
+        - name: kind
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [channel_hashes, pubkeys]
+          description: Optional group kind filter.
+      responses:
+        '200':
+          description: Policy groups
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+    post:
+      tags: [Network Policy]
+      summary: Create policy group
+      description: Create a named group for channel hashes or pubkeys.
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kind]
+              properties:
+                kind:
+                  type: string
+                  enum: [channel_hashes, pubkeys]
+                group_id:
+                  type: string
+                friendly_name:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '200':
+          description: Group created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+    delete:
+      tags: [Network Policy]
+      summary: Delete policy group
+      description: Delete a named group and all of its entries.
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kind, group_id]
+              properties:
+                kind:
+                  type: string
+                  enum: [channel_hashes, pubkeys]
+                group_id:
+                  type: string
+      responses:
+        '200':
+          description: Group deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /policy_group_entries:
+    get:
+      tags: [Network Policy]
+      summary: List group entries
+      description: Return entries for a specific named channel hash/pubkey group.
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      parameters:
+        - name: kind
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [channel_hashes, pubkeys]
+        - name: group_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Group entries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+    post:
+      tags: [Network Policy]
+      summary: Add group entry
+      description: Add a friendly-named entry to a policy group.
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kind, group_id, value]
+              properties:
+                kind:
+                  type: string
+                  enum: [channel_hashes, pubkeys]
+                group_id:
+                  type: string
+                value:
+                  type: string
+                entry_id:
+                  type: string
+                friendly_name:
+                  type: string
+      responses:
+        '200':
+          description: Entry added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+    delete:
+      tags: [Network Policy]
+      summary: Remove group entry
+      description: Remove an entry by entry_id or value from a policy group.
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kind, group_id]
+              properties:
+                kind:
+                  type: string
+                  enum: [channel_hashes, pubkeys]
+                group_id:
+                  type: string
+                entry_id:
+                  type: string
+                value:
+                  type: string
+      responses:
+        '200':
+          description: Entry removed
           content:
             application/json:
               schema:
@@ -1435,7 +1862,7 @@ paths:
       tags: [Identities]
       summary: Create new identity
       description: |
-        Create a new repeater or room server identity.
+        Create a new companion or room server identity.
         `name` must be non-empty after trimming leading/trailing whitespace (whitespace-only values are rejected).
       requestBody:
         required: true
@@ -1456,14 +1883,14 @@ paths:
                   example: "General Chat"
                 identity_key:
                   type: string
-                  pattern: '^[0-9a-fA-F]{64}$'
-                  description: 32-byte hex key (64 chars). Omit for auto-generation
-                  example: "abc123def456..."
+                  pattern: '^(?:[0-9a-fA-F]{64}|[0-9a-fA-F]{128})$'
+                  description: 32- or 64-byte hex key (64 or 128 chars). Omit for auto-generation
+                  example: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                 type:
                   type: string
-                  enum: [repeater, room_server]
+                  enum: [companion, room_server]
                   description: |
-                    - repeater: Repeater identity (only one allowed)
+                    - companion: Companion identity with a TCP endpoint
                     - room_server: Room server for group chat
                   example: room_server
                 settings:
@@ -1487,6 +1914,22 @@ paths:
                       default: 32
                       description: Maximum messages to keep (hard limit 32)
                       example: 32
+                    node_name:
+                      type: string
+                      description: Advertised node name (companion only; defaults to identity name)
+                      example: "My Companion"
+                    tcp_port:
+                      type: integer
+                      minimum: 1
+                      maximum: 65535
+                      default: 5000
+                      description: TCP listener port (companion only)
+                      example: 5000
+                    bind_address:
+                      type: string
+                      default: "0.0.0.0"
+                      description: TCP listener bind address (companion only)
+                      example: "0.0.0.0"
             examples:
               room_server:
                 value:
@@ -1496,11 +1939,15 @@ paths:
                     admin_password: "admin123"
                     guest_password: "guest123"
                     max_posts: 32
-              repeater:
+              companion:
                 value:
-                  name: "My Repeater"
-                  type: repeater
-                  identity_key: "abc123def456..."
+                  name: "My Companion"
+                  type: companion
+                  identity_key: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  settings:
+                    node_name: "My Companion"
+                    tcp_port: 5000
+                    bind_address: "0.0.0.0"
       responses:
         '200':
           description: Identity created
@@ -2401,6 +2848,1066 @@ paths:
                     properties:
                       deleted_count:
                         type: integer
+
+  /needs_setup:
+    get:
+      tags: [System]
+      summary: Check setup wizard status
+      responses:
+        '200':
+          description: Setup status
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /site_info:
+    get:
+      tags: [System]
+      summary: Get site and host info
+      responses:
+        '200':
+          description: Site info
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /hardware_options:
+    get:
+      tags: [System]
+      summary: Get supported hardware options
+      responses:
+        '200':
+          description: Hardware options
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /radio_presets:
+    get:
+      tags: [System]
+      summary: Get radio presets
+      responses:
+        '200':
+          description: Preset list
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /serial_ports:
+    get:
+      tags: [System]
+      summary: List available serial ports
+      responses:
+        '200':
+          description: Serial ports
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /setup_wizard:
+    post:
+      tags: [System]
+      summary: Submit setup wizard payload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Setup applied
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /check_pymc_console:
+    get:
+      tags: [System]
+      summary: Check pyMC console availability
+      responses:
+        '200':
+          description: Console status
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /mqtt_status:
+    get:
+      tags: [System]
+      summary: Get MQTT runtime status
+      responses:
+        '200':
+          description: MQTT status
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /broker_presets:
+    get:
+      tags: [System]
+      summary: List MQTT broker presets
+      responses:
+        '200':
+          description: Broker presets
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /update_web_config:
+    post:
+      tags: [System]
+      summary: Update web configuration
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Web config updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /update_mqtt_config:
+    post:
+      tags: [System]
+      summary: Update MQTT configuration
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: MQTT config updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /update_advert_rate_limit_config:
+    post:
+      tags: [Adverts]
+      summary: Update advert rate limit configuration
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Advert rate limit config updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /bulk_packets:
+    get:
+      tags: [Packets]
+      summary: Fetch packets in bulk
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 1000
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: start_timestamp
+          in: query
+          schema:
+            type: number
+        - name: end_timestamp
+          in: query
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Bulk packet result
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /airtime_data:
+    get:
+      tags: [Packets]
+      summary: Get lightweight airtime packet rows
+      parameters:
+        - name: start_timestamp
+          in: query
+          schema:
+            type: number
+        - name: end_timestamp
+          in: query
+          schema:
+            type: number
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50000
+      responses:
+        '200':
+          description: Airtime data rows
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /airtime_chart_data:
+    get:
+      tags: [Charts]
+      summary: Get server-aggregated airtime chart buckets
+      parameters:
+        - name: start_timestamp
+          in: query
+          schema:
+            type: number
+        - name: end_timestamp
+          in: query
+          schema:
+            type: number
+        - name: bucket_seconds
+          in: query
+          schema:
+            type: integer
+            default: 60
+        - name: sf
+          in: query
+          schema:
+            type: integer
+            default: 9
+        - name: bw_hz
+          in: query
+          schema:
+            type: integer
+            default: 62500
+        - name: cr
+          in: query
+          schema:
+            type: integer
+            default: 5
+        - name: preamble
+          in: query
+          schema:
+            type: integer
+            default: 17
+      responses:
+        '200':
+          description: Airtime buckets
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /adverts_count_by_contact_type:
+    get:
+      tags: [Adverts]
+      summary: Get advert count for contact type
+      parameters:
+        - name: contact_type
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: hours
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Advert count
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /advert_rate_limit_stats:
+    get:
+      tags: [Adverts]
+      summary: Get advert rate-limit runtime stats
+      responses:
+        '200':
+          description: Rate-limit stats
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /crc_error_count:
+    get:
+      tags: [System]
+      summary: Get CRC error count
+      parameters:
+        - name: hours
+          in: query
+          schema:
+            type: integer
+            default: 24
+      responses:
+        '200':
+          description: CRC error count
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /crc_error_history:
+    get:
+      tags: [System]
+      summary: Get CRC error history
+      parameters:
+        - name: hours
+          in: query
+          schema:
+            type: integer
+            default: 24
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: CRC error records
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /memory_debug:
+    get:
+      tags: [System]
+      summary: Get memory diagnostics
+      responses:
+        '200':
+          description: Memory diagnostics
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      tags: [System]
+      summary: Start/stop memory diagnostics tracing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [start, stop]
+      responses:
+        '200':
+          description: Tracing state changed
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /config_export:
+    get:
+      tags: [System]
+      summary: Export configuration
+      parameters:
+        - name: include_secrets
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Exported config payload
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    required: [meta, config]
+                    properties:
+                      meta:
+                        type: object
+                        required: [exported_at, version, config_path, includes_secrets]
+                        properties:
+                          exported_at:
+                            type: string
+                            format: date-time
+                          version:
+                            type: string
+                          config_path:
+                            type: string
+                          includes_secrets:
+                            type: boolean
+                      config:
+                        type: object
+                  error:
+                    type: string
+
+  /config_import:
+    post:
+      tags: [System]
+      summary: Import configuration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Import result
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /identity_export:
+    get:
+      tags: [Identities]
+      summary: Export repeater identity key
+      responses:
+        '200':
+          description: Identity export
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    required: [identity_key_hex, key_length_bytes]
+                    properties:
+                      identity_key_hex:
+                        type: string
+                      key_length_bytes:
+                        type: integer
+                      public_key_hex:
+                        type: string
+                      node_address:
+                        type: string
+                  error:
+                    type: string
+
+  /generate_vanity_key:
+    post:
+      tags: [Identities]
+      summary: Generate vanity identity key
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [prefix]
+              properties:
+                prefix:
+                  type: string
+                  minLength: 1
+                  maxLength: 8
+                apply:
+                  type: boolean
+      responses:
+        '200':
+          description: Vanity key generation result
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    required: [public_hex, private_hex, attempts]
+                    properties:
+                      public_hex:
+                        type: string
+                      private_hex:
+                        type: string
+                      attempts:
+                        type: integer
+                      applied:
+                        type: boolean
+                  error:
+                    type: string
+
+  /db_stats:
+    get:
+      tags: [System]
+      summary: Get database statistics
+      responses:
+        '200':
+          description: Database stats
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    required: [database_size_bytes, rrd_size_bytes, tables]
+                    properties:
+                      database_size_bytes:
+                        type: integer
+                      rrd_size_bytes:
+                        type: integer
+                      tables:
+                        type: array
+                        items:
+                          type: object
+                          required: [name, row_count, has_timestamp]
+                          properties:
+                            name:
+                              type: string
+                            row_count:
+                              type: integer
+                            oldest_timestamp:
+                              type: number
+                            newest_timestamp:
+                              type: number
+                            has_timestamp:
+                              type: boolean
+                  error:
+                    type: string
+
+  /db_purge:
+    post:
+      tags: [System]
+      summary: Purge database tables
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Table purge result
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data, message]
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      properties:
+                        deleted:
+                          type: integer
+                        error:
+                          type: string
+                  message:
+                    type: string
+                  error:
+                    type: string
+
+  /db_vacuum:
+    post:
+      tags: [System]
+      summary: Vacuum SQLite database
+      responses:
+        '200':
+          description: Vacuum result
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    required: [size_before, size_after, freed_bytes]
+                    properties:
+                      size_before:
+                        type: integer
+                      size_after:
+                        type: integer
+                      freed_bytes:
+                        type: integer
+                  error:
+                    type: string
+
+  /docs:
+    get:
+      tags: [System]
+      summary: Serve Swagger UI docs page
+      responses:
+        '200':
+          description: HTML docs page
+
+  /api/auth/tokens:
+    get:
+      tags: [Authentication]
+      summary: List API tokens (alias path)
+      responses:
+        '200':
+          description: Token list
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      tags: [Authentication]
+      summary: Create API token (alias path)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Token created
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/auth/tokens/{token_id}:
+    delete:
+      tags: [Authentication]
+      summary: Revoke API token (alias path)
+      parameters:
+        - name: token_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Token revoked
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /companion:
+    get:
+      tags: [System]
+      summary: List companion bridge instances
+      responses:
+        '200':
+          description: Companion instances
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /companion/self_info:
+    get:
+      tags: [System]
+      summary: Get local companion identity info
+      responses:
+        '200':
+          description: Companion identity
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /companion/contacts:
+    get:
+      tags: [System]
+      summary: List companion contacts
+      responses:
+        '200':
+          description: Contacts
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /companion/contact:
+    get:
+      tags: [System]
+      summary: Get one companion contact
+      parameters:
+        - name: pub_key
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Contact detail
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /companion/import_repeater_contacts:
+    post:
+      tags: [System]
+      summary: Import repeater adverts into companion contacts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Import result
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /companion/channels:
+    get:
+      tags: [System]
+      summary: List companion channels
+      responses:
+        '200':
+          description: Channels
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /companion/stats:
+    get:
+      tags: [System]
+      summary: Get companion stats
+      responses:
+        '200':
+          description: Companion stats
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /companion/send_text:
+    post:
+      tags: [System]
+      summary: Send direct text message via companion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Send result
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /companion/send_channel_message:
+    post:
+      tags: [System]
+      summary: Send channel message via companion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Send result
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /companion/login:
+    post:
+      tags: [System]
+      summary: Initiate companion login flow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Login result
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /companion/request_status:
+    post:
+      tags: [System]
+      summary: Request companion status frame
+      responses:
+        '200':
+          description: Request accepted
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /companion/request_telemetry:
+    post:
+      tags: [System]
+      summary: Request companion telemetry frame
+      responses:
+        '200':
+          description: Request accepted
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /companion/send_command:
+    post:
+      tags: [System]
+      summary: Send command to companion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Command result
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /companion/reset_path:
+    post:
+      tags: [System]
+      summary: Reset companion route/path state
+      responses:
+        '200':
+          description: Path reset
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /companion/set_advert_name:
+    post:
+      tags: [System]
+      summary: Set companion advert name
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Name updated
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /companion/set_advert_location:
+    post:
+      tags: [System]
+      summary: Set companion advert location
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Location updated
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /companion/events:
+    get:
+      tags: [System]
+      summary: Stream companion events (SSE)
+      responses:
+        '200':
+          description: Event stream
+
+  /update/status:
+    get:
+      tags: [System]
+      summary: Get update service status
+      responses:
+        '200':
+          description: Update status
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /update/check:
+    get:
+      tags: [System]
+      summary: Trigger or fetch update check
+      responses:
+        '200':
+          description: Check result
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      tags: [System]
+      summary: Trigger update check
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Check started/result
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /update/install:
+    post:
+      tags: [System]
+      summary: Install available update
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Install started
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /update/progress:
+    get:
+      tags: [System]
+      summary: Stream update progress (SSE)
+      responses:
+        '200':
+          description: Progress event stream
+
+  /update/channels:
+    get:
+      tags: [System]
+      summary: List update channels
+      responses:
+        '200':
+          description: Available channels
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /update/set_channel:
+    post:
+      tags: [System]
+      summary: Set update channel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Channel changed
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /update/changelog:
+    get:
+      tags: [System]
+      summary: Get update changelog
+      responses:
+        '200':
+          description: Changelog content
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /cli:
+    post:
+      tags: [System]
+      summary: Execute repeater CLI command
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [command]
+              properties:
+                command:
+                  type: string
+      responses:
+        '200':
+          description: CLI command result
+          content:
+            application/json:
+              schema:
+                type: object
 
 components:
   schemas:
