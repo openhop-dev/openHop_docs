@@ -1,11 +1,11 @@
 ---
-title: pyMC Repeater Home Assistant Integration
+title: openHop Repeater Home Assistant Integration
 description: Home Assistant integration docs for connecting to a local pyMC_Repeater instance.
 sidebar:
   order: 1
 ---
 
-Welcome to the docs for the `pyMC Repeater` Home Assistant integration.
+Welcome to the docs for the `openHop Repeater` Home Assistant integration.
 
 This integration connects Home Assistant directly to a local `pyMC_Repeater` instance, creates a dedicated API token during setup, and exposes repeater telemetry, MQTT broker state, control entities, and advanced service actions inside Home Assistant.
 

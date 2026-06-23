@@ -28,7 +28,7 @@ The repo currently includes radio presets for:
 - Generic SX1262 / E22-class boards
 - CH341 USB-SPI + SX1262 combinations
 
-For non-GPIO modem-style transports, use [KISS Setup](/projects/pymc-repeater/kiss-setup/) or [pyMC USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/).
+For non-GPIO modem-style transports, use [KISS Setup](/projects/pymc-repeater/kiss-setup/) or [openHop USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/).
 
 ## Backend selection
 
@@ -223,6 +223,6 @@ That helper now supports:
 
 - [Installation](/projects/pymc-repeater/installation/)
 - [Configuration Reference](/projects/pymc-repeater/config-file/)
-- [pyMC USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/)
+- [openHop USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/)
 - [KISS Setup](/projects/pymc-repeater/kiss-setup/)
 - [Troubleshooting](/projects/pymc-repeater/troubleshooting/)

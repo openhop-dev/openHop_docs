@@ -11,6 +11,11 @@ export default defineConfig({
 			description: 'Documentation hub for the OpenHop ecosystem: Core, Repeater, Home Assistant integration, and add-on projects',
 			favicon: '/favicon.png',
 			head: [
+				{ tag: 'meta', attrs: { property: 'og:image', content: '/openhop_logo.png' } },
+				{ tag: 'meta', attrs: { property: 'og:image:alt', content: 'openHop logo' } },
+				{ tag: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' } },
+				{ tag: 'meta', attrs: { name: 'twitter:image', content: '/openhop_logo.png' } },
+				{ tag: 'meta', attrs: { name: 'twitter:image:alt', content: 'openHop logo' } },
 				{
 					tag: 'script',
 					content: `(() => {
@@ -70,19 +75,19 @@ export default defineConfig({
 					label: 'Projects',
 					items: [
 						{
-							label: 'pyMC Core',
+							label: 'openHop Core',
 							autogenerate: { directory: 'projects/pymc-core' },
 						},
 						{
-							label: 'pyMC Repeater',
+							label: 'openHop Repeater',
 							autogenerate: { directory: 'projects/pymc-repeater' },
 						},
 						{
-							label: 'pyMC HA Integration',
+							label: 'openHop HA Integration',
 							autogenerate: { directory: 'projects/pymc-ha-integration' },
 						},
 						{
-							label: 'pyMC HA Add-on',
+							label: 'openHop HA Add-on',
 							autogenerate: { directory: 'projects/pymc-ha-addon' },
 						},
 					],

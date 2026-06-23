@@ -1,11 +1,11 @@
 ---
 title: Configuration Reference
-description: Current config.yaml reference for pyMC Repeater.
+description: Current config.yaml reference for openHop Repeater.
 ---
 
-# pyMC Repeater Configuration Guide
+# openHop Repeater Configuration Guide
 
-Reference for configuring your pyMC Repeater using `config.yaml`, located at `/etc/pymc_repeater/config.yaml`.
+Reference for configuring your openHop Repeater using `config.yaml`, located at `/etc/pymc_repeater/config.yaml`.
 
 ## Table of Contents
 
@@ -379,7 +379,7 @@ Key fields:
 - `lbt_enabled`
 - `lbt_max_attempts`
 
-See [pyMC USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/) for the operational flow.
+See [openHop USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/) for the operational flow.
 
 ### `radio_type: pymc_usb`
 
@@ -402,7 +402,7 @@ Key fields:
 - `lbt_enabled`
 - `lbt_max_attempts`
 
-See [pyMC USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/) for the operational flow.
+See [openHop USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/) for the operational flow.
 
 ### `radio_type: null` or `none`
 

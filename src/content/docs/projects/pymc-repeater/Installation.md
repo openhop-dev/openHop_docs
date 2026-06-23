@@ -85,7 +85,7 @@ The current helper defaults are:
 - `pymc_usb.lbt_enabled: true`
 - `pymc_usb.lbt_max_attempts: 5`
 
-Use [pyMC USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/) for the full flow.
+Use [openHop USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/) for the full flow.
 
 ## pyMC TCP modem installs
 
@@ -106,7 +106,7 @@ The current helper writes:
 - `pymc_tcp.lbt_enabled: true`
 - `pymc_tcp.lbt_max_attempts: 5`
 
-Use [pyMC USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/) for the config details.
+Use [openHop USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/) for the config details.
 
 ## Proxmox LXC with CH341
 
@@ -150,7 +150,7 @@ http://<repeater-ip>:8000
 ## Related pages
 
 - [Hardware Setup](/projects/pymc-repeater/hardware-setup/)
-- [pyMC USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/)
+- [openHop USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/)
 - [KISS Setup](/projects/pymc-repeater/kiss-setup/)
 - [Configuration Reference](/projects/pymc-repeater/config-file/)
 - [Troubleshooting](/projects/pymc-repeater/troubleshooting/)

@@ -1,6 +1,6 @@
 ---
-title: pyMC Core Quick Start
-description: Install pyMC Core and bootstrap a basic local node runtime.
+title: openHop Core Quick Start
+description: Install openHop Core and bootstrap a basic local node runtime.
 ---
 
 ## Install

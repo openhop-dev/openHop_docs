@@ -1,5 +1,5 @@
 ---
-title: pyMC Repeater Setup
+title: openHop Repeater Setup
 description: Install and run pyMC_Repeater on supported hosts.
 ---
 
@@ -44,6 +44,6 @@ After startup:
 
 - [Installation](/projects/pymc-repeater/installation/)
 - [Hardware Setup](/projects/pymc-repeater/hardware-setup/)
-- [pyMC USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/)
+- [openHop USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/)
 - [KISS Setup](/projects/pymc-repeater/kiss-setup/)
 - [Configuration Reference](/projects/pymc-repeater/config-file/)
