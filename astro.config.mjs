@@ -5,10 +5,6 @@ import starlight from '@astrojs/starlight';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://docs.openhop.dev',
-	server: {
-		host: true,
-		allowedHosts: ['meshmonitor.yellowcooln.cloud'],
-	},
 	integrations: [
 		starlight({
 			title: 'OpenHop Docs',
