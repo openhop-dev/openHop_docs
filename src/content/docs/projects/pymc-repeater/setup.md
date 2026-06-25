@@ -8,6 +8,7 @@ description: Install and run pyMC_Repeater on supported hosts.
 - Decide whether the host will use `sx1262`, `sx1262_ch341`, `kiss`, `pymc_usb`, `pymc_tcp`, or `null`.
 - Confirm hardware or serial device access.
 - Confirm network reachability if the modem lives on Wi-Fi or Ethernet.
+- For openHop Modem deployments, flash and provision the modem first. See [openHop Modem](/projects/pymc-modem/).
 - Ensure Python and Git are available.
 
 ## Install from source
@@ -44,6 +45,7 @@ After startup:
 
 - [Installation](/projects/pymc-repeater/installation/)
 - [Hardware Setup](/projects/pymc-repeater/hardware-setup/)
+- [openHop Modem](/projects/pymc-modem/)
 - [openHop USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/)
 - [KISS Setup](/projects/pymc-repeater/kiss-setup/)
 - [Configuration Reference](/projects/pymc-repeater/config-file/)

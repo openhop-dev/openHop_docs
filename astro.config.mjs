@@ -5,6 +5,10 @@ import starlight from '@astrojs/starlight';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://docs.openhop.dev',
+	server: {
+		host: true,
+		allowedHosts: ['meshmonitor.yellowcooln.cloud'],
+	},
 	integrations: [
 		starlight({
 			title: 'OpenHop Docs',
@@ -81,6 +85,10 @@ export default defineConfig({
 						{
 							label: 'openHop Repeater',
 							autogenerate: { directory: 'projects/pymc-repeater' },
+						},
+						{
+							label: 'openHop Modem',
+							autogenerate: { directory: 'projects/pymc-modem' },
 						},
 						{
 							label: 'openHop HA Integration',
