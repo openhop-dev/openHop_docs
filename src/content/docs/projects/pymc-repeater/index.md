@@ -3,7 +3,7 @@ title: openHop Repeater Overview
 description: Operational docs for running openHop Repeater across SPI, CH341, KISS, pyMC USB, and pyMC TCP deployments.
 ---
 
-openHop Repeater is a Python repeater daemon built on top of pyMC_core.
+openHop Repeater is an always-on MeshCore infrastructure node built on top of pyMC_core. It can forward mesh traffic, expose a dashboard and API, run policies, host room-server and companion identities, and use radio hardware ranging from Pi HATs to USB or TCP openHop Modems.
 
 ## What this section covers
 
@@ -20,6 +20,7 @@ openHop Repeater is a Python repeater daemon built on top of pyMC_core.
 
 ## Next step
 
-- Start with [Setup](/projects/pymc-repeater/setup/)
+- Start with [What is openHop Repeater?](/projects/pymc-repeater/what-is-openhop-repeater/)
+- Then continue to [Setup](/projects/pymc-repeater/setup/)
 - Browse the full index at [Home](/projects/pymc-repeater/home/)
 - Jump straight to [Installation](/projects/pymc-repeater/installation/), [Hardware Setup](/projects/pymc-repeater/hardware-setup/), [openHop Modem](/projects/pymc-modem/), [openHop USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/), [KISS Setup](/projects/pymc-repeater/kiss-setup/), or [Troubleshooting](/projects/pymc-repeater/troubleshooting/)
