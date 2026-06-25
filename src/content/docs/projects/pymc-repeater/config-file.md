@@ -164,6 +164,7 @@ Source type:
 
 - `serial` for a directly attached receiver
 - `file` for a file or sidecar bridge writing NMEA
+- `modem_http` for a networked openHop Modem HTTP `/api/stats` GPS payload
 
 ### Serial source settings
 
@@ -184,6 +185,27 @@ gps:
   source_path: "/var/lib/pymc_repeater/gps_nmea.txt"
   poll_interval_seconds: 2.0
 ```
+
+### Modem HTTP source settings
+
+Use this when a networked openHop Modem exposes parsed GPS data from its HTTP API.
+
+```yaml
+gps:
+  enabled: true
+  source: modem_http
+  host: "pymc-modem.local"
+  port: 80
+  endpoint: "/api/stats"
+  scheme: "http"
+  username: "admin"
+  password: "password"
+  poll_interval_seconds: 2.0
+```
+
+Supported source aliases are `modem_http`, `pymc_modem`, and `http`. Prefer `modem_http` in new configs.
+
+See [openHop Modem Repeater Integration](/projects/pymc-modem/repeater-integration/) for the full RF, sensor, and GPS setup flow.
 
 ### Location behavior
 
@@ -253,6 +275,7 @@ The current example config includes these sensor types:
 - `ens210`
 - `shtc3`
 - `waveshare_ups_d`
+- `pymc_modem`
 
 Example:
 
@@ -270,7 +293,21 @@ sensors:
       settings:
         i2c_address: 0x70
         bus_number: 1
+    - type: pymc_modem
+      name: modem
+      enabled: true
+      settings:
+        host: "pymc-modem.local"
+        port: 80
+        endpoint: "/api/stats"
+        scheme: "http"
+        username: "admin"
+        password: "password"
+        poll_interval_seconds: 60.0
+        timeout_seconds: 2.0
 ```
+
+The `pymc_modem` sensor reads modem diagnostics from an openHop Modem HTTP API and exposes them under `/api/stats -> sensors`. It is useful for battery, solar, and modem-visible GPS diagnostics. If you want Repeater's native `/api/gps` endpoint to use the modem's location fix, configure `gps.source: modem_http` as well.
 
 ## Mesh
 

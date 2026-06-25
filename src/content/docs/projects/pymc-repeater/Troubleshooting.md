@@ -500,7 +500,7 @@ ls -l /dev/spidev*
 
 ### Report Issues
 
-When reporting issues on [GitHub](https://github.com/pyMC-dev/pyMC_Repeater/issues):
+When reporting issues on [GitHub](https://github.com/openhop-dev/openHop-Repeater/issues):
 
 1. **Describe the problem** clearly
 2. **Include logs** (use DEBUG level)
@@ -514,5 +514,5 @@ When reporting issues on [GitHub](https://github.com/pyMC-dev/pyMC_Repeater/issu
 
 - [Configuration Reference](/projects/pymc-repeater/config-file/)
 - [Hardware Setup](/projects/pymc-repeater/hardware-setup/)
-- [GitHub Issues](https://github.com/pyMC-dev/pyMC_Repeater/issues)
-- [GitHub Discussions](https://github.com/pyMC-dev/pyMC_Repeater/discussions)
+- [GitHub Issues](https://github.com/openhop-dev/openHop-Repeater/issues)
+- [GitHub Discussions](https://github.com/openhop-dev/openHop-Repeater/discussions)

@@ -9,11 +9,13 @@ This section tracks the current local `pyMC_Repeater` repo rather than the older
 
 ## Start here
 
-1. [Installation](/projects/pymc-repeater/installation/)
-2. [Hardware Setup](/projects/pymc-repeater/hardware-setup/)
-3. [Configuration Reference](/projects/pymc-repeater/config-file/)
-4. [openHop USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/)
-5. [KISS Setup](/projects/pymc-repeater/kiss-setup/)
+1. [What is openHop Repeater?](/projects/pymc-repeater/what-is-openhop-repeater/)
+2. [Installation](/projects/pymc-repeater/installation/)
+3. [Hardware Setup](/projects/pymc-repeater/hardware-setup/)
+4. [Configuration Reference](/projects/pymc-repeater/config-file/)
+5. [openHop Modem](/projects/pymc-modem/)
+6. [openHop USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/)
+7. [KISS Setup](/projects/pymc-repeater/kiss-setup/)
 
 ## Supported deployment styles
 
@@ -29,6 +31,7 @@ This section tracks the current local `pyMC_Repeater` repo rather than the older
 
 - GPS receiver support and GPS time sync
 - background sensor plug-ins exposed through `/api/stats`
+- openHop Modem HTTP GPS and `pymc_modem` sensor telemetry
 - `mqtt_brokers` based publishing
 - openHop Glass control-plane integration
 - new hardware presets including uConsole, meshadv, UltraPeater, and UltraPeaterZero
@@ -36,6 +39,8 @@ This section tracks the current local `pyMC_Repeater` repo rather than the older
 ## Useful pages
 
 - [Configuration Reference](/projects/pymc-repeater/config-file/)
+- [What is openHop Repeater?](/projects/pymc-repeater/what-is-openhop-repeater/)
+- [openHop Modem](/projects/pymc-modem/)
 - [openHop USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/)
 - [LetsMesh Integration](/projects/pymc-repeater/letsmesh-integration/)
 - [Identity Management](/projects/pymc-repeater/identity-management/)
@@ -44,5 +49,7 @@ This section tracks the current local `pyMC_Repeater` repo rather than the older
 ## External resources
 
 - [openHop Repeater repository](https://github.com/pyMC-dev/pyMC_Repeater)
+- [openHop Modem firmware](https://github.com/pyMC-dev/pymc_modem)
+- [openHop Modem Flasher](https://github.com/openhop-dev/openHop-Modem-Flasher)
 - [openHop Core](https://github.com/pyMC-dev/pyMC_core)
 - [MeshCore](https://github.com/meshcore-dev/MeshCore)

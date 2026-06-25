@@ -7,6 +7,8 @@ description: Configure openHop Repeater to use a pymc_usb modem over USB-CDC or 
 
 Use these modes when the radio hardware is already managed by a modem running `pymc_usb` firmware rather than by local SX1262 GPIO and SPI control.
 
+For device selection, firmware flashing, HTTP diagnostics, modem sensors, and modem-backed GPS, see the [openHop Modem section](/projects/pymc-modem/).
+
 ## When to use each mode
 
 - Use `radio_type: pymc_usb` when the modem is plugged directly into the host over USB-CDC.
@@ -122,4 +124,5 @@ Look for:
 - [Installation](/projects/pymc-repeater/installation/)
 - [Hardware Setup](/projects/pymc-repeater/hardware-setup/)
 - [Configuration Reference](/projects/pymc-repeater/config-file/)
+- [openHop Modem Repeater Integration](/projects/pymc-modem/repeater-integration/)
 - [KISS Setup](/projects/pymc-repeater/kiss-setup/)

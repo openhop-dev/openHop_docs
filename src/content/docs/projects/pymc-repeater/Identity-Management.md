@@ -451,7 +451,7 @@ python3 check_address.py
 
 ## Additional Resources
 
-- [pyMC Repeater GitHub](https://github.com/pyMC-dev/pyMC_Repeater)
+- [pyMC Repeater GitHub](https://github.com/openhop-dev/openHop-Repeater)
 - [MeshCore Flasher](https://flasher.meshcore.io/)
 - [Configuration Guide](/projects/pymc-repeater/config-file/)
 - [Installation Guide](/projects/pymc-repeater/installation/)

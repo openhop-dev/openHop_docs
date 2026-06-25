@@ -22,7 +22,7 @@ The main configuration file is `/etc/pymc_repeater/config.yaml`.
 The current upstream README uses the management script directly:
 
 ```bash
-git clone https://github.com/pyMC-dev/pyMC_Repeater.git
+git clone https://github.com/openhop-dev/openHop-Repeater.git
 cd pyMC_Repeater
 sudo ./manage.sh
 ```
