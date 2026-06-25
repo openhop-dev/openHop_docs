@@ -16,7 +16,7 @@ openHop Repeater is an always-on MeshCore infrastructure node built on top of py
 
 ## Useful links
 
-- Project repository: [openHop Repeater](https://github.com/pyMC-dev/pyMC_Repeater)
+- Project repository: [openHop Repeater](https://github.com/openhop-dev/openHop-Repeater)
 
 ## Next step
 

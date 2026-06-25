@@ -28,4 +28,4 @@ This integration connects Home Assistant directly to a local `pyMC_Repeater` ins
 ## Repository
 
 - Integration repo: [pyMC-HA-Integration](https://github.com/pyMC-dev/pyMC-HA-Integration)
-- pyMC Repeater upstream: [pyMC-dev/pyMC_Repeater](https://github.com/pyMC-dev/pyMC_Repeater)
+- pyMC Repeater upstream: [pyMC-dev/pyMC_Repeater](https://github.com/openhop-dev/openHop-Repeater)

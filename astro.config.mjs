@@ -65,10 +65,10 @@ export default defineConfig({
 			},
 			customCss: ['./src/styles/brand.css'],
 			social: [
-				{ icon: 'github', label: 'OpenHop on GitHub', href: 'https://github.com/pymc-dev' },
+				{ icon: 'github', label: 'OpenHop on GitHub', href: 'https://github.com/openhop-dev' },
 			],
 			editLink: {
-				baseUrl: 'https://github.com/pyMC-dev/pyMC_docs/edit/main/',
+				baseUrl: 'https://github.com/openhop-dev/pyMC_docs/edit/main/',
 			},
 			sidebar: [
 				{

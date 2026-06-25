@@ -14,7 +14,7 @@ openHop Core is a Python implementation of MeshCore for LoRa mesh networking on 
 
 ## Useful links
 
-- Project repository: [openHop Core](https://github.com/pyMC-dev/pyMC_core)
+- Project repository: [openHop Core](https://github.com/openhop-dev/openHop-Core)
 - PyPI package: [pymc-core](https://pypi.org/project/pymc-core/)
 
 ## Next step

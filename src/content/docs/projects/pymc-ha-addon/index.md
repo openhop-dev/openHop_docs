@@ -15,7 +15,7 @@ openHop HA Add-on packages `pyMC_Repeater` as Home Assistant add-ons so you can 
 ## Useful links
 
 - Project repository: [openHop HA Add-on](https://github.com/pyMC-dev/pyMC-HA-Add-on)
-- Upstream repeater: [openHop Repeater](https://github.com/pyMC-dev/pyMC_Repeater)
+- Upstream repeater: [openHop Repeater](https://github.com/openhop-dev/openHop-Repeater)
 
 ## Channels
 
