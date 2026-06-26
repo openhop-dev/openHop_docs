@@ -23,7 +23,7 @@ Reference for configuring your openHop Repeater using `config.yaml`, located at 
 - [Duty Cycle](#duty-cycle)
 - [Storage](#storage)
 - [MQTT Brokers](#mqtt-brokers)
-- [pyMC Glass](#pymc-glass)
+- [openHop Glass](#openhop-glass)
 - [Logging](#logging)
 - [Web](#web)
 - [Examples](#examples)
@@ -584,7 +584,7 @@ Each broker entry supports fields such as:
 
 This is also where current LetsMesh-style publishing is modeled.
 
-## pyMC Glass
+## openHop Glass
 
 Central control-plane integration is configured under `glass:`.
 
@@ -599,7 +599,7 @@ glass:
   cert_store_dir: "/etc/pymc_repeater/glass"
 ```
 
-Use this when the repeater should post `/inform` payloads to pyMC_Glass and accept managed updates from it.
+Use this when the repeater should post `/inform` payloads to openHop Glass and accept managed updates from it.
 
 ## Logging
 
@@ -674,7 +674,7 @@ radio:
   coding_rate: 8
 ```
 
-### pyMC USB modem host
+### openHop USB modem host
 
 ```yaml
 radio_type: pymc_usb
@@ -697,7 +697,7 @@ radio:
   preamble_length: 16
 ```
 
-### pyMC TCP modem host
+### openHop TCP modem host
 
 ```yaml
 radio_type: pymc_tcp
@@ -743,6 +743,6 @@ sx1262:
 
 ## Notes
 
-- The current repo schema is defined by the upstream `config.yaml.example` in `pyMC_Repeater`.
+- The current repo schema is defined by the upstream `config.yaml.example` in `openhop_repeater`.
 - Older repeater docs and examples may still mention `mesh.global_flood_allow` or a top-level `mqtt:` block. Those are stale against the current repo.
 - After config edits, restart the service with `sudo systemctl restart pymc-repeater` and watch logs with `journalctl -u pymc-repeater -f`.

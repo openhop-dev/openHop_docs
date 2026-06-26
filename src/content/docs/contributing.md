@@ -1,6 +1,6 @@
 ---
 title: Contributing
-description: How to add and format markdown pages in pyMC Docs.
+description: How to add and format markdown pages in openHop Docs.
 ---
 
 This site is markdown-first. Adding a page should be simple.
@@ -47,9 +47,9 @@ description: One-line summary shown in metadata and previews.
 
 Current first-release sections:
 
-- pyMC Core
-- pyMC Repeater
-- pyMC HA Integration
-- pyMC HA Add-on
+- openHop Core
+- openHop Repeater
+- openHop HA Integration
+- openHop HA Add-on
 
 Additional project sections can be added later using the same directory pattern.

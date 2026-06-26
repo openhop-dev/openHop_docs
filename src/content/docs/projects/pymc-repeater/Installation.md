@@ -1,11 +1,11 @@
 ---
 title: Installation
-description: Current install paths for pyMC Repeater.
+description: Current install paths for openHop Repeater.
 ---
 
 # Installation Guide
 
-The current `pyMC_Repeater` repo supports several install shapes:
+The current `openhop_repeater` repo supports several install shapes:
 
 - Standard Linux host with native SPI and GPIO
 - CH341 USB-SPI hosts
@@ -22,8 +22,8 @@ The main configuration file is `/etc/pymc_repeater/config.yaml`.
 The current upstream README uses the management script directly:
 
 ```bash
-git clone https://github.com/openhop-dev/openHop-Repeater.git
-cd pyMC_Repeater
+git clone https://github.com/openhop-dev/openhop_repeater.git
+cd openhop_repeater
 sudo ./manage.sh
 ```
 
@@ -68,7 +68,7 @@ For serial TNC deployments:
 
 Start with [KISS Setup](/projects/pymc-repeater/kiss-setup/).
 
-## pyMC USB modem installs
+## openHop USB modem installs
 
 Use this when the radio side is a board running `pymc_usb` firmware and the modem is attached to the repeater host over USB-CDC.
 
@@ -87,7 +87,7 @@ The current helper defaults are:
 
 Use [openHop USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/) for the full flow.
 
-## pyMC TCP modem installs
+## openHop TCP modem installs
 
 Use this when the radio side is a board running `pymc_usb` firmware and exposing a TCP server over LAN, Wi-Fi, or Ethernet.
 
@@ -113,7 +113,7 @@ Use [openHop USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/) for
 The repo README now documents a Proxmox host-side installer for CH341-backed repeaters.
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/pyMC-dev/pyMC_Repeater/main/scripts/proxmox-install.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/openhop-dev/openhop_repeater/main/scripts/proxmox-install.sh)"
 ```
 
 That flow is intended to run on the Proxmox host, not inside the container.

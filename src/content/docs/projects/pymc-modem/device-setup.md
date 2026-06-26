@@ -24,7 +24,7 @@ openHop Modem firmware supports multiple boards from the same `pymc_modem` sourc
 | Heltec T114 | `heltec_t114` | USB-CDC only |
 | Seeed XIAO nRF52840 + Wio-SX1262 | `xiao_nrf52_wio` | USB-CDC only |
 
-Use the hosted flasher for normal installs and updates: [flasher.openhop.dev](https://flasher.openhop.dev/). For source builds, see the [pymc_modem repository](https://github.com/pyMC-dev/pymc_modem).
+Use the hosted flasher for normal installs and updates: [flasher.openhop.dev](https://flasher.openhop.dev/). For source builds, see the [openhop_modem repository](https://github.com/openhop-dev/openhop_modem).
 
 ## USB mode checklist
 

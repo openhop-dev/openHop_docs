@@ -1,6 +1,6 @@
 ---
 title: KISS Setup
-description: Configure pyMC Repeater to use a serial KISS modem instead of GPIO radio hardware.
+description: Configure openHop Repeater to use a serial KISS modem instead of GPIO radio hardware.
 ---
 
 # KISS Setup

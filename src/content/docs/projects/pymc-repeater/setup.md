@@ -1,6 +1,6 @@
 ---
 title: openHop Repeater Setup
-description: Install and run pyMC_Repeater on supported hosts.
+description: Install and run openHop Repeater on supported hosts.
 ---
 
 ## Before you begin
@@ -14,8 +14,8 @@ description: Install and run pyMC_Repeater on supported hosts.
 ## Install from source
 
 ```bash
-git clone https://github.com/openhop-dev/openHop-Repeater.git
-cd pyMC_Repeater
+git clone https://github.com/openhop-dev/openhop_repeater.git
+cd openhop_repeater
 sudo ./manage.sh
 ```
 

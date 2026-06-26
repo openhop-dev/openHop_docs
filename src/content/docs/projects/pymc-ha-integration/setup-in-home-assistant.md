@@ -9,7 +9,7 @@ After installation:
 
 1. Open `Settings` -> `Devices & Services`.
 2. Click `Add Integration`.
-3. Search for `pyMC Repeater`.
+3. Search for `openHop Repeater`.
 4. Enter:
    - repeater host or IP
    - repeater API port
@@ -35,7 +35,7 @@ The integration options let you change:
 
 ## Naming
 
-The integration tries to use the repeater node name from pyMC instead of showing only the host and port.
+The integration tries to use the repeater node name from openHop Repeater instead of showing only the host and port.
 
 ## Related
 

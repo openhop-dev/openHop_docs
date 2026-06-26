@@ -20,4 +20,4 @@ This guide will cover:
 - Building custom features
 - Pull request process
 
-For now, visit the [GitHub repository](https://github.com/openhop-dev/openHop-Repeater).
+For now, visit the [GitHub repository](https://github.com/openhop-dev/openhop_repeater).

@@ -3,7 +3,7 @@ title: openHop HA Add-on Overview
 description: Run openHop Repeater inside Home Assistant using the openHop HA Add-on repository.
 ---
 
-openHop HA Add-on packages `pyMC_Repeater` as Home Assistant add-ons so you can run the repeater inside Home Assistant with the same upstream config model and web UI.
+openHop HA Add-on packages `openhop_repeater` as Home Assistant add-ons so you can run the repeater inside Home Assistant with the same upstream config model and web UI.
 
 ## What this section covers
 
@@ -14,13 +14,13 @@ openHop HA Add-on packages `pyMC_Repeater` as Home Assistant add-ons so you can 
 
 ## Useful links
 
-- Project repository: [openHop HA Add-on](https://github.com/pyMC-dev/pyMC-HA-Add-on)
-- Upstream repeater: [openHop Repeater](https://github.com/openhop-dev/openHop-Repeater)
+- Project repository: [openHop HA Add-on](https://github.com/openhop-dev/openHop-HA-Add-on)
+- Upstream repeater: [openHop Repeater](https://github.com/openhop-dev/openhop_repeater)
 
 ## Channels
 
-- `pyMC Repeater Dev` tracks `pymcdev/pymc-repeater:dev`
-- `pyMC Repeater Main` tracks `pymcdev/pymc-repeater:main` when that channel is published upstream
+- `openHop Repeater Dev` tracks `openhop/openhop-repeater:dev`
+- `openHop Repeater Main` tracks `openhop/openhop-repeater:main` when that channel is published upstream
 
 ## Next step
 

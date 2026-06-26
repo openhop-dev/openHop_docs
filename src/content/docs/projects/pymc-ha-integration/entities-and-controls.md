@@ -52,7 +52,7 @@ Some entities are created from live repeater data at setup time, including:
 - route types
 - database table counters
 
-If those change later in pyMC, reload the integration in Home Assistant.
+If those change later in openHop Repeater, reload the integration in Home Assistant.
 
 ## Related
 

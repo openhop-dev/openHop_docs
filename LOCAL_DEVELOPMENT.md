@@ -47,7 +47,7 @@ npm run sync:openapi
 If a local sibling repo exists at:
 
 ```text
-../pyMC_Repeater/repeater/web/openapi.yaml
+../openhop_repeater/repeater/web/openapi.yaml
 ```
 
 the checked-in repeater OpenAPI file will be refreshed from that source.
@@ -61,9 +61,9 @@ public/openapi/repeater.yaml
 ## Content Locations
 
 - Main docs content: `src/content/docs/`
-- pyMC Core docs: `src/content/docs/projects/pymc-core/`
-- pyMC Repeater docs: `src/content/docs/projects/pymc-repeater/`
-- pyMC HA Integration docs: `src/content/docs/projects/pymc-ha-integration/`
+- openHop Core docs: `src/content/docs/projects/pymc-core/`
+- openHop Repeater docs: `src/content/docs/projects/pymc-repeater/`
+- openHop HA Integration docs: `src/content/docs/projects/pymc-ha-integration/`
 
 ## Common Commands
 

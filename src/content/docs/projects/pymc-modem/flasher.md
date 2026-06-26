@@ -23,7 +23,7 @@ Use a browser with Web Serial support, such as Chrome, Edge, or Chromium. The si
 
 The flasher reads most modem firmware files from:
 
-[https://github.com/pyMC-dev/pymc_modem/tree/main/firmware](https://github.com/pyMC-dev/pymc_modem/tree/main/firmware)
+[https://github.com/openhop-dev/openhop_modem/tree/main/firmware](https://github.com/openhop-dev/openhop_modem/tree/main/firmware)
 
 ESP32-family firmware variants use this layout:
 

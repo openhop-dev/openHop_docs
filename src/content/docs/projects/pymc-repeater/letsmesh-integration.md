@@ -1,6 +1,6 @@
 ---
 title: LetsMesh Integration
-description: Current LetsMesh publishing notes for pyMC Repeater.
+description: Current LetsMesh publishing notes for openHop Repeater.
 ---
 
 # LetsMesh Integration

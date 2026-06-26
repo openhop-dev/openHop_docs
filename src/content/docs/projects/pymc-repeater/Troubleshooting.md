@@ -4,7 +4,7 @@ title: Troubleshooting
 
 # Troubleshooting Guide
 
-Common issues and solutions for pyMC Repeater.
+Common issues and solutions for openHop Repeater.
 
 ---
 
@@ -500,7 +500,7 @@ ls -l /dev/spidev*
 
 ### Report Issues
 
-When reporting issues on [GitHub](https://github.com/openhop-dev/openHop-Repeater/issues):
+When reporting issues on [GitHub](https://github.com/openhop-dev/openhop_repeater/issues):
 
 1. **Describe the problem** clearly
 2. **Include logs** (use DEBUG level)
@@ -514,5 +514,5 @@ When reporting issues on [GitHub](https://github.com/openhop-dev/openHop-Repeate
 
 - [Configuration Reference](/projects/pymc-repeater/config-file/)
 - [Hardware Setup](/projects/pymc-repeater/hardware-setup/)
-- [GitHub Issues](https://github.com/openhop-dev/openHop-Repeater/issues)
-- [GitHub Discussions](https://github.com/openhop-dev/openHop-Repeater/discussions)
+- [GitHub Issues](https://github.com/openhop-dev/openhop_repeater/issues)
+- [GitHub Discussions](https://github.com/openhop-dev/openhop_repeater/discussions)

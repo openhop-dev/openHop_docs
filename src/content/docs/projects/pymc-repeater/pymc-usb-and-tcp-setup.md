@@ -101,7 +101,7 @@ Even though the modem firmware owns the radio hardware, these repeater settings 
 - `radio.coding_rate`
 - `radio.preamble_length`
 
-The current setup defaults for the pyMC modem paths use:
+The current setup defaults for the openHop modem paths use:
 
 - `tx_power: 22`
 - `preamble_length: 16`

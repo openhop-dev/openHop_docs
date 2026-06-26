@@ -18,7 +18,7 @@ The modem firmware owns the radio hardware and exposes a small control/data surf
 
 ## Repositories and tools
 
-- Modem firmware and Python driver: [pymc_modem](https://github.com/pyMC-dev/pymc_modem)
+- Modem firmware and Python driver: [openhop_modem](https://github.com/openhop-dev/openhop_modem)
 - Browser flasher: [flasher.openhop.dev](https://flasher.openhop.dev/)
 
 ## Supported connection modes

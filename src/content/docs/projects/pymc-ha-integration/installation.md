@@ -13,7 +13,7 @@ sidebar:
 4. Add:
 
    ```text
-   https://github.com/pyMC-dev/pyMC-HA-Integration
+   https://github.com/openhop-dev/openHop-HA-Integration
    ```
 
 5. Choose `Integration`.
@@ -32,7 +32,7 @@ sidebar:
 
 ## Requirements
 
-- a running `pyMC_Repeater` instance
+- a running `openhop_repeater` instance
 - network reachability from Home Assistant to the repeater host and port
 - the repeater admin password for the initial setup flow
 

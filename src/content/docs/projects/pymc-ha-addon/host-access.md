@@ -1,6 +1,6 @@
 ---
 title: Host Access and Storage
-description: Hardware access, networking, and storage behavior for the pyMC HA Add-on.
+description: Hardware access, networking, and storage behavior for the openHop HA Add-on.
 ---
 
 # Host Access and Storage
@@ -61,4 +61,4 @@ Host networking also matters for:
 
 - [Installation](/projects/pymc-ha-addon/installation/)
 - [Configuration](/projects/pymc-ha-addon/configuration/)
-- [pyMC Repeater Hardware Setup](/projects/pymc-repeater/hardware-setup/)
+- [openHop Repeater Hardware Setup](/projects/pymc-repeater/hardware-setup/)

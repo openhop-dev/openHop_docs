@@ -68,7 +68,7 @@ export default defineConfig({
 				{ icon: 'github', label: 'OpenHop on GitHub', href: 'https://github.com/openhop-dev' },
 			],
 			editLink: {
-				baseUrl: 'https://github.com/openhop-dev/pyMC_docs/edit/main/',
+				baseUrl: 'https://github.com/openhop-dev/openHop_docs/edit/main/',
 			},
 			sidebar: [
 				{

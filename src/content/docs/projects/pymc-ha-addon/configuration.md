@@ -1,6 +1,6 @@
 ---
 title: Configuration
-description: Where the add-on stores config.yaml and how it maps to the upstream pyMC Repeater schema.
+description: Where the add-on stores config.yaml and how it maps to the upstream openHop Repeater schema.
 ---
 
 # Configuration
@@ -23,7 +23,7 @@ Current location notes shipped by the add-ons:
 On first start, the add-on creates:
 
 - `/config/config.yaml`
-- `/config/identity.key` when pyMC Repeater generates a node identity
+- `/config/identity.key` when openHop Repeater generates a node identity
 - `/var/lib/pymc_repeater` for runtime state
 
 After that, `config.yaml` is the single source of truth. If the repeater updates the file itself, those changes persist across restarts.
@@ -51,9 +51,9 @@ The add-on follows the upstream repeater schema, including:
 - `pymc_tcp`
 - `null`
 
-For the full schema, use the main [pyMC Repeater Configuration Reference](/projects/pymc-repeater/config-file/).
+For the full schema, use the main [openHop Repeater Configuration Reference](/projects/pymc-repeater/config-file/).
 
-## Example: pyMC TCP inside the add-on
+## Example: openHop TCP inside the add-on
 
 ```yaml
 radio_type: pymc_tcp
@@ -72,5 +72,5 @@ The add-on does not invent a second config model. It passes the normal repeater 
 ## Related pages
 
 - [Host Access and Storage](/projects/pymc-ha-addon/host-access/)
-- [pyMC Repeater Configuration Reference](/projects/pymc-repeater/config-file/)
+- [openHop Repeater Configuration Reference](/projects/pymc-repeater/config-file/)
 - [openHop USB/TCP Setup](/projects/pymc-repeater/pymc-usb-and-tcp-setup/)

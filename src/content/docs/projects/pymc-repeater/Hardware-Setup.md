@@ -1,11 +1,11 @@
 ---
 title: Hardware Setup
-description: Supported pyMC Repeater hardware and radio backend notes.
+description: Supported openHop Repeater hardware and radio backend notes.
 ---
 
 # Hardware Setup Guide
 
-pyMC Repeater supports more than just a Raspberry Pi with a GPIO-connected SX1262. The current repo supports five active backend classes plus a no-radio mode:
+openHop Repeater supports more than just a Raspberry Pi with a GPIO-connected SX1262. The current repo supports five active backend classes plus a no-radio mode:
 
 - Native `sx1262` over Linux SPI and host GPIO
 - `sx1262_ch341` over a CH341 USB-SPI adapter
@@ -115,7 +115,7 @@ For a common E22 mapping, the repo README uses:
 | Busy | 4 |
 | IRQ | 6 |
 
-## pyMC USB modem hosts
+## openHop USB modem hosts
 
 When `radio_type: pymc_usb` is selected:
 
@@ -135,7 +135,7 @@ pymc_usb:
   lbt_max_attempts: 5
 ```
 
-## pyMC TCP modem hosts
+## openHop TCP modem hosts
 
 When `radio_type: pymc_tcp` is selected:
 
@@ -216,7 +216,7 @@ That helper now supports:
 - selecting `sx1262`, `sx1262_ch341`, `kiss`, `pymc_usb`, `pymc_tcp`, or `null`
 - applying current radio presets
 - writing KISS serial settings
-- writing pyMC USB and pyMC TCP transport settings
+- writing openHop USB and openHop TCP transport settings
 - writing hardware-specific pin maps
 
 ## Related pages

@@ -42,7 +42,7 @@ The integration exposes advanced service actions under the `pymc_repeater` domai
 
 ## Multi-repeater setups
 
-If you have more than one pyMC repeater config entry in Home Assistant, use `config_entry_id` when calling actions so the integration knows which repeater to target.
+If you have more than one openHop Repeater config entry in Home Assistant, use `config_entry_id` when calling actions so the integration knows which repeater to target.
 
 ## Related
 

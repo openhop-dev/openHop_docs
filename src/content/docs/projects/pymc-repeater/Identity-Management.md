@@ -4,7 +4,7 @@ title: Identity Management
 
 # Identity Management Guide
 
-Guide for managing cryptographic identities in pyMC Repeater.
+Guide for managing cryptographic identities in openHop Repeater.
 
 ---
 
@@ -108,7 +108,7 @@ If you have a MeshCore firmware device and want your repeater to use that identi
 #### Script Usage
 
 ```bash
-cd /path/to/pyMC_Repeater
+cd /path/to/openhop_repeater
 sudo ./convert_firmware_key.sh <64-byte-hex-key> [config-path]
 ```
 
@@ -119,8 +119,8 @@ sudo ./convert_firmware_key.sh <64-byte-hex-key> [config-path]
 #### Complete Example
 
 ```bash
-# Navigate to pyMC_Repeater directory
-cd ~/pyMC_Repeater
+# Navigate to openhop_repeater directory
+cd ~/openhop_repeater
 
 # Run the conversion script with your firmware key
 sudo ./convert_firmware_key.sh \
@@ -451,7 +451,7 @@ python3 check_address.py
 
 ## Additional Resources
 
-- [pyMC Repeater GitHub](https://github.com/openhop-dev/openHop-Repeater)
+- [openHop Repeater GitHub](https://github.com/openhop-dev/openhop_repeater)
 - [MeshCore Flasher](https://flasher.meshcore.io/)
 - [Configuration Guide](/projects/pymc-repeater/config-file/)
 - [Installation Guide](/projects/pymc-repeater/installation/)
@@ -460,4 +460,4 @@ python3 check_address.py
 ---
 
 **Last Updated:** January 2026  
-**Compatible with:** current local `pyMC_Repeater` repo schema and runtime
+**Compatible with:** current local `openhop_repeater` repo schema and runtime

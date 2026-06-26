@@ -5,7 +5,7 @@ description: Entry point for current openHop Repeater docs.
 
 # openHop Repeater Documentation
 
-This section tracks the current local `pyMC_Repeater` repo rather than the older Raspberry Pi only docs set.
+This section tracks the current local `openhop_repeater` repo rather than the older Raspberry Pi only docs set.
 
 ## Start here
 
@@ -48,8 +48,8 @@ This section tracks the current local `pyMC_Repeater` repo rather than the older
 
 ## External resources
 
-- [openHop Repeater repository](https://github.com/pyMC-dev/pyMC_Repeater)
-- [openHop Modem firmware](https://github.com/pyMC-dev/pymc_modem)
+- [openHop Repeater repository](https://github.com/openhop-dev/openhop_repeater)
+- [openHop Modem firmware](https://github.com/openhop-dev/openhop_modem)
 - [openHop Modem Flasher](https://github.com/openhop-dev/openHop-Modem-Flasher)
-- [openHop Core](https://github.com/pyMC-dev/pyMC_core)
+- [openHop Core](https://github.com/openhop-dev/openhop_core)
 - [MeshCore](https://github.com/meshcore-dev/MeshCore)
