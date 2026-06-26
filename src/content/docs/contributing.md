@@ -8,10 +8,10 @@ This site is markdown-first. Adding a page should be simple.
 ## Add a new page
 
 1. Create a `.md` file under one of these directories:
-   - `src/content/docs/projects/pymc-core/`
-   - `src/content/docs/projects/pymc-repeater/`
-   - `src/content/docs/projects/pymc-ha-integration/`
-   - `src/content/docs/projects/pymc-ha-addon/`
+   - `src/content/docs/projects/openhop-core/`
+   - `src/content/docs/projects/openhop-repeater/`
+   - `src/content/docs/projects/openhop-ha-integration/`
+   - `src/content/docs/projects/openhop-ha-addon/`
 2. Add frontmatter:
 
 ```md

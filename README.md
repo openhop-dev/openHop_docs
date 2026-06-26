@@ -22,15 +22,15 @@ The site is built with Astro and Starlight.
 
 ## Project Docs
 
-- `openHop Core`: https://docs.openhop.dev/projects/pymc-core/
-- `openHop Repeater`: https://docs.openhop.dev/projects/pymc-repeater/
-- `openHop Modem`: https://docs.openhop.dev/projects/pymc-modem/
-- `openHop HA Integration`: https://docs.openhop.dev/projects/pymc-ha-integration/
-- `openHop HA Add-on`: https://docs.openhop.dev/projects/pymc-ha-addon/
+- `openHop Core`: https://docs.openhop.dev/projects/openhop-core/
+- `openHop Repeater`: https://docs.openhop.dev/projects/openhop-repeater/
+- `openHop Modem`: https://docs.openhop.dev/projects/openhop-modem/
+- `openHop HA Integration`: https://docs.openhop.dev/projects/openhop-ha-integration/
+- `openHop HA Add-on`: https://docs.openhop.dev/projects/openhop-ha-addon/
 
 ## Repository Naming
 
-Some repository names and URL paths still contain historical `pyMC` identifiers for compatibility. User-facing docs and site branding should use `openHop`.
+User-facing docs, repository links, and site URL paths should use `openHop` naming. Historical `pymc_*` identifiers remain only where they are still part of runtime configuration, package names, service paths, or compatibility APIs.
 
 ## Local Development
 

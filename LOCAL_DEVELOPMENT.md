@@ -61,9 +61,9 @@ public/openapi/repeater.yaml
 ## Content Locations
 
 - Main docs content: `src/content/docs/`
-- openHop Core docs: `src/content/docs/projects/pymc-core/`
-- openHop Repeater docs: `src/content/docs/projects/pymc-repeater/`
-- openHop HA Integration docs: `src/content/docs/projects/pymc-ha-integration/`
+- openHop Core docs: `src/content/docs/projects/openhop-core/`
+- openHop Repeater docs: `src/content/docs/projects/openhop-repeater/`
+- openHop HA Integration docs: `src/content/docs/projects/openhop-ha-integration/`
 
 ## Common Commands
 

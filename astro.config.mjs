@@ -76,23 +76,23 @@ export default defineConfig({
 					items: [
 						{
 							label: 'openHop Core',
-							autogenerate: { directory: 'projects/pymc-core' },
+							autogenerate: { directory: 'projects/openhop-core' },
 						},
 						{
 							label: 'openHop Repeater',
-							autogenerate: { directory: 'projects/pymc-repeater' },
+							autogenerate: { directory: 'projects/openhop-repeater' },
 						},
 						{
 							label: 'openHop Modem',
-							autogenerate: { directory: 'projects/pymc-modem' },
+							autogenerate: { directory: 'projects/openhop-modem' },
 						},
 						{
 							label: 'openHop HA Integration',
-							autogenerate: { directory: 'projects/pymc-ha-integration' },
+							autogenerate: { directory: 'projects/openhop-ha-integration' },
 						},
 						{
 							label: 'openHop HA Add-on',
-							autogenerate: { directory: 'projects/pymc-ha-addon' },
+							autogenerate: { directory: 'projects/openhop-ha-addon' },
 						},
 					],
 				},
