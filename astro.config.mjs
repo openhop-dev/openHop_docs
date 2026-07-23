@@ -8,7 +8,7 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'OpenHop Docs',
-			description: 'Documentation hub for the OpenHop ecosystem: Core, Repeater, Home Assistant integration, and add-on projects',
+			description: 'Documentation hub for the openHop ecosystem: Core, Repeater, Modem, Home Assistant, and Unraid projects',
 			favicon: '/favicon.png',
 			head: [
 				{ tag: 'meta', attrs: { property: 'og:image', content: '/openhop_logo.png' } },
@@ -93,6 +93,10 @@ export default defineConfig({
 						{
 							label: 'openHop HA Add-on',
 							autogenerate: { directory: 'projects/openhop-ha-addon' },
+						},
+						{
+							label: 'openHop for Unraid',
+							autogenerate: { directory: 'projects/openhop-unraid' },
 						},
 					],
 				},

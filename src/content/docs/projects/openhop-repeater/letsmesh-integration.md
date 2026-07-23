@@ -1,6 +1,8 @@
 ---
 title: LetsMesh Integration
 description: Current LetsMesh publishing notes for openHop Repeater.
+sidebar:
+  order: 14
 ---
 
 # LetsMesh Integration

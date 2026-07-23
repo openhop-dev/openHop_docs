@@ -1,6 +1,8 @@
 ---
 title: openHop Repeater Setup
 description: Install and run openHop Repeater on supported hosts.
+sidebar:
+  order: 3
 ---
 
 ## Before you begin
@@ -21,19 +23,21 @@ sudo ./manage.sh
 
 ## Reconfigure radio mode later
 
-```bash
-sudo bash setup-radio-config.sh /etc/pymc_repeater
-sudo systemctl restart pymc-repeater
+The browser setup route covers all supported backends:
+
+```text
+http://<repeater-ip>:8000/setup
 ```
 
-The helper can now write config for:
+The terminal helper is limited to direct SX1262 presets and KISS:
 
-- direct `sx1262` hardware
-- `sx1262_ch341` USB-SPI setups
-- `kiss` serial TNCs
-- `pymc_usb` USB-CDC modems
-- `pymc_tcp` network modems
-- `null` mode
+```bash
+sudo bash setup-radio-config.sh /etc/openhop_repeater
+sudo systemctl restart openhop-repeater
+```
+
+Configure `sx1262_ch341`, `pymc_usb`, `pymc_tcp`, and `null` through `/setup` or
+the config file instead.
 
 ## Dashboard
 

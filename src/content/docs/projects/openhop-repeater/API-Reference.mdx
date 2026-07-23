@@ -1,5 +1,8 @@
 ---
 title: API Reference
+description: Interactive OpenAPI reference for the authenticated openHop Repeater REST API.
+sidebar:
+  order: 11
 ---
 
 import OpenApiViewer from '../../../../components/OpenApiViewer.astro';
@@ -8,6 +11,14 @@ This page is generated from the OpenAPI spec in the repeater project.
 
 - Source file: openhop_repeater/repeater/web/openapi.yaml
 - Raw spec URL in this docs site: /openapi/repeater.yaml
+
+Most endpoints require a JWT or API token. Interactive requests can change
+configuration, identities, policy, radio state, or transmit on the mesh. Confirm
+the selected server and use read-only endpoints first. The public documentation
+site does not proxy requests to your Repeater.
+
+Review [Security and Authentication](/projects/openhop-repeater/security-and-authentication/)
+before exposing or automating the API.
 
 ## Interactive API Docs
 

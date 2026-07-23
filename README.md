@@ -9,6 +9,7 @@ It brings together docs for:
 - `openHop Modem`
 - `openHop HA Integration`
 - `openHop HA Add-on`
+- `openHop for Unraid`
 
 The production site is:
 
@@ -27,6 +28,7 @@ The site is built with Astro and Starlight.
 - `openHop Modem`: https://docs.openhop.dev/projects/openhop-modem/
 - `openHop HA Integration`: https://docs.openhop.dev/projects/openhop-ha-integration/
 - `openHop HA Add-on`: https://docs.openhop.dev/projects/openhop-ha-addon/
+- `openHop for Unraid`: https://docs.openhop.dev/projects/openhop-unraid/
 
 ## Repository Naming
 

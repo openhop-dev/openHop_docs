@@ -1,6 +1,8 @@
 ---
 title: What is openHop Repeater?
 description: A first-user overview of what openHop Repeater does for MeshCore networks, supported hardware paths, policies, room servers, companions, and modem options.
+sidebar:
+  order: 2
 ---
 
 # What is openHop Repeater?

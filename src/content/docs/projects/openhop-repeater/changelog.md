@@ -1,5 +1,7 @@
 ---
 title: Changelog
+sidebar:
+  order: 19
 ---
 
 The historical changelog is currently maintained in the upstream project repository.

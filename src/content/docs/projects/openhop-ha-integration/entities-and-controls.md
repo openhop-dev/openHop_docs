@@ -18,6 +18,8 @@ Examples of included telemetry:
 - ACL totals and companion state
 - room statistics
 - GPS diagnostics when available from the repeater API
+- external sensor-manager data, including supported modem and UPS readings
+- neighbor-link counts and current default-region state
 
 ## Control entities
 
@@ -41,6 +43,11 @@ Examples of included controls:
 - numbers:
   - max airtime percent
   - advert tuning and rate-limit values
+
+CAD calibration and manual CAD checks are response-returning actions rather than
+ordinary entities. Neighbor histories, broker presets, packet/contact drill-downs,
+and other large datasets are also fetched on demand so they do not inflate every
+poll.
 
 ## Dynamic entities
 

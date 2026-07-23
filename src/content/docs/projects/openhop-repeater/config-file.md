@@ -1,11 +1,15 @@
 ---
 title: Configuration Reference
 description: Current config.yaml reference for openHop Repeater.
+sidebar:
+  order: 9
 ---
 
 # openHop Repeater Configuration Guide
 
-Reference for configuring your openHop Repeater using `config.yaml`, located at `/etc/pymc_repeater/config.yaml`.
+Reference for configuring openHop Repeater using `config.yaml`, installed at
+`/etc/openhop_repeater/config.yaml`. The authoritative, commented schema is
+`config.yaml.example` in the Repeater repository's `dev` branch.
 
 ## Table of Contents
 
@@ -25,6 +29,7 @@ Reference for configuring your openHop Repeater using `config.yaml`, located at 
 - [MQTT Brokers](#mqtt-brokers)
 - [openHop Glass](#openhop-glass)
 - [Logging](#logging)
+- [HTTP Server](#http-server)
 - [Web](#web)
 - [Examples](#examples)
 
@@ -71,6 +76,20 @@ Maximum number of hops a flood packet may already have taken before this repeate
 ### `repeater.use_score_for_tx`
 
 Enables score-based filtering and adaptive transmission timing.
+
+### `repeater.multi_acks`
+
+Optional MeshCore-compatible routed acknowledgement redundancy. `0` disables it;
+`1` sends a MULTIPART-wrapped redundant copy before the normal routed ACK. Leave
+it disabled unless the mesh benefits from the additional airtime.
+
+### Neighbour link metrics
+
+`neighbour_link_metrics_enabled` records observation-only upstream link data.
+`neighbour_link_ewma_alpha`, `neighbour_link_ttl_seconds`, and
+`neighbour_link_max_entries` control smoothing and retention. These metrics do
+not currently change forwarding, deduplication, delays, routes, or packet
+acceptance.
 
 ### `repeater.score_threshold`
 
@@ -182,7 +201,7 @@ gps:
 ```yaml
 gps:
   source: file
-  source_path: "/var/lib/pymc_repeater/gps_nmea.txt"
+  source_path: "/var/lib/openhop_repeater/gps_nmea.txt"
   poll_interval_seconds: 2.0
 ```
 
@@ -333,6 +352,12 @@ Loop detection mode:
 - `minimal`
 - `moderate`
 - `strict`
+
+### `mesh.default_region`
+
+Optional default transport-key region for locally originated flood adverts.
+Leave it `null` for unscoped floods. Region names and keys are security-sensitive;
+manage them through the dashboard/API and do not publish key material.
 
 ## Identities
 
@@ -544,12 +569,14 @@ Persistent local state and retention settings.
 
 ```yaml
 storage:
-  storage_dir: "/var/lib/pymc_repeater"
+  storage_dir: "/var/lib/openhop_repeater"
   retention:
     sqlite_cleanup_days: 31
 ```
 
-The daemon stores runtime data under `storage.storage_dir`. The default install keeps the main config at `/etc/pymc_repeater/config.yaml` and state data under `/var/lib/pymc_repeater`.
+The daemon stores runtime data under `storage.storage_dir`. The default install
+keeps the main config at `/etc/openhop_repeater/config.yaml` and state data under
+`/var/lib/openhop_repeater`. The old top-level `storage_dir` form is deprecated.
 
 ## MQTT Brokers
 
@@ -596,7 +623,7 @@ glass:
   request_timeout_seconds: 10
   verify_tls: true
   api_token: ""
-  cert_store_dir: "/etc/pymc_repeater/glass"
+  cert_store_dir: "/etc/openhop_repeater/glass"
 ```
 
 Use this when the repeater should post `/inform` payloads to openHop Glass and accept managed updates from it.
@@ -609,9 +636,35 @@ logging:
   format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 ```
 
+## HTTP Server
+
+The `http:` block controls the embedded dashboard and API listener. These settings
+have supported live-update paths.
+
+```yaml
+http:
+  enabled: true
+  host: "0.0.0.0"
+  port: 8000
+  thread_pool: 8
+  thread_pool_max: 16
+  socket_timeout: 65
+  socket_queue_size: 100
+```
+
+- `enabled` starts or stops the listener.
+- `host` and `port` select the bind address and port.
+- `thread_pool` and `thread_pool_max` tune CherryPy workers.
+- `socket_timeout` and `socket_queue_size` tune idle sockets and the pending
+  connection backlog.
+
+Binding to `0.0.0.0` exposes the service on every host interface. Keep it on a
+trusted LAN/VPN or protect it with an authenticated reverse proxy.
+
 ## Web
 
-Web server settings are configured under `web:`.
+Frontend and browser cross-origin settings are configured under `web:`. Listener
+address, port, and worker settings belong under `http:`, not `web:`.
 
 ```yaml
 web:
@@ -690,11 +743,11 @@ pymc_usb:
 
 radio:
   frequency: 915000000
-  tx_power: 22
+  tx_power: 14
   bandwidth: 62500
   spreading_factor: 8
   coding_rate: 8
-  preamble_length: 16
+  preamble_length: 32
 ```
 
 ### openHop TCP modem host
@@ -715,11 +768,11 @@ pymc_tcp:
 
 radio:
   frequency: 915000000
-  tx_power: 22
+  tx_power: 14
   bandwidth: 62500
   spreading_factor: 8
   coding_rate: 8
-  preamble_length: 16
+  preamble_length: 32
 ```
 
 ### CH341 / Proxmox-style host
@@ -745,4 +798,10 @@ sx1262:
 
 - The current repo schema is defined by the upstream `config.yaml.example` in `openhop_repeater`.
 - Older repeater docs and examples may still mention `mesh.global_flood_allow` or a top-level `mqtt:` block. Those are stale against the current repo.
-- After config edits, restart the service with `sudo systemctl restart pymc-repeater` and watch logs with `journalctl -u pymc-repeater -f`.
+- Some HTTP, logging, and radio parameters can be applied live, while
+  `radio_type`, KISS transport, and modem transport changes require a restart.
+- After restart-required edits, run `sudo systemctl restart openhop-repeater` and
+  watch logs with `journalctl -u openhop-repeater -f`.
+- Legacy `/etc/pymc_repeater` and `/var/lib/pymc_repeater` installations are
+  migrated by the current management script; new documentation and installs use
+  the openHop paths.

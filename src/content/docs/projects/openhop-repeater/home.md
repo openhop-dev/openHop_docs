@@ -1,6 +1,8 @@
 ---
 title: Documentation Home
 description: Entry point for current openHop Repeater docs.
+sidebar:
+  order: 20
 ---
 
 # openHop Repeater Documentation

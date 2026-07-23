@@ -1,6 +1,8 @@
 ---
 title: openHop Repeater Overview
 description: Operational docs for running openHop Repeater across SPI, CH341, KISS, openHop USB, and openHop TCP deployments.
+sidebar:
+  order: 1
 ---
 
 openHop Repeater is an always-on MeshCore infrastructure node built on top of openHop Core. It can forward mesh traffic, expose a dashboard and API, run policies, host room-server and companion identities, and use radio hardware ranging from Pi HATs to USB or TCP openHop Modems.

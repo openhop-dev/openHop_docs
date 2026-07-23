@@ -15,7 +15,8 @@ These are intentionally separate. For example, a TCP modem can carry packets on 
 
 ## Select the modem as Repeater's radio
 
-Edit `/etc/pymc_repeater/config.yaml` and set the top-level `radio_type`.
+Edit `/etc/openhop_repeater/config.yaml` and set the top-level `radio_type`, or
+use the Repeater browser flow at `http://<repeater-ip>:8000/setup`.
 
 ### USB-CDC modem
 
@@ -159,8 +160,8 @@ For a GPS-capable modem, it is normal to enable both. Use the sensor for battery
 After editing the config:
 
 ```bash
-sudo systemctl restart pymc-repeater
-sudo journalctl -u pymc-repeater -f
+sudo systemctl restart openhop-repeater
+sudo journalctl -u openhop-repeater -f
 ```
 
 Check the modem HTTP API directly from the Repeater host:
