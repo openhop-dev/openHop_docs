@@ -20,6 +20,7 @@ authentication does not make direct public exposure a recommended deployment.
 Current builds expose setup and operational views for:
 
 - system, radio, packet, neighbor, GPS, and sensor status;
+- stored neighbour region scopes and on-demand zero-hop scope queries;
 - packet history and live WebSocket updates;
 - configuration and hardware presets;
 - radio settings, CAD calibration, and noise-floor monitoring;

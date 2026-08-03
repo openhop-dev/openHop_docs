@@ -46,6 +46,13 @@ Common causes:
 - a stale legacy path or system Python installation shadowing the managed virtual
   environment.
 
+Current development builds report boot-time configuration and local-identity
+errors as concise configuration messages instead of printing a full traceback.
+Treat that message as the primary failure: check the named file/key, YAML shape,
+duplicate identity name, or same-class one-byte public-key prefix collision. Do
+not enable debug logging merely to obtain a traceback before checking the stated
+configuration error.
+
 Use `sudo bash ./manage.sh upgrade` from the checkout to repair/migrate a managed
 installation. Do not install dependencies into system Python with
 `--break-system-packages`; the current service runs from
@@ -115,6 +122,28 @@ requires it.
 - Confirm the node is not accidentally pointed at a different serial/TCP modem.
 
 Do not raise transmit power to diagnose receive-only problems.
+
+## Neighbour scopes or MQTT publication are missing
+
+Check `GET /api/mqtt_status` after scheduling a cycle. The neighbour publisher
+reports a phase (`disabled`, `scheduled`, `due`, or `active`), time until the next
+cycle, the last result, and the last publish timestamp.
+
+- `disabled`: confirm the master settings block is enabled and at least one
+  enabled broker has the per-broker `neighbors: true` flag.
+- `scheduled`: wait until due or use the authenticated
+  `POST /api/publish_neighbors` trigger.
+- `active`: allow the discovery window and serialized scope queries to finish;
+  a normal cycle can take several minutes.
+- Repeated deferral: confirm an opted-in broker is connected and accepts the
+  `neighbors` topic.
+- Timeout rows: confirm the target is a fresh zero-hop repeater. Anonymous scope
+  replies are rate-limited, so repeated manual queries can also time out.
+- No stored scopes: inspect `GET /api/neighbor_scopes`. An empty scope string in
+  a successful response means unscoped traffic only; it is not missing data.
+
+A full cycle transmits discovery and scope requests. Verify RF settings, duty
+cycle headroom, and authorization before triggering one during troubleshooting.
 
 ## Charts or history are missing
 

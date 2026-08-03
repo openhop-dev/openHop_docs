@@ -256,7 +256,10 @@ Relevant keys:
 
 ## Sensors
 
-The sensor subsystem polls host or I2C data sources and exposes them under `/api/stats`.
+The sensor subsystem polls host or I2C data sources and exposes them under
+`/api/stats`. Current MeshCore status replies also use the first valid sensor bus
+voltage as battery voltage. Telemetry replies include available INA219-style bus
+voltage, current, and power before temperature and humidity channels.
 
 ### Top-level controls
 
@@ -605,11 +608,52 @@ Each broker entry supports fields such as:
 - `password`
 - `format`
 - `retain_status`
+- `neighbors`
 - `tls.enabled`
 - `tls.insecure`
 - `disallowed_packet_types`
 
 This is also where current LetsMesh-style publishing is modeled.
+
+### Periodic neighbour publication
+
+The development branch can publish a zero-hop neighbour and region-scope table
+to the MC2MQTT `neighbors` topic. It is opt-in per broker because some brokers
+reject unknown topics and close the connection.
+
+```yaml
+mqtt_brokers:
+  neighbors:
+    enabled: true
+    interval_hours: 24
+    discovery_timeout_seconds: 60
+    scope_response_timeout_seconds: 0
+    max_neighbors: 32
+    max_neighbor_age_seconds: 86400
+    max_sweep_seconds: 900
+    duty_cycle_abort_seconds: 30
+  brokers:
+    - preset: meshat-se
+      neighbors: true
+```
+
+Important behavior:
+
+- `mqtt_brokers.neighbors` is a settings block, not a boolean. A scalar such as
+  `mqtt_brokers.neighbors: true` is ignored with a startup warning.
+- `mqtt_brokers.neighbors.enabled` is the master kill switch and defaults to
+  `true`; at least one enabled broker must also set `neighbors: true`.
+- `interval_hours` accepts `12` through `336` hours.
+- Each cycle sends one zero-hop discovery broadcast, then queries neighbour
+  scopes serially to avoid response collisions. It can take several minutes and
+  consumes RF airtime.
+- A value of `0` for `scope_response_timeout_seconds` derives the response window
+  from the active radio settings.
+- The Meshat.se preset opts in by default. Do not enable the topic for another
+  broker until its contract is known to accept it.
+
+See [LetsMesh Integration](/projects/openhop-repeater/letsmesh-integration/) for
+manual triggers, status, and the related API endpoints.
 
 ## openHop Glass
 

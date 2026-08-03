@@ -20,6 +20,17 @@ site does not proxy requests to your Repeater.
 Review [Security and Authentication](/projects/openhop-repeater/security-and-authentication/)
 before exposing or automating the API.
 
+Current development builds add authenticated neighbour operations for scheduling
+a full MQTT publication cycle, reading persisted neighbour scopes, and querying
+one zero-hop neighbour. They are documented as `publish_neighbors`,
+`neighbor_scopes`, and `query_neighbor_scopes` in the synchronized specification.
+
+The runtime `noise_floor_history` endpoint also accepts `hours`, `limit`, and a
+non-negative `offset`. Its response echoes the normalized `limit` and `offset`,
+which allows a client to page through dense samples. This pagination is runtime
+behavior in the current Repeater `dev` branch even where an older generated API
+form shows only the `hours` field.
+
 ## Interactive API Docs
 
 <OpenApiViewer />

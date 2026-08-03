@@ -77,6 +77,12 @@ include `tcp_port`, optional `bind_address`, and timeout behavior. Use a unique
 port per companion and remember that one client connects to each companion TCP
 port at a time.
 
+Identity names must be unique. The first byte of each public key must also be
+unique within the server class (primary Repeater plus room servers) and within
+the companion class. A companion may share that one-byte prefix with a
+server-class identity because current routing and persistence keep those classes
+in separate namespaces and verify the full cryptographic identity.
+
 The dashboard and authenticated API expose identity operations. Creating,
 updating, deleting, or importing an identity changes persistent state and may
 affect clients, contacts, queues, and advertised identity. Export a backup before

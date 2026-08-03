@@ -24,10 +24,13 @@ The main configuration file is `/etc/openhop_repeater/config.yaml`.
 The current Repeater `dev` branch uses the management script directly:
 
 ```bash
-git clone https://github.com/openhop-dev/openhop_repeater.git
+git clone --branch dev --single-branch https://github.com/openhop-dev/openhop_repeater.git
 cd openhop_repeater
 sudo bash ./manage.sh install
 ```
+
+These development docs track the Repeater `dev` branch. Use `--branch main`
+instead when you intentionally want the stable branch.
 
 That flow installs the service, creates the config directory, and launches the
 terminal radio helper. The terminal helper currently configures direct `sx1262`
@@ -165,12 +168,21 @@ archives conflicting legacy directories, disables the old `pymc-repeater`
 service, and uses the `openhop-repeater` service going forward.
 
 Back up the config and identity material before upgrading. Use the management
-script rather than moving directories by hand:
+script rather than moving directories by hand. When running the script from a
+repository checkout, update that checkout first because `manage.sh` installs the
+local source tree:
 
 ```bash
 cd openhop_repeater
+git fetch origin
+git switch dev
+git pull --ff-only origin dev
 sudo bash ./manage.sh upgrade
 ```
+
+The managed installer uses the host's `python3-pip` package to bootstrap a
+dedicated virtual environment and installs build-version tooling inside that
+environment. It does not require `pip --break-system-packages`.
 
 ## Docker Compose
 

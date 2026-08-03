@@ -47,6 +47,11 @@ before offline database maintenance. If charts are missing, check the API's
 reported `rrd_enabled`, `rrd_available`, and `metrics_data_source` values before
 assuming data was lost.
 
+The RF health charts can include or hide packet drop-reason series. That toggle
+changes chart presentation only; it is not a persisted daemon or packet-policy
+setting. For dense noise-floor history, API clients can page with `limit` and a
+non-negative `offset` instead of requesting an unbounded result set.
+
 ## Measure after each change
 
 Compare:
