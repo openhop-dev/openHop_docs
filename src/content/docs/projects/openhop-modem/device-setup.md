@@ -13,6 +13,8 @@ openHop Modem firmware supports multiple boards from the same `pymc_modem` sourc
 | --- | --- | --- |
 | Heltec WiFi LoRa 32 V3 | `heltec_v3` | Wi-Fi TCP + USB-CDC |
 | Heltec WiFi LoRa 32 V4 | `heltec_v4` | Wi-Fi TCP + USB-CDC |
+| Heltec WiFi LoRa 32 V4.2 | `heltec_v42` | Wi-Fi TCP + USB-CDC |
+| Heltec WiFi LoRa 32 V4.3 | `heltec_v43` | Wi-Fi TCP + USB-CDC |
 | Heltec Wireless Tracker V2 | `heltec_tracker_v2` | Wi-Fi TCP + USB-CDC |
 | Ikoka Stick | `ikoka_stick` | Wi-Fi TCP + USB-CDC |
 | Seeed XIAO Wio-SX1262 | `xiao_wio_sx1262` | Wi-Fi TCP + USB-CDC |
@@ -21,8 +23,10 @@ openHop Modem firmware supports multiple boards from the same `pymc_modem` sourc
 | RAK3112 WisMesh | `rak3112_wismesh` | Wi-Fi TCP + USB-CDC |
 | B&Q Consulting Station G2 | `station_g2` | Wi-Fi TCP + USB-CDC |
 | WaveShare ESP32-P4-Nano | `esp32_p4_nano` | Ethernet or Wi-Fi TCP + USB flashing/debug paths |
+| MeshSmith EtherMesh-1W | `ethermesh_1w` | Ethernet TCP + USB-UART flashing/debug |
 | Heltec T114 | `heltec_t114` | USB-CDC only |
 | Seeed XIAO nRF52840 + Wio-SX1262 | `xiao_nrf52_wio` | USB-CDC only |
+| RAK4631 WisMesh Ethernet Gateway | `rak4631_wismesh_eth` | Ethernet TCP + USB-CDC fallback |
 
 Use the hosted flasher for normal installs and updates: [flasher.openhop.dev](https://flasher.openhop.dev/). For source builds, see the [openhop_modem repository](https://github.com/openhop-dev/openhop_modem).
 
@@ -56,12 +60,16 @@ Use TCP mode when the modem is on the same LAN as the repeater host.
 3. Confirm the modem's hostname or IP address.
 4. Configure Repeater with `radio_type: pymc_tcp`, `host`, and `port: 5055`.
 
-On first boot, Wi-Fi-capable modems expose a setup access point named like `LoRa-Modem-XXXX`. Connect to it, open `http://192.168.4.1`, choose the Wi-Fi network, save, and let the modem reboot.
+On first boot, Wi-Fi-capable modems expose a setup access point named like
+`openHop-Modem-XXXX`. Connect to it, open `http://192.168.4.1`, choose the Wi-Fi
+network, save, and let the modem reboot.
 
 The modem mDNS hostnames are board-specific and include the final MAC bytes. Examples include:
 
 - `heltec-<mac3>.local`
 - `heltec-v4-<mac3>.local`
+- `heltec-v42-<mac3>.local`
+- `heltec-v43-<mac3>.local`
 - `tracker-v2-<mac3>.local`
 - `ikoka-<mac3>.local`
 - `xiao-wio-<mac3>.local`
@@ -70,10 +78,18 @@ The modem mDNS hostnames are board-specific and include the final MAC bytes. Exa
 - `rak3112-<mac3>.local`
 - `station-g2-<mac3>.local`
 - `p4nano-<mac3>.local`
+- `ethermesh-1w-<mac3>.local`
+
+The RAK4631 WisMesh Ethernet firmware does not provide mDNS. Find its DHCP
+address from the router or network inventory and connect directly to that IP.
+Its hostname is status-only. It has no HTTP management/OTA stack; configure its
+TCP defaults at build time and update it through the USB bootloader.
 
 ## HTTP management and diagnostics
 
-Network-capable modems expose a small HTTP UI and JSON API. Current firmware protects the HTTP surface with Basic Auth.
+Web-enabled ESP32 modems expose a small HTTP UI and JSON API. Current firmware
+protects the HTTP surface with Basic Auth. The RAK4631 Ethernet variant is not a
+web-enabled build and does not expose this HTTP surface.
 
 Default credentials on first boot:
 

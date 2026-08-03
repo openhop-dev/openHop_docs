@@ -75,9 +75,14 @@ Confirm the dashboard updates and received traffic appears when the configured
 mesh is active. Send a manual advert only after TX settings are verified; it uses
 airtime and announces the node to the mesh.
 
+After reception is proven, calibrate a supported radio's Channel Activity
+Detection before leaving the node in normal transmit service. Use both a quiet
+baseline and known compatible traffic; see [CAD Calibration](/projects/openhop-repeater/cad-calibration/).
+
 ## Next steps
 
 - [Web Dashboard](/projects/openhop-repeater/web-dashboard/)
+- [CAD Calibration](/projects/openhop-repeater/cad-calibration/)
 - [Configuration Reference](/projects/openhop-repeater/config-file/)
 - [Identity Management](/projects/openhop-repeater/identity-management/)
 - [Troubleshooting](/projects/openhop-repeater/troubleshooting/)

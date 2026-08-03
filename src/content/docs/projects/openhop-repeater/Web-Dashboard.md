@@ -23,7 +23,8 @@ Current builds expose setup and operational views for:
 - stored neighbour region scopes and on-demand zero-hop scope queries;
 - packet history and live WebSocket updates;
 - configuration and hardware presets;
-- radio settings, CAD calibration, and noise-floor monitoring;
+- radio settings, [CAD calibration](/projects/openhop-repeater/cad-calibration/),
+  and noise-floor monitoring;
 - policy and transport-key management;
 - primary, room-server, and companion identities;
 - logs, updates, and frontend selection.

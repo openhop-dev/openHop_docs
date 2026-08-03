@@ -39,6 +39,11 @@ range, robustness, latency, and airtime. The values must remain compatible with
 the mesh. Do not increase power as the first response to packet loss; inspect
 antenna, placement, noise floor, supply quality, and modulation agreement first.
 
+For a CAD-capable backend, follow [CAD Calibration](/projects/openhop-repeater/cad-calibration/)
+after the radio and modulation settings are known to receive normal traffic. A
+calibrated clear/busy decision reduces unnecessary LBT backoff without making
+the radio ignore real compatible channel activity.
+
 ## Storage and charts
 
 Repeater serializes blocking storage work through a dedicated writer. Avoid

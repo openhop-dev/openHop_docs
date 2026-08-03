@@ -27,13 +27,18 @@ The flasher reads most modem firmware files from:
 
 ESP32-family firmware variants use this layout:
 
-| File | Flash offset | Used for |
-| --- | --- | --- |
-| `bootloader.bin` | `0x0` | Erase/full flash |
-| `partitions.bin` | `0x8000` | Erase/full flash |
-| `firmware.bin` | `0x10000` | Normal update and erase/full flash |
+| File | Used for |
+| --- | --- |
+| `firmware.factory.bin` | Complete first install or recovery image written at `0x0`. |
+| `bootloader.bin` | Bootloader component; its offset is selected by the target toolchain. |
+| `partitions.bin` | Partition-table component used to assemble a complete install. |
+| `firmware.bin` | App-only update, normally written at `0x10000` on a compatible existing layout. |
 
-nRF52 variants use a `firmware.zip` DFU package.
+nRF52 variants provide a `firmware.zip` DFU package and, where generated, a
+`firmware.uf2` drag-and-drop image. Do not apply ESP32 offsets to nRF52 targets.
+ESP32-P4 bootloader offsets also differ from common ESP32-S3 layouts, so prefer
+the factory image or the hosted flasher instead of a hand-written component
+command.
 
 ## Flash a device
 
@@ -51,8 +56,8 @@ Do not disconnect the board while flashing. After a successful flash, reset or p
 
 | Action | Meaning | When to use |
 | --- | --- | --- |
-| Flash | Writes the application firmware at `0x10000`. | Normal updates on a board that already has a compatible bootloader and partition table. |
-| Erase Device | Erases and writes the full flash set, such as bootloader, partitions, and firmware. | Fresh installs, recovery, or switching a board from another firmware layout. |
+| Flash | Writes the application firmware using the selected variant's manifest. | Normal updates on a board that already has a compatible bootloader and partition table. |
+| Erase Device | Erases and installs the selected variant's complete firmware layout. | Fresh installs, recovery, or switching a board from another firmware layout. |
 
 ## Board bootloader notes
 
