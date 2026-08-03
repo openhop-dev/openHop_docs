@@ -1,6 +1,8 @@
 ---
 title: Hardware Setup
 description: Supported openHop Repeater hardware and radio backend notes.
+sidebar:
+  order: 6
 ---
 
 # Hardware Setup Guide
@@ -32,7 +34,7 @@ For non-GPIO modem-style transports, use [KISS Setup](/projects/openhop-repeater
 
 ## Backend selection
 
-Choose the backend with the top-level `radio_type` in `/etc/pymc_repeater/config.yaml`.
+Choose the backend with the top-level `radio_type` in `/etc/openhop_repeater/config.yaml`.
 
 ```yaml
 radio_type: sx1262
@@ -45,8 +47,10 @@ Supported values:
 - `kiss`
 - `pymc_usb`
 - `pymc_tcp`
-- `null`
-- `none`
+- `null` or `none`
+
+For `sx1262_ch341`, `pymc_usb`, `pymc_tcp`, or `null`, use the browser flow at
+`http://<repeater-ip>:8000/setup` or edit the config directly.
 
 ## Native SX1262 wiring
 
@@ -171,6 +175,9 @@ If you do not have RF hardware on this host at all, use `radio_type: null` and s
 - Often require `use_dio3_tcxo: true`
 - Some also require `use_dio2_rf: true`
 - Some newer presets also require `use_gpiod_backend: true` and `gpio_chip: 1`
+- The current `meshadv-mini` preset explicitly enables both DIO3 TCXO control and
+  DIO2 RF-switch control. Reapply the current preset or set both flags after an
+  upgrade if an older config was copied forward.
 
 ### Waveshare SPI HAT
 
@@ -198,26 +205,23 @@ The host must expose the USB adapter with the correct permissions before the rep
 ### Service logs
 
 ```bash
-journalctl -u pymc-repeater -f
+journalctl -u openhop-repeater -f
 ```
 
 If the hardware setup is wrong, this is the first place to look.
 
 ## Radio configuration helper
 
-The standard install flow launches the helper automatically, but you can rerun it later:
+The standard install flow launches the terminal helper automatically. It handles
+direct SX1262 presets and KISS only:
 
 ```bash
-sudo bash setup-radio-config.sh /etc/pymc_repeater
+sudo bash setup-radio-config.sh /etc/openhop_repeater
 ```
 
-That helper now supports:
-
-- selecting `sx1262`, `sx1262_ch341`, `kiss`, `pymc_usb`, `pymc_tcp`, or `null`
-- applying current radio presets
-- writing KISS serial settings
-- writing openHop USB and openHop TCP transport settings
-- writing hardware-specific pin maps
+Use it to apply a current direct-SX1262 hardware preset or write KISS serial
+settings. Configure `sx1262_ch341`, `pymc_usb`, `pymc_tcp`, and `null` through
+`http://<repeater-ip>:8000/setup` or by editing the config directly.
 
 ## Related pages
 

@@ -20,7 +20,11 @@ openHop HA Add-on packages `openhop_repeater` as Home Assistant add-ons so you c
 ## Channels
 
 - `openHop Repeater Dev` tracks `openhop/openhop-repeater:dev`
-- `openHop Repeater Main` tracks `openhop/openhop-repeater:main` when that channel is published upstream
+- `openHop Repeater Main` tracks `openhop/openhop-repeater:main`
+
+These are separate add-ons, not a runtime channel selector. Each has its own slug,
+private config mount, identity, and persistent data. Installing one does not move
+or copy state from the other.
 
 ## Next step
 

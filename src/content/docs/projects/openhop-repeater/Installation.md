@@ -1,6 +1,8 @@
 ---
 title: Installation
 description: Current install paths for openHop Repeater.
+sidebar:
+  order: 4
 ---
 
 # Installation Guide
@@ -15,47 +17,53 @@ The current `openhop_repeater` repo supports several install shapes:
 - `pymc_tcp` modem deployments over Wi-Fi or Ethernet
 - no-radio `null` mode for dashboard, API, or companion-only services
 
-The main configuration file is `/etc/pymc_repeater/config.yaml`.
+The main configuration file is `/etc/openhop_repeater/config.yaml`.
 
 ## Standard install
 
-The current upstream README uses the management script directly:
+The current Repeater `dev` branch uses the management script directly:
 
 ```bash
-git clone https://github.com/openhop-dev/openhop_repeater.git
+git clone --branch dev --single-branch https://github.com/openhop-dev/openhop_repeater.git
 cd openhop_repeater
-sudo ./manage.sh
+sudo bash ./manage.sh install
 ```
 
-That flow installs the service, creates the config directory, and launches the radio configuration helper.
+These development docs track the Repeater `dev` branch. Use `--branch main`
+instead when you intentionally want the stable branch.
+
+That flow installs the service, creates the config directory, and launches the
+terminal radio helper. The terminal helper currently configures direct `sx1262`
+presets or `kiss`; use the browser `/setup` flow or edit the config for CH341,
+openHop USB/TCP, or `null` deployments.
 
 ## What the installer sets up
 
 - service user and permissions
-- `/opt/pymc_repeater`
-- `/etc/pymc_repeater`
-- `/var/log/pymc_repeater`
+- `/opt/openhop_repeater` with a dedicated Python virtual environment
+- `/etc/openhop_repeater`
+- `/var/lib/openhop_repeater`
+- `/var/log/openhop_repeater`
 - interactive radio and hardware configuration
-- `pymc-repeater.service`
+- `openhop-repeater.service`
 
 ## Re-running radio setup
 
 To revisit hardware or modem selection later:
 
 ```bash
-sudo bash setup-radio-config.sh /etc/pymc_repeater
-sudo systemctl restart pymc-repeater
+sudo bash setup-radio-config.sh /etc/openhop_repeater
+sudo systemctl restart openhop-repeater
 ```
 
-The helper now supports:
+The terminal helper supports:
 
 - direct `sx1262` hardware
-- `sx1262_ch341` USB-SPI hosts
 - `kiss` modem mode
-- `pymc_usb` USB-CDC modem mode
-- `pymc_tcp` network modem mode
-- `null` mode for no RF hardware
 - hardware presets from `radio-settings.json`
+
+For all supported backends, open `http://<repeater-ip>:8000/setup` or update the
+relevant config block directly.
 
 ## KISS modem installs
 
@@ -73,12 +81,12 @@ Start with [KISS Setup](/projects/openhop-repeater/kiss-setup/).
 Use this when the radio side is a board running `pymc_usb` firmware and the modem is attached to the repeater host over USB-CDC.
 
 1. Install the repeater normally.
-2. Run `sudo bash setup-radio-config.sh /etc/pymc_repeater`.
-3. Select the `pymc_usb modem (USB-CDC)` hardware option.
-4. Confirm the serial device, usually `/dev/ttyACM0`.
-5. Restart the service and watch logs.
+2. Open `/setup` or edit `/etc/openhop_repeater/config.yaml`.
+3. Set `radio_type: pymc_usb` and confirm the serial device, usually
+   `/dev/ttyACM0`.
+4. Restart the service and watch logs.
 
-The current helper defaults are:
+The commented canonical config example uses:
 
 - `pymc_usb.port: /dev/ttyACM0`
 - `pymc_usb.baudrate: 921600`
@@ -92,12 +100,12 @@ Use [openHop USB/TCP Setup](/projects/openhop-repeater/openhop-usb-and-tcp-setup
 Use this when the radio side is a board running `pymc_usb` firmware and exposing a TCP server over LAN, Wi-Fi, or Ethernet.
 
 1. Install the repeater normally.
-2. Run `sudo bash setup-radio-config.sh /etc/pymc_repeater`.
-3. Select the `pymc_tcp modem (Wi-Fi / Ethernet)` hardware option.
-4. Replace the placeholder host with the modem LAN address or mDNS name.
-5. Restart the service and confirm the repeater connects.
+2. Open `/setup` or edit `/etc/openhop_repeater/config.yaml`.
+3. Set `radio_type: pymc_tcp` and replace the placeholder host with the modem LAN
+   address or mDNS name.
+4. Restart the service and confirm the repeater connects.
 
-The current helper writes:
+The commented canonical config example uses:
 
 - `pymc_tcp.host: REPLACE_WITH_MODEM_HOST`
 - `pymc_tcp.port: 5055`
@@ -127,8 +135,8 @@ Use it when:
 ## First checks after install
 
 ```bash
-sudo systemctl status pymc-repeater
-sudo journalctl -u pymc-repeater -f
+sudo systemctl status openhop-repeater
+sudo journalctl -u openhop-repeater -f
 ```
 
 Dashboard URL:
@@ -137,15 +145,58 @@ Dashboard URL:
 http://<repeater-ip>:8000
 ```
 
+For containers, persistent volumes, and device mapping, use
+[Docker Deployment](/projects/openhop-repeater/docker/).
+
 ## Null mode
 
 `radio_type: null` or `radio_type: none` starts the daemon without RF hardware. This is useful when you only need the dashboard, API, room servers, or companion TCP endpoints on a host.
 
 ## Useful config paths
 
-- Main config: `/etc/pymc_repeater/config.yaml`
-- Runtime state: `/var/lib/pymc_repeater`
-- Logs via journald: `journalctl -u pymc-repeater`
+- Main config: `/etc/openhop_repeater/config.yaml`
+- Runtime state: `/var/lib/openhop_repeater`
+- Installed application and virtual environment: `/opt/openhop_repeater`
+- Logs via journald: `journalctl -u openhop-repeater`
+
+## Upgrading an older pyMC installation
+
+The current management script detects legacy `/opt/pymc_repeater`,
+`/etc/pymc_repeater`, `/var/lib/pymc_repeater`, and `/var/log/pymc_repeater`
+paths. During install or upgrade it migrates their contents to the openHop paths,
+archives conflicting legacy directories, disables the old `pymc-repeater`
+service, and uses the `openhop-repeater` service going forward.
+
+Back up the config and identity material before upgrading. Use the management
+script rather than moving directories by hand. When running the script from a
+repository checkout, update that checkout first because `manage.sh` installs the
+local source tree:
+
+```bash
+cd openhop_repeater
+git fetch origin
+git switch dev
+git pull --ff-only origin dev
+sudo bash ./manage.sh upgrade
+```
+
+The managed installer uses the host's `python3-pip` package to bootstrap a
+dedicated virtual environment and installs build-version tooling inside that
+environment. It does not require `pip --break-system-packages`.
+
+## Docker Compose
+
+The published container uses named volumes for config and data by default:
+
+```bash
+cp .env.example .env
+docker compose up -d
+```
+
+Review `.env`, group IDs, device mappings, and host hardware access first. Do not
+bind-mount a missing `./config.yaml` file: Docker may create a directory at that
+path and prevent startup. Container upgrades are performed by pulling a newer
+image and recreating the container, not through the dashboard updater.
 
 ## Related pages
 

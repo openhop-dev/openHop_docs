@@ -30,8 +30,17 @@ The integration will:
 
 The integration options let you change:
 
+- polling interval from 5 to 300 seconds; the default is 15 seconds
 - system uptime display unit
 - data size display unit
+
+Changing an option reloads the integration automatically. One integration-wide
+poll drives the normal entities; GPS updates use a separate server-sent-event
+stream when the Repeater exposes it.
+
+With multiple Repeaters, each host and port is a separate config entry. Advanced
+actions should include `config_entry_id` so Home Assistant targets the intended
+Repeater.
 
 ## Naming
 

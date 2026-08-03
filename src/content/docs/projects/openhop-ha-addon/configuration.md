@@ -15,18 +15,26 @@ Inside the container, `/config` is the add-on's private config mount. On the hos
 
 Current location notes shipped by the add-ons:
 
-- dev channel: `addon_config/*_pymc_repeater_dev/config.yaml`
-- main channel: `addon_config/*_pymc_repeater_main/config.yaml`
+- dev channel: `addon_config/*_openhop_repeater_dev/config.yaml`
+- main channel: `addon_config/*_openhop_repeater_main/config.yaml`
+
+The wildcard prefix is assigned by Home Assistant. Use the config-location note
+shown in the installed add-on rather than guessing the full host path.
 
 ## First-start behavior
 
-On first start, the add-on creates:
+On first start, the add-on bootstrap helper creates or merges:
 
 - `/config/config.yaml`
 - `/config/identity.key` when openHop Repeater generates a node identity
-- `/var/lib/pymc_repeater` for runtime state
+- `/var/lib/openhop_repeater` for runtime state
 
-After that, `config.yaml` is the single source of truth. If the repeater updates the file itself, those changes persist across restarts.
+Inside the container, `/etc/openhop_repeater` is a symlink to `/config`, so the
+upstream runtime still opens `/etc/openhop_repeater/config.yaml`. If the Repeater
+updates the config through its supported manager/API, those changes persist.
+
+The Dev and Main add-ons have distinct private mounts. Configuration and identity
+do not migrate automatically between their slugs.
 
 ## Minimum fields to review
 
@@ -67,7 +75,15 @@ pymc_tcp:
   lbt_max_attempts: 5
 ```
 
-The add-on does not invent a second config model. It passes the normal repeater schema through.
+The add-on does not invent a second config model. It passes the normal Repeater
+schema through. You can also complete first-run configuration at:
+
+```text
+http://<home-assistant-host>:8000/setup
+```
+
+Protect the private add-on config: it may contain identity keys, passwords, JWT
+secrets, MQTT credentials, and modem tokens.
 
 ## Related pages
 

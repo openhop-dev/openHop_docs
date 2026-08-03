@@ -1,518 +1,190 @@
 ---
 title: Troubleshooting
+description: Diagnose service, configuration, radio, modem, dashboard, and storage problems safely.
+sidebar:
+  order: 17
 ---
 
-# Troubleshooting Guide
+Start with logs and preserve the first error. Avoid changing radio, permissions,
+packages, and config simultaneously; that hides the root cause.
 
-Common issues and solutions for openHop Repeater.
-
----
-
-## Quick Diagnostics
+## Quick diagnostics
 
 ```bash
-# Check service status
-sudo systemctl status pymc-repeater
-
-# View recent logs
-journalctl -u pymc-repeater -n 100
-
-# Live log monitoring
-journalctl -u pymc-repeater -f
-
-# Check configuration
-yq eval '.' /etc/pymc_repeater/config.yaml
-
-# Verify SPI
-ls -l /dev/spidev*
+sudo systemctl status openhop-repeater
+sudo journalctl -u openhop-repeater -n 100 --no-pager
+sudo journalctl -u openhop-repeater -f
 ```
 
----
+The current native install uses:
 
-## Service Issues
+- application: `/opt/openhop_repeater`;
+- config: `/etc/openhop_repeater/config.yaml`;
+- state: `/var/lib/openhop_repeater`;
+- service: `openhop-repeater`.
 
-### Service Won't Start
+Do not paste the full config into a support request. It can contain passwords,
+tokens, location, MQTT credentials, and private identity material. Redact secrets
+and include only the relevant section plus the error.
 
-**Symptoms:**
-```
-● pymc-repeater.service - failed
-```
+## Service does not start
 
-**Check logs:**
-```bash
-journalctl -u pymc-repeater -n 50
-```
-
-**Common causes:**
-
-1. **SPI Not Enabled**
-   ```bash
-   sudo raspi-config
-   # Interface Options → SPI → Enable
-   sudo reboot
-   ```
-
-2. **Wrong GPIO Configuration**
-   - Verify `sx1262` section in `/etc/pymc_repeater/config.yaml`
-   - Check BCM pin numbers match your hardware
-
-3. **Missing Dependencies**
-   ```bash
-   cd /opt/pymc_repeater
-   sudo pip install --break-system-packages -e .
-   ```
-
-4. **Permission Issues**
-   ```bash
-   sudo chown -R repeater:repeater /opt/pymc_repeater /etc/pymc_repeater /var/lib/pymc_repeater
-   sudo usermod -a -G gpio,spi repeater
-   ```
-
-### Service Crashes/Restarts
-
-**Check for issues:**
-```bash
-# Recent crashes
-journalctl -u pymc-repeater --since "1 hour ago"
-
-```
-
-**Solutions:**
-- Reduce `logging.level` from DEBUG to INFO
-- Add cooling (heatsink/fan)
-- Check power supply capacity
-- Review configuration for errors
-
----
-
-## Radio/Hardware Issues
-
-### Radio Not Detected
-
-**Error:** `Failed to initialize radio hardware`
-
-**Solutions:**
-
-1. **Verify SPI enabled:**
-   ```bash
-   lsmod | grep spi
-   ls -l /dev/spidev*
-   ```
-
-2. **Check GPIO configuration:**
-   ```yaml
-   sx1262:
-     cs_pin: 21
-     reset_pin: 18
-     busy_pin: 20
-     irq_pin: 16
-   ```
-
-3. **Test with different pins if custom wiring**
-
-4. **Verify 3.3V power to module**
-
-5. **Check for loose connections**
-
-### No Packets Received
-
-**Symptoms:** Service running, but no packets in logs/dashboard
-
-**Check:**
-
-1. **Radio settings match network:**
-   ```yaml
-   radio:
-     frequency: 869618000  # Must match other nodes
-     spreading_factor: 8
-     bandwidth: 62500
-     coding_rate: 8
-     sync_word: 13380
-   ```
-
-2. **Antenna connected properly**
-
-3. **Check TX power:**
-   ```yaml
-   radio:
-     tx_power: 14  # Try increasing to 20
-   ```
-
-4. **Verify other nodes are transmitting**
-
-5. **Check logs for received packets:**
-   ```bash
-   journalctl -u pymc-repeater 
-   ```
-
-### Poor Signal Quality
-
-**Symptoms:** Low RSSI, high packet loss
-
-**Solutions:**
-
-1. **Check antenna:**
-   - Proper 868/915 MHz antenna
-   - Secure connection
-   - Vertical orientation
-   - Away from metal
-
-2. **Increase TX power:**
-   ```yaml
-   radio:
-     tx_power: 20  # Maximum for most modules
-   ```
-
-3. **Optimize placement:**
-   - Higher location
-   - Clear line of sight
-   - Away from interference sources
-
-4. **Monitor signal:**
-   ```bash
-   # Watch RSSI/SNR in logs
-   journalctl -u pymc-repeater -f | grep -i rssi
-   ```
-
----
-
-## Network/Connectivity Issues
-
-### Can't Access Web Interface
-
-**Check service is running:**
-```bash
-sudo systemctl status pymc-repeater
-```
-
-**Verify port 8000 listening:**
-```bash
-sudo netstat -tulpn | grep 8000
-```
-
-**Test from Pi itself:**
-```bash
-curl http://localhost:8000
-```
-
-**Check firewall (if enabled):**
-```bash
-sudo ufw status
-sudo ufw allow 8000/tcp
-```
-
-**Find Pi's IP address:**
-```bash
-ip add
-```
-
-### LetsMesh / MQTT Broker Publishing Problems
-
-**Symptoms:** No status updates on LetsMesh dashboard
-
-**Check configuration:**
-```yaml
-mqtt_brokers:
-  iata_code: "NYC"
-  status_interval: 60
-  brokers:
-    - name: "LetsMesh"
-      host: "mqtt-us-v1.letsmesh.net"
-      port: 443
-      transport: "websockets"
-      audience: "mqtt-us-v1.letsmesh.net"
-      use_jwt_auth: true
-      enabled: true
-```
-
-**Verify internet connectivity:**
-```bash
-ping -c 4 mqtt-eu-v1.letsmesh.net
-curl -I https://analyzer.letsmesh.sh
-```
-
-**Check logs for errors:**
-```bash
-journalctl -u pymc-repeater | grep -i letsmesh
-```
-
-**Common errors:**
-
-1. **JWT or auth errors** - Recheck `audience`, TLS, and endpoint details
-2. **Wrong endpoint** - Recheck the broker host and transport
-3. **Network blocked** - Check firewall for port 443
-
-### MQTT Not Publishing
-
-**Check configuration:**
-```yaml
-mqtt_brokers:
-  brokers:
-    - name: "Local MQTT"
-      host: "localhost"
-      port: 1883
-      transport: "tcp"
-      format: "mqtt"
-      enabled: true
-```
-
-**Test MQTT broker:**
-```bash
-# Install mosquitto-clients
-sudo apt-get install mosquitto-clients
-
-# Subscribe to test
-mosquitto_sub -h localhost -t "meshcore/#" -v
-```
-
-**Check broker running:**
-```bash
-sudo systemctl status mosquitto
-```
-
----
-
-## Configuration Issues
-
-### Invalid YAML Syntax
-
-**Error:** `Error parsing config.yaml`
-
-**Test syntax:**
-```bash
-yq eval '.' /etc/pymc_repeater/config.yaml
-```
-
-**Common mistakes:**
-- Missing colons after keys
-- Wrong indentation (use 2 spaces)
-- Tabs instead of spaces
-- Unquoted special characters
-
-### Configuration Not Applied
-
-**After editing config, restart service:**
-```bash
-sudo systemctl restart pymc-repeater
-```
-
-**Verify config loaded:**
-```bash
-journalctl -u pymc-repeater -n 50 | grep -i config
-```
-
-### Settings Reverting After Upgrade
-
-**Use manage script for upgrades:**
-```bash
-sudo bash manage.sh upgrade
-```
-
-This preserves your configuration while adding new options.
-
----
-
-## Performance Issues
-
-### High CPU Usage
-
-**Check current usage:**
-```bash
-top -u repeater
-```
-
-**Common causes:**
-
-1. **DEBUG logging**
-   ```yaml
-   logging:
-     level: INFO  # Change from DEBUG
-   ```
-
-2. **High packet rate** - Normal for busy networks
-
-3. **Database operations** - Check SQLite file size
-
-**Monitor:**
-```bash
-# CPU temperature
-vcgencmd measure_temp
-
-# Process stats
-ps aux | grep repeater
-```
-
-### High Memory Usage
-
-**Check memory:**
-```bash
-free -h
-```
-
-**Solutions:**
-- Reduce `repeater.cache_ttl`
-- Clean up old database records
-- Restart service periodically
-
-### Disk Space Issues
-
-**Check disk usage:**
-```bash
-df -h
-du -sh /var/lib/pymc_repeater/*
-```
-
-**Clean up old data:**
-```yaml
-storage:
-  retention:
-    sqlite_cleanup_days: 7  # Reduce from 31
-```
-
-**Manual cleanup:**
-```bash
-# Delete old SQLite records
-sqlite3 /var/lib/pymc_repeater/repeater.db "DELETE FROM packets WHERE timestamp < strftime('%s', 'now', '-7 days')"
-
-# Vacuum database
-sqlite3 /var/lib/pymc_repeater/repeater.db "VACUUM"
-```
-
----
-
-## Upgrade Issues
-
-### Config Merge Errors
-
-**Symptoms:** Configuration lost or broken after upgrade
-
-**Solution:**
-```bash
-# Restore from backup
-sudo cp /etc/pymc_repeater.backup.*/config.yaml /etc/pymc_repeater/
-
-# Restart service
-sudo systemctl restart pymc-repeater
-```
-
-**Manual merge:**
-```bash
-# Compare old and new
-diff /etc/pymc_repeater.backup.*/config.yaml /etc/pymc_repeater/config.yaml.example
-```
-
-### Service Fails After Upgrade
-
-**Check Python dependencies:**
-```bash
-cd /opt/pymc_repeater
-sudo pip install --break-system-packages -e . --force-reinstall
-```
-
-**Verify systemd service:**
-```bash
-sudo systemctl daemon-reload
-sudo systemctl restart pymc-repeater
-```
-
----
-
-## Data/Database Issues
-
-### Database Corruption
-
-**Symptoms:** Service crashes, database errors in logs
-
-**Check integrity:**
-```bash
-sqlite3 /var/lib/pymc_repeater/repeater.db "PRAGMA integrity_check"
-```
-
-**Backup and repair:**
-```bash
-# Stop service
-sudo systemctl stop pymc-repeater
-
-# Backup
-sudo cp /var/lib/pymc_repeater/repeater.db /var/lib/pymc_repeater/repeater.db.backup
-
-# Repair
-sqlite3 /var/lib/pymc_repeater/repeater.db ".recover" | sqlite3 /var/lib/pymc_repeater/repeater_new.db
-sudo mv /var/lib/pymc_repeater/repeater_new.db /var/lib/pymc_repeater/repeater.db
-
-# Restart
-sudo systemctl start pymc-repeater
-```
-
-### Missing Statistics
-
-**Symptoms:** No RRD graphs, missing historical data
-
-**Check RRD files:**
-```bash
-ls -lh /var/lib/pymc_repeater/*.rrd
-```
-
-**Recreate if missing:**
-```bash
-# Service will auto-create on next start
-sudo systemctl restart pymc-repeater
-```
-
----
-
-## Getting More Help
-
-### Enable Debug Logging
-
-```yaml
-logging:
-  level: DEBUG
-```
+Read the earliest traceback or error after a restart:
 
 ```bash
-sudo systemctl restart pymc-repeater
-journalctl -u pymc-repeater -f
+sudo systemctl restart openhop-repeater
+sudo journalctl -u openhop-repeater -n 150 --no-pager
 ```
 
-**⚠️ Remember to set back to INFO after debugging**
+Common causes:
 
-### Collect Diagnostic Info
+- invalid YAML or a key at the wrong indentation;
+- wrong `radio_type` for the configured backend block;
+- missing serial, SPI, GPIO, or USB device;
+- service-user permission to the selected device;
+- another process already using the device or TCP port;
+- a stale legacy path or system Python installation shadowing the managed virtual
+  environment.
 
-```bash
-# System info
-uname -a
-cat /etc/os-release
+Current development builds report boot-time configuration and local-identity
+errors as concise configuration messages instead of printing a full traceback.
+Treat that message as the primary failure: check the named file/key, YAML shape,
+duplicate identity name, or same-class one-byte public-key prefix collision. Do
+not enable debug logging merely to obtain a traceback before checking the stated
+configuration error.
 
-# Service status
-sudo systemctl status pymc-repeater
+Use `sudo bash ./manage.sh upgrade` from the checkout to repair/migrate a managed
+installation. Do not install dependencies into system Python with
+`--break-system-packages`; the current service runs from
+`/opt/openhop_repeater/venv`.
 
-# Recent logs
-journalctl -u pymc-repeater -n 200 > pymc-repeater.log
+## Isolate software from radio hardware
 
-# Configuration
-cat /etc/pymc_repeater/config.yaml > config.txt
+Temporarily use `radio_type: null` in a copied or backed-up config. If the daemon
+and dashboard then start, focus on the radio backend, device access, or wiring.
+For a receive-only investigation with initialized hardware, use
+`repeater.mode: no_tx`.
 
-# Hardware
-gpio readall
-ls -l /dev/spidev*
-```
+## Direct SX1262 problems
 
-### Report Issues
+Verify all of the following against the exact board revision:
 
-When reporting issues on [GitHub](https://github.com/openhop-dev/openhop_repeater/issues):
+- Linux SPI bus and chip-select device exist;
+- GPIO numbering matches the selected backend;
+- reset, busy, IRQ, TXEN/RXEN, and enable pins are correct;
+- DIO3 TCXO voltage and DIO2 RF-switch settings match the module;
+- no other daemon is holding GPIO/SPI;
+- the antenna is attached before transmit.
 
-1. **Describe the problem** clearly
-2. **Include logs** (use DEBUG level)
-3. **Share configuration** (remove sensitive data)
-4. **List hardware** (Pi model, LoRa module)
-5. **Mention version** (`cat /opt/pymc_repeater/pyproject.toml`)
+With `sx1262_ch341`, pin values are CH341 GPIO numbers `0-7`, not Raspberry Pi
+BCM numbers. Confirm the adapter appears as VID/PID `1a86:5512` and is passed
+through to a container when applicable.
 
----
+## KISS, USB, or TCP modem problems
 
-## Additional Resources
+For serial backends, confirm the configured device exists, the service user can
+open it, the baud rate is correct, and no terminal/modem-manager process owns it.
 
-- [Configuration Reference](/projects/openhop-repeater/config-file/)
-- [Hardware Setup](/projects/openhop-repeater/hardware-setup/)
-- [GitHub Issues](https://github.com/openhop-dev/openhop_repeater/issues)
-- [GitHub Discussions](https://github.com/openhop-dev/openhop_repeater/discussions)
+For `pymc_tcp`, verify host, port, token, DNS/mDNS resolution, and routing from the
+Repeater host. A network ping alone does not prove the modem protocol port is
+reachable. For `pymc_usb`, verify the USB-CDC device path after reconnects.
+
+Then compare frequency, bandwidth, spreading factor, coding rate, preamble, sync,
+LBT, and power with the modem and the mesh.
+
+## Dashboard is unavailable
+
+1. Confirm the service is active.
+2. Test `http://localhost:8000` from the Repeater host.
+3. Confirm the host is listening on the expected address and port.
+4. Check host/container firewall and port mapping.
+5. Review logs for HTTP bind, frontend-path, or authentication errors.
+
+Keep port 8000 private to a trusted LAN, VPN, or protected reverse proxy. CORS is
+disabled by default and should remain disabled unless a known browser client
+requires it.
+
+## Login or API failures
+
+- Confirm the admin/guest password in the protected config, without posting it.
+- Expired JWTs require a new login.
+- API tokens are shown in plaintext only when created; create a replacement if a
+  token was lost and revoke the old record.
+- Interactive Swagger requests use the currently selected server. Verify it
+  before calling a mutating endpoint.
+
+## No packets received
+
+- Confirm other nodes are active and use the same RF settings.
+- Check antenna, feed line, connector, and placement.
+- Review noise-floor, RSSI/SNR, CRC-error, and reconnect indicators.
+- Verify transport-key scope and `mesh.unscoped_flood_allow` policy.
+- Confirm the node is not accidentally pointed at a different serial/TCP modem.
+
+Do not raise transmit power to diagnose receive-only problems.
+
+## Neighbour scopes or MQTT publication are missing
+
+Check `GET /api/mqtt_status` after scheduling a cycle. The neighbour publisher
+reports a phase (`disabled`, `scheduled`, `due`, or `active`), time until the next
+cycle, the last result, and the last publish timestamp.
+
+- `disabled`: confirm the master settings block is enabled and at least one
+  enabled broker has the per-broker `neighbors: true` flag.
+- `scheduled`: wait until due or use the authenticated
+  `POST /api/publish_neighbors` trigger.
+- `active`: allow the discovery window and serialized scope queries to finish;
+  a normal cycle can take several minutes.
+- Repeated deferral: confirm an opted-in broker is connected and accepts the
+  `neighbors` topic.
+- Timeout rows: confirm the target is a fresh zero-hop repeater. Anonymous scope
+  replies are rate-limited, so repeated manual queries can also time out.
+- No stored scopes: inspect `GET /api/neighbor_scopes`. An empty scope string in
+  a successful response means unscoped traffic only; it is not missing data.
+
+A full cycle transmits discovery and scope requests. Verify RF settings, duty
+cycle headroom, and authorization before triggering one during troubleshooting.
+
+## Charts or history are missing
+
+The metrics API reports whether RRD is enabled and available and whether charts
+are using RRD or SQLite. If RRD is disabled or unavailable, SQLite may still
+provide chart data. Check state-directory ownership and free disk space before
+attempting database repair.
+
+Never modify or vacuum the live database. Back up `/var/lib/openhop_repeater`,
+stop the service, and work on a copy if offline recovery is required.
+
+## Upgrade problems
+
+The management script migrates legacy `pymc_repeater` directories and disables
+the old service. If an upgrade fails:
+
+1. Save the full journal locally.
+2. Check whether both old and new services exist.
+3. Verify the service unit points to `/opt/openhop_repeater/venv/bin/python` and
+   `/etc/openhop_repeater/config.yaml`.
+4. Re-run `sudo bash ./manage.sh upgrade` from a clean checkout.
+5. Restore a backup only after identifying which config/state paths are active.
+
+Docker installations are upgraded by pulling and recreating the container, not
+through the dashboard updater.
+
+## Collect a safe support bundle
+
+Include:
+
+- OS and Python version;
+- install type: native, Docker, HA add-on, Buildroot, or Proxmox LXC;
+- Repeater commit/tag or image tag;
+- selected `radio_type` and hardware model/revision;
+- redacted relevant config section;
+- first error and surrounding journal lines;
+- what changed immediately before the failure.
+
+Exclude private keys, JWT secrets, passwords, API tokens, MQTT/Glass/modem
+credentials, exact private location, and complete databases.
+
+For configuration details, see
+[Configuration Reference](/projects/openhop-repeater/config-file/) and
+[Hardware Setup](/projects/openhop-repeater/hardware-setup/).

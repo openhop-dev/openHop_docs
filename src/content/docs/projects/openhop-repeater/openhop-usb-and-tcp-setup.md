@@ -1,6 +1,8 @@
 ---
 title: openHop USB/TCP Setup
 description: Configure openHop Repeater to use a pymc_usb modem over USB-CDC or over TCP.
+sidebar:
+  order: 8
 ---
 
 # openHop USB/TCP Setup
@@ -16,7 +18,7 @@ For device selection, firmware flashing, HTTP diagnostics, modem sensors, and mo
 
 Both modes keep the repeater in charge of node behavior, the dashboard, API, MQTT, GPS, identities, and storage.
 
-The main config file is `/etc/pymc_repeater/config.yaml`.
+The main config file is `/etc/openhop_repeater/config.yaml`.
 
 ## openHop USB over USB-CDC
 
@@ -32,7 +34,7 @@ pymc_usb:
   lbt_max_attempts: 5
 ```
 
-What the current setup helper writes by default:
+The commented canonical config example uses these USB values:
 
 - `port: /dev/ttyACM0`
 - `baudrate: 921600`
@@ -64,7 +66,7 @@ pymc_tcp:
   lbt_max_attempts: 5
 ```
 
-What the current setup helper writes by default:
+The commented canonical config example uses these TCP values:
 
 - `host: REPLACE_WITH_MODEM_HOST`
 - `port: 5055`
@@ -77,18 +79,17 @@ Replace the placeholder host before expecting the service to start cleanly.
 
 Use the modem LAN IP, hostname, or mDNS name, for example `pymc-3e2834.local`.
 
-## Using the setup helper
+## Configure the backend
 
-```bash
-sudo bash setup-radio-config.sh /etc/pymc_repeater
+Use the browser setup flow:
+
+```text
+http://<repeater-ip>:8000/setup
 ```
 
-During the prompts:
-
-1. Select either `pymc_usb modem (USB-CDC)` or `pymc_tcp modem (Wi-Fi / Ethernet)`.
-2. Choose the radio preset that matches the network.
-3. For `pymc_usb`, confirm the serial device and baud rate.
-4. For `pymc_tcp`, replace the placeholder host with the modem address.
+Alternatively, edit the `pymc_usb` or `pymc_tcp` block in
+`/etc/openhop_repeater/config.yaml`. The terminal `setup-radio-config.sh` helper
+does not currently configure these two backends.
 
 ## Radio settings that still matter
 
@@ -101,16 +102,19 @@ Even though the modem firmware owns the radio hardware, these repeater settings 
 - `radio.coding_rate`
 - `radio.preamble_length`
 
-The current setup defaults for the openHop modem paths use:
+The canonical Repeater config currently defaults to:
 
-- `tx_power: 22`
-- `preamble_length: 16`
+- `tx_power: 14`
+- `preamble_length: 32`
+
+Hardware presets may intentionally override these values. Match the actual mesh
+and regional rules rather than assuming either set is universal.
 
 ## Restart and verify
 
 ```bash
-sudo systemctl restart pymc-repeater
-sudo journalctl -u pymc-repeater -f
+sudo systemctl restart openhop-repeater
+sudo journalctl -u openhop-repeater -f
 ```
 
 Look for:

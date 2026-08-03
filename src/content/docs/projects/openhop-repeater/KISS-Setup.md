@@ -1,6 +1,8 @@
 ---
 title: KISS Setup
 description: Configure openHop Repeater to use a serial KISS modem instead of GPIO radio hardware.
+sidebar:
+  order: 7
 ---
 
 # KISS Setup
@@ -39,14 +41,14 @@ radio:
   coding_rate: 8
 ```
 
-The main config file is `/etc/pymc_repeater/config.yaml`.
+The main config file is `/etc/openhop_repeater/config.yaml`.
 
 ## Using the setup helper
 
 The repo helper supports KISS mode directly:
 
 ```bash
-sudo bash setup-radio-config.sh /etc/pymc_repeater
+sudo bash setup-radio-config.sh /etc/openhop_repeater
 ```
 
 During the prompts:
@@ -80,8 +82,8 @@ When using KISS:
 ## Restart and verify
 
 ```bash
-sudo systemctl restart pymc-repeater
-sudo journalctl -u pymc-repeater -f
+sudo systemctl restart openhop-repeater
+sudo journalctl -u openhop-repeater -f
 ```
 
 If startup fails, check for:

@@ -52,6 +52,18 @@ If a local sibling repo exists at:
 
 the checked-in repeater OpenAPI file will be refreshed from that source.
 
+To build against a specific Repeater Git ref without switching the sibling
+checkout, set `OPENHOP_REPEATER_OPENAPI_REF`. For example, to use the fetched
+development branch exactly:
+
+```bash
+git -C ../openhop_repeater fetch origin
+OPENHOP_REPEATER_OPENAPI_REF=origin/dev npm run build
+```
+
+An explicitly requested ref must exist in the sibling Git checkout; the sync
+fails rather than silently using a different spec.
+
 If that local repo is not present, the docs site falls back to the checked-in spec in:
 
 ```text

@@ -38,13 +38,15 @@ When using local GPIO or SPI:
 The add-on maps:
 
 - `addon_config` -> `/config`
-- `data` -> `/var/lib/pymc_repeater`
+- `data` -> `/var/lib/openhop_repeater`
 
 That means:
 
 - main config file: `/config/config.yaml`
 - node identity file: `/config/identity.key`
-- runtime state: `/var/lib/pymc_repeater`
+- runtime state: `/var/lib/openhop_repeater`
+- upstream runtime config path: `/etc/openhop_repeater/config.yaml`, through a
+  symlink to `/config`
 
 ## Network behavior
 
@@ -56,6 +58,17 @@ Host networking also matters for:
 - any room-server ports
 - `pymc_tcp` modem reachability
 - broker and control-plane connectivity
+
+Because both channel add-ons use host networking and default to the same ports,
+do not run Dev and Main simultaneously without changing all conflicting web,
+companion, and room-server listeners.
+
+## Security boundary
+
+`full_access: true`, disabled AppArmor, host networking, and direct hardware
+access give this add-on substantially more host reach than a typical add-on. Use
+only trusted images and configs, keep the dashboard on a trusted LAN/VPN, and do
+not expose hardware devices or port 8000 more broadly than required.
 
 ## Related pages
 
