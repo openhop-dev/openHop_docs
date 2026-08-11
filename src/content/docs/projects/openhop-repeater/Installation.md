@@ -200,6 +200,7 @@ image and recreating the container, not through the dashboard updater.
 
 ## Related pages
 
+- [Uninstallation](/projects/openhop-repeater/uninstallation/)
 - [Hardware Setup](/projects/openhop-repeater/hardware-setup/)
 - [openHop USB/TCP Setup](/projects/openhop-repeater/openhop-usb-and-tcp-setup/)
 - [KISS Setup](/projects/openhop-repeater/kiss-setup/)

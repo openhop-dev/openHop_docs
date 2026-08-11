@@ -1,13 +1,15 @@
 ---
-title: Documentation Home
-description: Entry point for current openHop Repeater docs.
+title: Documentation Directory
+description: Complete topic directory for current openHop Repeater documentation.
 sidebar:
   order: 20
 ---
 
-# openHop Repeater Documentation
+# openHop Repeater Documentation Directory
 
-This section tracks the current local `openhop_repeater` repo rather than the older Raspberry Pi only docs set.
+The canonical project entry point is the
+[openHop Repeater Overview](/projects/openhop-repeater/). This directory provides
+a longer task-oriented index without creating a second project home page.
 
 ## Start here
 
@@ -18,6 +20,7 @@ This section tracks the current local `openhop_repeater` repo rather than the ol
 5. [openHop Modem](/projects/openhop-modem/)
 6. [openHop USB/TCP Setup](/projects/openhop-repeater/openhop-usb-and-tcp-setup/)
 7. [KISS Setup](/projects/openhop-repeater/kiss-setup/)
+8. [Uninstallation](/projects/openhop-repeater/uninstallation/)
 
 ## Supported deployment styles
 
@@ -46,6 +49,7 @@ This section tracks the current local `openhop_repeater` repo rather than the ol
 - [openHop USB/TCP Setup](/projects/openhop-repeater/openhop-usb-and-tcp-setup/)
 - [LetsMesh Integration](/projects/openhop-repeater/letsmesh-integration/)
 - [Identity Management](/projects/openhop-repeater/identity-management/)
+- [Uninstallation](/projects/openhop-repeater/uninstallation/)
 - [Troubleshooting](/projects/openhop-repeater/troubleshooting/)
 
 ## External resources

@@ -98,6 +98,8 @@ attach a suitable antenna, and verify wiring before initializing or transmitting
 ## Choose the next guide
 
 - [Architecture and Transports](/projects/openhop-core/architecture-and-transports/)
+- [Node Usage](/projects/openhop-core/node-usage/)
 - [Companion Applications](/projects/openhop-core/companion-applications/)
+- [Examples and Hardware Safety](/projects/openhop-core/examples/)
+- [Direct SX1262 Hardware Setup](/projects/openhop-core/direct-sx1262-hardware/)
 - [Core Development](/projects/openhop-core/development/)
-- [Upstream examples](https://github.com/openhop-dev/openhop_core/tree/dev/examples) — these open hardware and may transmit; review them before running

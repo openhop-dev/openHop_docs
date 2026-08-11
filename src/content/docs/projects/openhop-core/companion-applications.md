@@ -2,7 +2,7 @@
 title: Companion Applications
 description: Choose CompanionRadio, CompanionBridge, or CompanionFrameServer for higher-level MeshCore applications.
 sidebar:
-  order: 4
+  order: 5
 ---
 
 The companion layer is the high-level API for applications that need contacts,
@@ -82,8 +82,15 @@ companion clients. Bind only to interfaces you intend to expose, choose a unique
 port, and add network controls appropriate to the deployment. A bridge does not
 provide authentication or durable storage automatically.
 
+The complete central transport, command-family, persistence, and exposure guide is
+[Companion Frame Server](/projects/openhop-core/companion-frame-server/). Practical
+chat, gateway, bridge, diagnostics, and channel patterns are in
+[Companion Recipes](/projects/openhop-core/companion-recipes/).
+
 ## Full API
 
-The companion API evolves quickly. Use the
-[companion source guide](https://github.com/openhop-dev/openhop_core/blob/dev/docs/docs/companion.md)
-and current source as the detailed reference.
+The companion API evolves quickly. Start with the central
+[API Reference](/projects/openhop-core/api-reference/#companion-apis), then use the
+[current companion source](https://github.com/openhop-dev/openhop_core/tree/dev/src/openhop_core/companion)
+and tests for implementation-level behavior. The API reference states which branch
+it tracks rather than presenting mutable source as a versioned release contract.
