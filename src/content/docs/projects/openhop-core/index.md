@@ -18,17 +18,26 @@ should be treated as experimental against the current dispatcher contract.
 
 - Installation and safe lifecycle patterns
 - Protocol, node, companion, and radio architecture
-- Supported transport backends and optional dependencies
-- Development, tests, and upstream API references
+- Practical node usage, current examples, and hardware safety
+- Direct SX1262 and KISS modem compatibility
+- Public API entry points, development, and tests
 
 ## Useful links
 
 - Project repository: [openHop Core](https://github.com/openhop-dev/openhop_core)
 - PyPI package: [openhop-core](https://pypi.org/project/openhop-core/)
-- Source API and examples: [openHop Core repository](https://github.com/openhop-dev/openhop_core/tree/dev/docs)
+- [API Reference](/projects/openhop-core/api-reference/)
+- [Examples and Hardware Safety](/projects/openhop-core/examples/)
+- [Node and Dispatcher API](/projects/openhop-core/node-and-dispatcher-api/)
+- [Protocol API](/projects/openhop-core/protocol-api/)
 
 ## Next step
 
 Start with [Quick Start](/projects/openhop-core/quick-start/), then read
-[Architecture and Transports](/projects/openhop-core/architecture-and-transports/)
-or [Companion Applications](/projects/openhop-core/companion-applications/).
+[Architecture and Transports](/projects/openhop-core/architecture-and-transports/),
+[Node Usage](/projects/openhop-core/node-usage/), or
+[Companion Applications](/projects/openhop-core/companion-applications/).
+
+For hosted companion clients, continue to
+[Companion Frame Server](/projects/openhop-core/companion-frame-server/) and
+[Companion Recipes](/projects/openhop-core/companion-recipes/).

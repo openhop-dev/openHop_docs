@@ -78,6 +78,10 @@ Do not treat example frequencies or pin maps as universal presets.
 ## Related resources
 
 - [Quick Start](/projects/openhop-core/quick-start/)
+- [Node Usage](/projects/openhop-core/node-usage/)
 - [Companion Applications](/projects/openhop-core/companion-applications/)
+- [Direct SX1262 Hardware Setup](/projects/openhop-core/direct-sx1262-hardware/)
+- [MeshCore KISS Modem Protocol Compatibility](/projects/openhop-core/kiss-modem-protocol/)
+- [API Reference](/projects/openhop-core/api-reference/)
 - [openHop Repeater Hardware Setup](/projects/openhop-repeater/hardware-setup/)
 - [Source hardware package](https://github.com/openhop-dev/openhop_core/tree/dev/src/openhop_core/hardware)

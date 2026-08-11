@@ -2,7 +2,7 @@
 title: Core Development
 description: Set up, test, format, and build documentation for openHop Core.
 sidebar:
-  order: 5
+  order: 14
 ---
 
 ## Development setup
@@ -60,9 +60,12 @@ cd docs
 python -m mkdocs build --clean
 ```
 
-The source tree also contains detailed MkDocs API material. The public openHop
-documentation site is [docs.openhop.dev](https://docs.openhop.dev/); this Core
-section focuses on stable ecosystem-level guidance.
+The source tree still contains the legacy MkDocs build for repository-local
+reference and contributor checks. The canonical public documentation is this
+`docs.openhop.dev` Core section. Use the central
+[API Reference](/projects/openhop-core/api-reference/) and task guides for public
+links; treat the source MkDocs pages as migration input rather than a separate
+public documentation site.
 
 ## Compatibility rules
 
@@ -76,6 +79,23 @@ section focuses on stable ecosystem-level guidance.
 - The caller owns radio shutdown after stopping `MeshNode`.
 - Never use hardware examples as unattended smoke tests.
 
+## Track development by commit
+
+openHop Core does not publish GitHub Releases. Track development through the
+[`dev` commit history](https://github.com/openhop-dev/openhop_core/commits/dev/) or
+[`main` commit history](https://github.com/openhop-dev/openhop_core/commits/main/).
+A branch name moves, so record the exact commit when testing or reporting behavior:
+
+```bash
+git branch --show-current
+git rev-parse HEAD
+git log --oneline CURRENT_COMMIT..origin/dev
+```
+
+Replace `CURRENT_COMMIT` with the previously recorded revision and use
+`origin/main` when that is the intended branch. Review actual source and test changes;
+commit subjects are an index, not a compatibility guarantee.
+
 ## Before opening a change
 
 1. Add or update focused tests.
@@ -84,6 +104,3 @@ section focuses on stable ecosystem-level guidance.
 4. Build the MkDocs site when documentation changes.
 5. Check the diff for generated files, identities, tokens, device paths, and other
    local artifacts.
-
-See the [repository contributing guide](https://github.com/openhop-dev/openhop_core/blob/dev/docs/docs/contributing.md)
-for the current project workflow.
