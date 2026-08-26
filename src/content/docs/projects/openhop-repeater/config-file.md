@@ -5,8 +5,6 @@ sidebar:
   order: 9
 ---
 
-# openHop Repeater Configuration Guide
-
 Reference for configuring openHop Repeater using `config.yaml`, installed at
 `/etc/openhop_repeater/config.yaml`. The authoritative, commented schema is
 `config.yaml.example` in the Repeater repository's `dev` branch.
@@ -75,7 +73,8 @@ Maximum number of hops a flood packet may already have taken before this repeate
 
 ### `repeater.use_score_for_tx`
 
-Enables score-based filtering and adaptive transmission timing.
+Shortens transmission delay according to packet score when the initially
+calculated delay is at least 50 ms. It does not filter or reject packets.
 
 ### `repeater.multi_acks`
 
@@ -98,6 +97,11 @@ Reserved for future use. Present in config, but does not currently change packet
 ### `repeater.send_advert_interval_hours`
 
 Automatic advert interval in hours. Set `0` to disable automatic adverts.
+
+### `repeater.direct_advert_interval_hours`
+
+Independent periodic direct-advert stream. The default `0` disables it; enabled
+values are `1` through `168` hours.
 
 ### `repeater.allow_discovery`
 
@@ -147,7 +151,7 @@ Authentication settings are nested under `repeater.security`.
 
 ### `repeater.security.max_clients`
 
-Maximum number of authenticated clients across identities.
+Maximum number of authenticated clients across identities. The current default is `5`.
 
 ### `repeater.security.admin_password`
 
@@ -213,7 +217,7 @@ Use this when a networked openHop Modem exposes parsed GPS data from its HTTP AP
 gps:
   enabled: true
   source: modem_http
-  host: "pymc-modem.local"
+  host: "REPLACE_WITH_MODEM_HOST"
   port: 80
   endpoint: "/api/stats"
   scheme: "http"
@@ -222,7 +226,8 @@ gps:
   poll_interval_seconds: 2.0
 ```
 
-Supported source aliases are `modem_http`, `pymc_modem`, and `http`. Prefer `modem_http` in new configs.
+Supported values are `modem_http` and the compatibility alias `http`. Prefer
+`modem_http` in new configs.
 
 See [openHop Modem Repeater Integration](/projects/openhop-modem/repeater-integration/) for the full RF, sensor, and GPS setup flow.
 
@@ -296,8 +301,10 @@ The current example config includes these sensor types:
 - `ina219`
 - `ens210`
 - `shtc3`
+- `bme280`
 - `waveshare_ups_d`
-- `pymc_modem`
+- `waveshare_ups_e`
+- `openhop_modem`
 
 Example:
 
@@ -315,11 +322,11 @@ sensors:
       settings:
         i2c_address: 0x70
         bus_number: 1
-    - type: pymc_modem
+    - type: openhop_modem
       name: modem
       enabled: true
       settings:
-        host: "pymc-modem.local"
+        host: "REPLACE_WITH_MODEM_HOST"
         port: 80
         endpoint: "/api/stats"
         scheme: "http"
@@ -329,7 +336,7 @@ sensors:
         timeout_seconds: 2.0
 ```
 
-The `pymc_modem` sensor reads modem diagnostics from an openHop Modem HTTP API and exposes them under `/api/stats -> sensors`. It is useful for battery, solar, and modem-visible GPS diagnostics. If you want Repeater's native `/api/gps` endpoint to use the modem's location fix, configure `gps.source: modem_http` as well.
+The `openhop_modem` sensor reads modem diagnostics from an openHop Modem HTTP API and exposes them under `/api/stats -> sensors`. It is useful for battery, solar, and modem-visible GPS diagnostics. If you want Repeater's native `/api/gps` endpoint to use the modem's location fix, configure `gps.source: modem_http` as well.
 
 ## Mesh
 
@@ -338,6 +345,8 @@ Mesh-wide forwarding and path encoding behavior.
 ### `mesh.unscoped_flood_allow`
 
 Controls whether unscoped flood traffic is allowed by default.
+`mesh.global_flood_allow` remains an accepted legacy alias and must match the
+preferred value when both are present.
 
 ### `mesh.path_hash_mode`
 
@@ -383,6 +392,46 @@ Key companion settings:
 
 For key generation and imports, see [Identity Management](/projects/openhop-repeater/identity-management/).
 
+## Multi-radio and RF Fabric
+
+Leave `radios:` unset to use the legacy top-level single-radio configuration.
+When `radios:` is present, each entry requires a unique `id`, a `radio_type`,
+its own `radio:` air settings, and the hardware block required by that backend.
+The top-level single-radio settings are then ignored for radio construction.
+
+```yaml
+fabric:
+  default_radio: local
+  tx_mode: bridge  # default | sticky | bridge
+
+radios:
+  - id: local
+    radio_type: modem_usb
+    radio:
+      frequency: 869618000
+      bandwidth: 62500
+      spreading_factor: 8
+      coding_rate: 8
+      preamble_length: 32
+    modem_usb:
+      port: "/dev/openhop-modem"
+  - id: link
+    radio_type: modem_tcp
+    radio:
+      frequency: 864200000
+      bandwidth: 62500
+      spreading_factor: 11
+      coding_rate: 8
+      preamble_length: 32
+    modem_tcp:
+      host: "REPLACE_WITH_MODEM_HOST"
+      port: 5055
+```
+
+`fabric.tx_mode` selects the default radio, the most recent receive radio
+(`sticky`), or the opposite radio (`bridge`). It does not broadcast every packet
+through every configured radio.
+
 ## Radio Backend Selection
 
 Choose the backend with the top-level `radio_type` key.
@@ -392,8 +441,8 @@ Supported values in the current repo:
 - `sx1262`
 - `sx1262_ch341`
 - `kiss`
-- `pymc_tcp`
-- `pymc_usb`
+- `modem_tcp`
+- `modem_usb`
 - `null`
 - `none`
 
@@ -419,15 +468,15 @@ kiss:
 
 See [KISS Setup](/projects/openhop-repeater/kiss-setup/) for the operational flow.
 
-### `radio_type: pymc_tcp`
+### `radio_type: modem_tcp`
 
-Use a `pymc_usb` firmware modem exposed over Wi-Fi or Ethernet.
+Use an openHop Modem over Wi-Fi or Ethernet.
 
 ```yaml
-radio_type: pymc_tcp
+radio_type: modem_tcp
 
-pymc_tcp:
-  host: "pymc-3e2834.local"
+modem_tcp:
+  host: "REPLACE_WITH_MODEM_HOST"
   port: 5055
   token: ""
   connect_timeout: 5.0
@@ -446,14 +495,14 @@ Key fields:
 
 See [openHop USB/TCP Setup](/projects/openhop-repeater/openhop-usb-and-tcp-setup/) for the operational flow.
 
-### `radio_type: pymc_usb`
+### `radio_type: modem_usb`
 
-Use a `pymc_usb` firmware modem attached over USB-CDC.
+Use an openHop Modem attached over USB serial.
 
 ```yaml
-radio_type: pymc_usb
+radio_type: modem_usb
 
-pymc_usb:
+modem_usb:
   port: "/dev/ttyACM0"
   baudrate: 921600
   lbt_enabled: true
@@ -500,7 +549,7 @@ radio:
   bandwidth: 62500
   spreading_factor: 8
   coding_rate: 8
-  preamble_length: 17
+  preamble_length: 32
   implicit_header: false
 ```
 
@@ -539,7 +588,7 @@ sx1262:
 
 Notes:
 
-- With `radio_type: sx1262`, pin numbers are normal Linux GPIO numbering for the host
+- With `radio_type: sx1262`, pin numbers are BCM GPIO numbers for the host
 - With `radio_type: sx1262_ch341`, the same pin fields map to CH341 GPIO numbers
 - `use_gpiod_backend` switches GPIO access to libgpiod-backed numbering on platforms such as Luckfox Pico Ultra
 - `gpio_chip` selects the gpiod chip index when `use_gpiod_backend` is enabled
@@ -575,7 +624,11 @@ storage:
   storage_dir: "/var/lib/openhop_repeater"
   retention:
     sqlite_cleanup_days: 31
+    companion_events_days: 31
 ```
+
+`sqlite_cleanup_days` controls packet/history retention. The companion event
+journal uses its independent `companion_events_days` retention period.
 
 The daemon stores runtime data under `storage.storage_dir`. The default install
 keeps the main config at `/etc/openhop_repeater/config.yaml` and state data under
@@ -607,6 +660,7 @@ Each broker entry supports fields such as:
 - `username`
 - `password`
 - `format`
+- `base_topic` (optional custom root; blank persists as `null` so defaults apply)
 - `retain_status`
 - `neighbors`
 - `tls.enabled`
@@ -614,6 +668,10 @@ Each broker entry supports fields such as:
 - `disallowed_packet_types`
 
 This is also where current LetsMesh-style publishing is modeled.
+
+When `base_topic` is omitted, the `mqtt` format derives
+`meshcore/repeater/<node_name>`. MC2MQTT-family formats derive
+`meshcore/<iata_code>/<public_key>`.
 
 ### Periodic neighbour publication
 
@@ -774,12 +832,12 @@ radio:
 ### openHop USB modem host
 
 ```yaml
-radio_type: pymc_usb
+radio_type: modem_usb
 
 repeater:
   node_name: "usb-modem-repeater"
 
-pymc_usb:
+modem_usb:
   port: "/dev/ttyACM0"
   baudrate: 921600
   lbt_enabled: true
@@ -797,13 +855,13 @@ radio:
 ### openHop TCP modem host
 
 ```yaml
-radio_type: pymc_tcp
+radio_type: modem_tcp
 
 repeater:
   node_name: "tcp-modem-repeater"
 
-pymc_tcp:
-  host: "pymc-3e2834.local"
+modem_tcp:
+  host: "REPLACE_WITH_MODEM_HOST"
   port: 5055
   token: ""
   connect_timeout: 5.0
@@ -841,7 +899,9 @@ sx1262:
 ## Notes
 
 - The current repo schema is defined by the upstream `config.yaml.example` in `openhop_repeater`.
-- Older repeater docs and examples may still mention `mesh.global_flood_allow` or a top-level `mqtt:` block. Those are stale against the current repo.
+- Older repeater docs and examples may still mention a top-level `mqtt:` block;
+  use `mqtt_brokers:` instead. `mesh.global_flood_allow` remains a legacy alias
+  for `mesh.unscoped_flood_allow`, not the preferred name.
 - Some HTTP, logging, and radio parameters can be applied live, while
   `radio_type`, KISS transport, and modem transport changes require a restart.
 - After restart-required edits, run `sudo systemctl restart openhop-repeater` and

@@ -5,8 +5,6 @@ sidebar:
   order: 20
 ---
 
-# openHop Repeater Documentation Directory
-
 The canonical project entry point is the
 [openHop Repeater Overview](/projects/openhop-repeater/). This directory provides
 a longer task-oriented index without creating a second project home page.
@@ -27,8 +25,8 @@ a longer task-oriented index without creating a second project home page.
 - Native SPI + GPIO hosts using `radio_type: sx1262`
 - CH341 USB-SPI hosts using `radio_type: sx1262_ch341`
 - Serial TNC hosts using `radio_type: kiss`
-- USB-CDC modem hosts using `radio_type: pymc_usb`
-- Wi-Fi or Ethernet modem hosts using `radio_type: pymc_tcp`
+- USB serial modem hosts using `radio_type: modem_usb`
+- Wi-Fi or Ethernet modem hosts using `radio_type: modem_tcp`
 - Dashboard-only or companion-only hosts using `radio_type: null`
 - Proxmox LXC deployments for CH341-backed radios
 
@@ -36,7 +34,7 @@ a longer task-oriented index without creating a second project home page.
 
 - GPS receiver support and GPS time sync
 - background sensor plug-ins exposed through `/api/stats`
-- openHop Modem HTTP GPS and `pymc_modem` sensor telemetry
+- openHop Modem HTTP GPS and `openhop_modem` sensor telemetry
 - `mqtt_brokers` based publishing
 - openHop Glass control-plane integration
 - new hardware presets including uConsole, meshadv, UltraPeater, and UltraPeaterZero
@@ -47,7 +45,7 @@ a longer task-oriented index without creating a second project home page.
 - [What is openHop Repeater?](/projects/openhop-repeater/what-is-openhop-repeater/)
 - [openHop Modem](/projects/openhop-modem/)
 - [openHop USB/TCP Setup](/projects/openhop-repeater/openhop-usb-and-tcp-setup/)
-- [LetsMesh Integration](/projects/openhop-repeater/letsmesh-integration/)
+- [MQTT and LetsMesh Integration](/projects/openhop-repeater/letsmesh-integration/)
 - [Identity Management](/projects/openhop-repeater/identity-management/)
 - [Uninstallation](/projects/openhop-repeater/uninstallation/)
 - [Troubleshooting](/projects/openhop-repeater/troubleshooting/)

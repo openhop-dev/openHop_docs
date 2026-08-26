@@ -1,9 +1,9 @@
 ---
 title: Installation
 description: Install the openHop HA Add-on repository and choose the right add-on channel.
+sidebar:
+  order: 2
 ---
-
-# Installation
 
 The add-on repository lives at:
 
@@ -30,11 +30,14 @@ Add the repository URL to Home Assistant's add-on repositories list, then refres
 1. Install either `openHop Repeater Dev` or `openHop Repeater Main`.
 2. Review the add-on's broad hardware privileges. If Home Assistant exposes a
    Protection mode control, local GPIO/SPI/USB access may require it to be off.
-3. Start the add-on. Its bootstrap helper creates or merges `/config/config.yaml`
-   from the packaged template without replacing an existing config.
-4. Open `http://<home-assistant-host>:8000/setup` and complete the Repeater setup
-   flow, or edit the private add-on config file directly.
-5. Restart the add-on after changes that require a Repeater restart.
+3. Start the add-on once. First start creates the complete `/config/config.yaml`
+   and replaces the template's shared admin password, guest password, and JWT
+   secret with unique values.
+4. Stop the add-on before editing hardware settings.
+5. Open the private `config.yaml`, record the generated admin/guest credentials,
+   and configure the radio backend and regional settings.
+6. Start the add-on again, then open `http://<home-assistant-host>:8000`.
+7. Restart the add-on after later changes that require a Repeater restart.
 
 ## Web UI
 

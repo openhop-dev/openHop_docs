@@ -5,30 +5,32 @@ sidebar:
   order: 6
 ---
 
-# Hardware Setup Guide
-
 openHop Repeater supports more than just a Raspberry Pi with a GPIO-connected SX1262. The current repo supports five active backend classes plus a no-radio mode:
 
 - Native `sx1262` over Linux SPI and host GPIO
 - `sx1262_ch341` over a CH341 USB-SPI adapter
 - `kiss` using a serial KISS TNC instead of GPIO radio control
-- `pymc_usb` using a USB-CDC modem running `pymc_usb` firmware
-- `pymc_tcp` using a network modem running `pymc_usb` firmware
+- `modem_usb` using a USB serial modem running openHop Modem firmware
+- `modem_tcp` using a network modem running openHop Modem firmware
 - `null` or `none` when you want the daemon without RF hardware
 
 ## Supported hardware families
 
-The repo currently includes radio presets for:
+The repo currently includes named radio presets for families such as:
 
 - HackerGadgets uConsole LoRa module variants
-- Frequency Labs `meshadv-mini`
-- Frequency Labs `meshadv`
-- Heltec `HT-RA62`
-- Zindello Industries `UltraPeater`
-- Zindello Industries `UltraPeaterZero`
+- PiMesh 1W variants
+- Frequency Labs `meshadv-mini` and `meshadv`
+- Zebra and Zebra Duo HAT variants
+- Femtofox 1W/2W
+- PineDio
+- RAK6421/RAK13300 slot variants
+- Zindello Industries UltraPeater and UltraPeaterZero variants
 - Waveshare SX1262 SPI HAT
-- Generic SX1262 / E22-class boards
 - CH341 USB-SPI + SX1262 combinations
+
+Heltec `HT-RA62` and generic SX1262/E22-class hardware may work through custom
+configuration, but they are not named presets in the current preset file.
 
 For non-GPIO modem-style transports, use [KISS Setup](/projects/openhop-repeater/kiss-setup/) or [openHop USB/TCP Setup](/projects/openhop-repeater/openhop-usb-and-tcp-setup/).
 
@@ -45,12 +47,13 @@ Supported values:
 - `sx1262`
 - `sx1262_ch341`
 - `kiss`
-- `pymc_usb`
-- `pymc_tcp`
+- `modem_usb`
+- `modem_tcp`
 - `null` or `none`
 
-For `sx1262_ch341`, `pymc_usb`, `pymc_tcp`, or `null`, use the browser flow at
-`http://<repeater-ip>:8000/setup` or edit the config directly.
+For `sx1262_ch341`, `modem_usb`, `modem_tcp`, or `null`, complete the initial
+choice in `/setup`. After onboarding, use **System → Configuration → Radio →
+Radio Hardware** or edit the config directly, then restart Repeater.
 
 ## Native SX1262 wiring
 
@@ -121,18 +124,18 @@ For a common E22 mapping, the repo README uses:
 
 ## openHop USB modem hosts
 
-When `radio_type: pymc_usb` is selected:
+When `radio_type: modem_usb` is selected:
 
-- the modem presents itself as a USB-CDC serial device such as `/dev/ttyACM0`
+- the modem presents itself as a USB serial device such as `/dev/ttyACM0`
 - the modem firmware handles the LoRa radio
 - the repeater still owns node behavior, API, dashboard, MQTT, GPS, and identities
 
 Minimal transport block:
 
 ```yaml
-radio_type: pymc_usb
+radio_type: modem_usb
 
-pymc_usb:
+modem_usb:
   port: "/dev/ttyACM0"
   baudrate: 921600
   lbt_enabled: true
@@ -141,19 +144,19 @@ pymc_usb:
 
 ## openHop TCP modem hosts
 
-When `radio_type: pymc_tcp` is selected:
+When `radio_type: modem_tcp` is selected:
 
 - the modem runs on another board and exposes a TCP service over LAN, Wi-Fi, or Ethernet
 - the helper writes a placeholder host until you replace it
-- the modem host or mDNS name is set under `pymc_tcp.host`
+- the modem host or mDNS name is set under `modem_tcp.host`
 
 Minimal transport block:
 
 ```yaml
-radio_type: pymc_tcp
+radio_type: modem_tcp
 
-pymc_tcp:
-  host: "pymc-3e2834.local"
+modem_tcp:
+  host: "REPLACE_WITH_MODEM_HOST"
   port: 5055
   token: ""
   connect_timeout: 5.0
@@ -220,8 +223,9 @@ sudo bash setup-radio-config.sh /etc/openhop_repeater
 ```
 
 Use it to apply a current direct-SX1262 hardware preset or write KISS serial
-settings. Configure `sx1262_ch341`, `pymc_usb`, `pymc_tcp`, and `null` through
-`http://<repeater-ip>:8000/setup` or by editing the config directly.
+settings. After onboarding, configure `sx1262_ch341`, `modem_usb`, `modem_tcp`,
+and `null` through **System → Configuration → Radio → Radio Hardware** or by
+editing the config directly, then restart Repeater.
 
 ## Related pages
 

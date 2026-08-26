@@ -40,11 +40,7 @@ if (sourceRef) {
 }
 
 const spec = source
-  .replaceAll('pyMC Repeater API', 'openHop Repeater API')
-  .replaceAll('REST API for pyMC Repeater', 'REST API for openHop Repeater')
-  .replaceAll('name: pyMC Repeater', 'name: openHop Repeater')
-  .replaceAll('url: https://github.com/rightup/pyMC_Repeater', 'url: https://github.com/openhop-dev/openhop_repeater')
-  .replaceAll('Check pyMC console availability', 'Check openHop console availability')
+  .replaceAll('Check pyMC console availability', 'Check openHop Console availability')
   // Repeater's runtime and published install docs use port 8000. Keep the
   // central docs viewer from offering stale 8080 example servers until the
   // authoritative Repeater OpenAPI examples are corrected upstream.

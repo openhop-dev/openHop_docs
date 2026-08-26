@@ -5,8 +5,6 @@ sidebar:
   order: 7
 ---
 
-# KISS Setup
-
 Use this mode when the repeater should talk to a serial KISS TNC rather than directly controlling SX1262 GPIO and SPI hardware.
 
 ## When to use it

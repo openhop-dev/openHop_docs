@@ -5,16 +5,14 @@ sidebar:
   order: 4
 ---
 
-# Installation Guide
-
 The current `openhop_repeater` repo supports several install shapes:
 
 - Standard Linux host with native SPI and GPIO
 - CH341 USB-SPI hosts
 - Proxmox LXC deployments using CH341 passthrough
 - KISS modem deployments using a serial TNC
-- `pymc_usb` modem deployments over USB-CDC
-- `pymc_tcp` modem deployments over Wi-Fi or Ethernet
+- `modem_usb` modem deployments over USB serial
+- `modem_tcp` modem deployments over Wi-Fi or Ethernet
 - no-radio `null` mode for dashboard, API, or companion-only services
 
 The main configuration file is `/etc/openhop_repeater/config.yaml`.
@@ -62,8 +60,9 @@ The terminal helper supports:
 - `kiss` modem mode
 - hardware presets from `radio-settings.json`
 
-For all supported backends, open `http://<repeater-ip>:8000/setup` or update the
-relevant config block directly.
+Use `http://<repeater-ip>:8000/setup` only during first-run onboarding. After
+onboarding, use **System → Configuration → Radio → Radio Hardware** or update the
+relevant config block directly, then restart Repeater.
 
 ## KISS modem installs
 
@@ -78,41 +77,43 @@ Start with [KISS Setup](/projects/openhop-repeater/kiss-setup/).
 
 ## openHop USB modem installs
 
-Use this when the radio side is a board running `pymc_usb` firmware and the modem is attached to the repeater host over USB-CDC.
+Use this when the radio side is a board running openHop Modem firmware and the modem is attached to the repeater host over USB serial.
 
 1. Install the repeater normally.
-2. Open `/setup` or edit `/etc/openhop_repeater/config.yaml`.
-3. Set `radio_type: pymc_usb` and confirm the serial device, usually
+2. During first-run onboarding use `/setup`; later use the authenticated Radio
+   Hardware page or edit `/etc/openhop_repeater/config.yaml`.
+3. Set `radio_type: modem_usb` and confirm the serial device, usually
    `/dev/ttyACM0`.
 4. Restart the service and watch logs.
 
 The commented canonical config example uses:
 
-- `pymc_usb.port: /dev/ttyACM0`
-- `pymc_usb.baudrate: 921600`
-- `pymc_usb.lbt_enabled: true`
-- `pymc_usb.lbt_max_attempts: 5`
+- `modem_usb.port: /dev/ttyACM0`
+- `modem_usb.baudrate: 921600`
+- `modem_usb.lbt_enabled: true`
+- `modem_usb.lbt_max_attempts: 5`
 
 Use [openHop USB/TCP Setup](/projects/openhop-repeater/openhop-usb-and-tcp-setup/) for the full flow.
 
 ## openHop TCP modem installs
 
-Use this when the radio side is a board running `pymc_usb` firmware and exposing a TCP server over LAN, Wi-Fi, or Ethernet.
+Use this when the radio side is a board running openHop Modem firmware and exposing a TCP server over LAN, Wi-Fi, or Ethernet.
 
 1. Install the repeater normally.
-2. Open `/setup` or edit `/etc/openhop_repeater/config.yaml`.
-3. Set `radio_type: pymc_tcp` and replace the placeholder host with the modem LAN
+2. During first-run onboarding use `/setup`; later use the authenticated Radio
+   Hardware page or edit `/etc/openhop_repeater/config.yaml`.
+3. Set `radio_type: modem_tcp` and replace the placeholder host with the modem LAN
    address or mDNS name.
 4. Restart the service and confirm the repeater connects.
 
 The commented canonical config example uses:
 
-- `pymc_tcp.host: REPLACE_WITH_MODEM_HOST`
-- `pymc_tcp.port: 5055`
-- `pymc_tcp.token: ""`
-- `pymc_tcp.connect_timeout: 5.0`
-- `pymc_tcp.lbt_enabled: true`
-- `pymc_tcp.lbt_max_attempts: 5`
+- `modem_tcp.host: REPLACE_WITH_MODEM_HOST`
+- `modem_tcp.port: 5055`
+- `modem_tcp.token: ""`
+- `modem_tcp.connect_timeout: 5.0`
+- `modem_tcp.lbt_enabled: true`
+- `modem_tcp.lbt_max_attempts: 5`
 
 Use [openHop USB/TCP Setup](/projects/openhop-repeater/openhop-usb-and-tcp-setup/) for the config details.
 

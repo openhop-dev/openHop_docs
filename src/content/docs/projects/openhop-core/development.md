@@ -1,13 +1,13 @@
 ---
 title: Core Development
-description: Set up, test, format, and build documentation for openHop Core.
+description: Set up, test, format, and validate changes to openHop Core.
 sidebar:
   order: 14
 ---
 
 ## Development setup
 
-Use Python 3.9 through 3.12 in a virtual environment:
+Use Python 3.10 through 3.13 in a virtual environment:
 
 ```bash
 git clone https://github.com/openhop-dev/openhop_core.git
@@ -17,6 +17,12 @@ source .venv/bin/activate
 python -m pip install -e ".[dev]"
 python -m pip install pre-commit
 pre-commit install
+```
+
+For a test-only environment without the formatting and contributor tools:
+
+```bash
+python -m pip install -e ".[test]"
 ```
 
 The repository has no dependency lockfile. Record the Python and dependency
@@ -49,23 +55,9 @@ pre-commit run --all-files
 ```
 
 Pre-commit can rewrite files. It runs whitespace and YAML checks, Black, isort,
-and flake8; it does not run pytest. Review all changes, then run tests separately.
+flake8, and the repository's full pytest gate. Review all changes and still run
+focused tests while developing so failures remain easy to isolate.
 Mypy is installed as a development dependency but is not a configured project gate.
-
-## Build the Core documentation
-
-```bash
-python -m pip install -r docs/requirements.txt
-cd docs
-python -m mkdocs build --clean
-```
-
-The source tree still contains the legacy MkDocs build for repository-local
-reference and contributor checks. The canonical public documentation is this
-`docs.openhop.dev` Core section. Use the central
-[API Reference](/projects/openhop-core/api-reference/) and task guides for public
-links; treat the source MkDocs pages as migration input rather than a separate
-public documentation site.
 
 ## Compatibility rules
 
@@ -73,7 +65,7 @@ public documentation site.
 - Use independent firmware byte vectors for packet-format changes.
 - Preserve serialized radio transmission, acknowledgement cleanup, cancellation,
   callbacks, and async behavior.
-- Public code remains compatible with Python 3.9.
+- Public code remains compatible with Python 3.10.
 - A successful radio `send()` returns a metadata mapping; only failure returns
   `None`.
 - The caller owns radio shutdown after stopping `MeshNode`.
@@ -81,7 +73,7 @@ public documentation site.
 
 ## Track development by commit
 
-openHop Core does not publish GitHub Releases. Track development through the
+Track development through the
 [`dev` commit history](https://github.com/openhop-dev/openhop_core/commits/dev/) or
 [`main` commit history](https://github.com/openhop-dev/openhop_core/commits/main/).
 A branch name moves, so record the exact commit when testing or reporting behavior:
@@ -96,11 +88,14 @@ Replace `CURRENT_COMMIT` with the previously recorded revision and use
 `origin/main` when that is the intended branch. Review actual source and test changes;
 commit subjects are an index, not a compatibility guarantee.
 
+Package publication automation can run from a published GitHub Release or by
+manual workflow dispatch. A release or package version still does not replace
+recording the exact source commit used for development and hardware validation.
+
 ## Before opening a change
 
 1. Add or update focused tests.
 2. Run the focused tests and full test suite.
 3. Run pre-commit and review any rewrites.
-4. Build the MkDocs site when documentation changes.
-5. Check the diff for generated files, identities, tokens, device paths, and other
+4. Check the diff for generated files, identities, tokens, device paths, and other
    local artifacts.

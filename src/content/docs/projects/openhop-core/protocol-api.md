@@ -7,7 +7,7 @@ sidebar:
 
 This page migrates the legacy `docs/docs/api/core.md` and
 `docs/docs/api/protocol.md` topics. It tracks openHop Core `dev` commit
-[`0d1dbf2`](https://github.com/openhop-dev/openhop_core/tree/0d1dbf2c10c23be07d4a3c529eee05414994b499/src/openhop_core/protocol).
+[`77f116a`](https://github.com/openhop-dev/openhop_core/tree/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/protocol).
 Use current source/tests for exact signatures and wire-format changes.
 
 ## Packet
@@ -20,7 +20,7 @@ Packet bytes are a wire contract. Do not insert fields, change path interpretati
 or alter hash inputs without independent firmware vectors.
 
 Exact source:
-[`packet.py`](https://github.com/openhop-dev/openhop_core/blob/0d1dbf2c10c23be07d4a3c529eee05414994b499/src/openhop_core/protocol/packet.py)
+[`packet.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/protocol/packet.py)
 
 ## PacketBuilder
 
@@ -38,19 +38,21 @@ or hashes. A builder creates protocol structure; it does not decide whether the
 frequency, route, recipient, or application action is safe.
 
 Exact source:
-[`packet_builder.py`](https://github.com/openhop-dev/openhop_core/blob/0d1dbf2c10c23be07d4a3c529eee05414994b499/src/openhop_core/protocol/packet_builder.py)
+[`packet_builder.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/protocol/packet_builder.py)
 
-## PacketFilter and PacketHashCache
+## PacketFilter and the internal hash cache
 
-`PacketFilter` applies admission and duplicate filtering. `PacketHashCache` provides a
-bounded cache for recently observed hashes.
+`PacketFilter` is the exported admission and duplicate filter used by Dispatcher.
+`PacketHashCache` is an unexported, module-level helper intended for
+application-level message deduplication; it is not part of the canonical public
+protocol API.
 
 The dispatcher uses filter results before application handlers. Clearing filter state
 can allow recently seen traffic to be processed again; expose that as an intentional
 operator action rather than routine maintenance.
 
 Exact source:
-[`packet_filter.py`](https://github.com/openhop-dev/openhop_core/blob/0d1dbf2c10c23be07d4a3c529eee05414994b499/src/openhop_core/protocol/packet_filter.py)
+[`packet_filter.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/protocol/packet_filter.py)
 
 ## Packet utilities
 
@@ -84,8 +86,8 @@ capabilities.
 
 Exact sources:
 
-- [`identity.py`](https://github.com/openhop-dev/openhop_core/blob/0d1dbf2c10c23be07d4a3c529eee05414994b499/src/openhop_core/protocol/identity.py)
-- [`modem_identity.py`](https://github.com/openhop-dev/openhop_core/blob/0d1dbf2c10c23be07d4a3c529eee05414994b499/src/openhop_core/protocol/modem_identity.py)
+- [`identity.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/protocol/identity.py)
+- [`modem_identity.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/protocol/modem_identity.py)
 
 ## CryptoUtils
 
@@ -98,7 +100,7 @@ Do not replace algorithms or change encoded inputs based on API shape alone. Add
 independent firmware vectors and negative/tamper tests for protocol crypto changes.
 
 Exact source:
-[`crypto.py`](https://github.com/openhop-dev/openhop_core/blob/0d1dbf2c10c23be07d4a3c529eee05414994b499/src/openhop_core/protocol/crypto.py)
+[`crypto.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/protocol/crypto.py)
 
 ## Routing regions and transport scope
 
@@ -121,7 +123,18 @@ and other wire values. Constants are not user preferences. Changing one can alte
 serialization or firmware compatibility even when Python tests still pass.
 
 Exact source:
-[`constants.py`](https://github.com/openhop-dev/openhop_core/blob/0d1dbf2c10c23be07d4a3c529eee05414994b499/src/openhop_core/protocol/constants.py)
+[`constants.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/protocol/constants.py)
+
+Current public ClientACL helpers are `PERM_ACL_GUEST=0`,
+`PERM_ACL_READ_ONLY=1`, `PERM_ACL_READ_WRITE=2`, `PERM_ACL_ADMIN=3`,
+`PERM_ACL_ROLE_MASK=0x03`, `acl_role()`, and `acl_is_admin()`. Admin is role
+equality with `3`; do not test only the `0x02` bit.
+
+In login replies, byte 6 is the tri-state `admin_code`: `0` non-admin, `1`
+admin, and `2` room-server plain guest. Byte 7 is the ACL permissions byte.
+Never use `bool(admin_code)` because code `2` is not admin.
+
+Cayenne LPP helpers include `encode_barometric_pressure(channel, hpa)`.
 
 ## Validation workflow for protocol changes
 
@@ -137,7 +150,7 @@ Exact source:
 ## Exact public exports
 
 The canonical protocol export list is
-[`protocol/__init__.py`](https://github.com/openhop-dev/openhop_core/blob/0d1dbf2c10c23be07d4a3c529eee05414994b499/src/openhop_core/protocol/__init__.py).
+[`protocol/__init__.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/protocol/__init__.py).
 Optional/internal helpers not exported there should not be presented as stable public
 API merely because they can be imported by path.
 

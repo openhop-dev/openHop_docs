@@ -1,6 +1,6 @@
 ---
 title: Development History
-description: Track openHop Repeater changes by branch and commit because the project does not publish releases.
+description: Track openHop Repeater changes through tags, branches, commits, and container identifiers.
 sidebar:
   order: 18.5
 ---
@@ -10,6 +10,7 @@ changelog. Track changes through the repository's branch and commit history:
 
 - [`dev` branch commits](https://github.com/openhop-dev/openhop_repeater/commits/dev/)
 - [`main` branch commits](https://github.com/openhop-dev/openhop_repeater/commits/main/)
+- [Repository tags](https://github.com/openhop-dev/openhop_repeater/tags)
 - [openHop Repeater source](https://github.com/openhop-dev/openhop_repeater)
 
 ## Record the exact version you run
@@ -22,8 +23,9 @@ git branch --show-current
 git rev-parse HEAD
 ```
 
-For containers, also record the image tag and immutable image digest. Moving `dev`
-or `main` tags can point to different builds later.
+Container publication emits moving `main`/`dev` tags, a
+`v<setuptools-scm-version>` tag, and a short-SHA tag. Also record the immutable
+image digest; moving tags can point to different builds later.
 
 ## Review changes before upgrading
 

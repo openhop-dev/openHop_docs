@@ -10,7 +10,7 @@ radio, join a mesh, receive traffic, transmit RF, or send captured packets to an
 host. Read the whole script and its selected transport before running it.
 
 This inventory tracks openHop Core `dev` commit
-[`0d1dbf2`](https://github.com/openhop-dev/openhop_core/tree/0d1dbf2c10c23be07d4a3c529eee05414994b499/examples).
+[`77f116a`](https://github.com/openhop-dev/openhop_core/tree/77f116a8dab097642d04a16c8aaf097c0dd33cc3/examples).
 
 ## Safe verification before hardware
 
@@ -56,7 +56,7 @@ Before any example that creates a radio:
 ## Transport selection
 
 The current shared factory supports several radio names. Inspect
-[`examples/common.py`](https://github.com/openhop-dev/openhop_core/blob/0d1dbf2c10c23be07d4a3c529eee05414994b499/examples/common.py)
+[`examples/common.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/examples/common.py)
 before relying on a name because each path has different arguments and side effects.
 
 Current families include:
@@ -65,7 +65,7 @@ Current families include:
 - CH341 USB-to-SPI/GPIO;
 - generic serial KISS;
 - MeshCore KISS modem;
-- openHop Modem over USB or TCP.
+- openHop Modem through the canonical `modem_usb` or `modem_tcp` choices.
 
 Use [Direct SX1262 Hardware](/projects/openhop-core/direct-sx1262-hardware/) for
 current board mappings and

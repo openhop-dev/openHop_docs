@@ -454,6 +454,18 @@ paths:
       tags: [System]
       summary: Send repeater advertisement
       description: Manually trigger sending a repeater advertisement packet
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mode:
+                  type: string
+                  enum: [flood, direct]
+                  default: flood
+                  description: Advert send mode label for UI/workflow selection.
       responses:
         '200':
           description: Advertisement sent
@@ -797,7 +809,10 @@ paths:
     post:
       tags: [System]
       summary: Update radio configuration
-      description: Update LoRa radio parameters
+      description: |
+        Update LoRa radio parameters. In multi-radio mode, pass radio_id to
+        target a radios[] entry; air settings are written to that entry and
+        mirrored to top-level radio when it is the default radio.
       security:
         - BearerAuth: []
         - ApiKeyAuth: []
@@ -807,6 +822,31 @@ paths:
           application/json:
             schema:
               type: object
+              properties:
+                radio_id:
+                  type: string
+                  description: Optional multi-radio id from config.radios[].id
+                frequency:
+                  type: number
+                bandwidth:
+                  type: number
+                spreading_factor:
+                  type: integer
+                coding_rate:
+                  type: integer
+                tx_power:
+                  type: number
+                preamble_length:
+                  type: integer
+                flood_advert_interval_hours:
+                  type: integer
+                  description: Repeater flood advert interval in hours (0 = off, 3-168)
+                advert_interval_minutes:
+                  type: integer
+                  description: Legacy local advert interval in minutes (0 = off, 1-10080)
+                direct_advert_interval_hours:
+                  type: integer
+                  description: Additional repeater advert interval in hours (0 = off, 1-168)
       responses:
         '200':
           description: Radio config updated
@@ -2372,6 +2412,18 @@ paths:
                       type: string
                       description: Advertised node name (companion only; defaults to identity name)
                       example: "My Companion"
+                    flood_advert_interval_hours:
+                      type: integer
+                      minimum: 0
+                      maximum: 168
+                      description: Room-server flood advert interval in hours (0 = off)
+                      example: 6
+                    direct_advert_interval_hours:
+                      type: integer
+                      minimum: 0
+                      maximum: 168
+                      description: Room-server additional advert interval in hours (0 = off)
+                      example: 2
                     tcp_port:
                       type: integer
                       minimum: 1
@@ -2533,7 +2585,7 @@ paths:
                   description: New identity key (optional)
                 settings:
                   type: object
-                  description: Updated settings
+                  description: Updated settings (room server settings may include flood_advert_interval_hours and direct_advert_interval_hours)
       responses:
         '200':
           description: Identity updated
@@ -3384,7 +3436,7 @@ paths:
   /check_pymc_console:
     get:
       tags: [System]
-      summary: Check openHop console availability
+      summary: Check openHop Console availability
       responses:
         '200':
           description: Console status
@@ -5191,12 +5243,14 @@ components:
           example: "e1"
         permissions:
           type: string
-          enum: [admin, guest, read_only]
+          enum: [admin, read_write, read_only, guest]
           description: |
-            Client permission level:
-            - admin: Full access
-            - guest: Limited access
+            Client ACL role (low two bits of the permissions byte, matching
+            MeshCore ClientACL.h):
+            - admin: Full access, including settings and CLI
+            - read_write: May send and receive messages (room server guests)
             - read_only: Read-only access
+            - guest: Base telemetry only (repeater guests, read-only logins)
           example: "admin"
         last_activity:
           type: integer

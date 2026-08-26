@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-A TCP modem does not need a Docker device mapping. Use this guide for USB-CDC
+A TCP modem does not need a Docker device mapping. Use this guide for USB serial
 openHop Modems and KISS radios that appear as `/dev/ttyACM*` or `/dev/ttyUSB*`.
 
 ## Identify the device

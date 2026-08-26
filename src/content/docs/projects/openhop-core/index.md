@@ -6,8 +6,9 @@ sidebar:
 ---
 
 openHop Core is a Python implementation of the MeshCore protocol. It provides the
-wire-format, cryptography, identity, routing, asynchronous node, companion, and
-radio layers used by openHop Repeater and other Python mesh applications.
+wire-format, cryptography, identity, routing, asynchronous node, optional RF
+Fabric, companion, and radio layers used by openHop Repeater and other Python
+mesh applications.
 
 The library preserves compatibility with MeshCore firmware while supporting more
 than direct SPI radios: applications can use SX1262 hardware, KISS serial modems,
@@ -17,7 +18,7 @@ should be treated as experimental against the current dispatcher contract.
 ## What this section covers
 
 - Installation and safe lifecycle patterns
-- Protocol, node, companion, and radio architecture
+- Protocol, node, RF Fabric, companion, and radio architecture
 - Practical node usage, current examples, and hardware safety
 - Direct SX1262 and KISS modem compatibility
 - Public API entry points, development, and tests

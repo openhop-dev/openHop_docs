@@ -44,7 +44,7 @@ Check the top-level `radio_type` in the config:
 - `sx1262` for Linux SPI and system GPIO;
 - `sx1262_ch341` for CH341 USB-SPI and CH341 GPIO numbers `0-7`;
 - `kiss` for a serial KISS modem;
-- `pymc_usb` or `pymc_tcp` for openHop Modem transports;
+- `modem_usb` or `modem_tcp` for openHop Modem transports;
 - `null` for setup, dashboard, API, or companion-only use without RF.
 
 For a new or uncertain setup, start in `repeater.mode: no_tx` or use
