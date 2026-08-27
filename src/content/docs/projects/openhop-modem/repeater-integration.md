@@ -101,7 +101,7 @@ sensors:
         endpoint: "/api/stats"
         scheme: "http"
         username: "admin"
-        password: "password"
+        password: "openhop"
         poll_interval_seconds: 60.0
         timeout_seconds: 2.0
 ```
@@ -128,7 +128,7 @@ gps:
   endpoint: "/api/stats"
   scheme: "http"
   username: "admin"
-  password: "password"
+  password: "openhop"
   poll_interval_seconds: 2.0
 
   api_fallback_to_config_location: true
@@ -167,7 +167,7 @@ sudo journalctl -u openhop-repeater -f
 Check the modem HTTP API directly from the Repeater host:
 
 ```bash
-curl -u admin:password http://pymc-modem.local/api/stats
+curl -u admin:openhop http://pymc-modem.local/api/stats
 ```
 
 Check Repeater's API:
