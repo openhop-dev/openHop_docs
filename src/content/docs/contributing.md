@@ -10,8 +10,10 @@ This site is markdown-first. Adding a page should be simple.
 1. Create a `.md` file under one of these directories:
    - `src/content/docs/projects/openhop-core/`
    - `src/content/docs/projects/openhop-repeater/`
+   - `src/content/docs/projects/openhop-modem/`
    - `src/content/docs/projects/openhop-ha-integration/`
    - `src/content/docs/projects/openhop-ha-addon/`
+   - `src/content/docs/projects/openhop-unraid/`
 2. Add frontmatter:
 
 ```md
@@ -43,13 +45,11 @@ description: One-line summary shown in metadata and previews.
 - Use fenced code blocks with language identifiers.
 - Link to source repositories for deep implementation details.
 
-## Content scope in this phase
-
-Current first-release sections:
+## Current project sections
 
 - openHop Core
 - openHop Repeater
+- openHop Modem
 - openHop HA Integration
 - openHop HA Add-on
-
-Additional project sections can be added later using the same directory pattern.
+- openHop Unraid

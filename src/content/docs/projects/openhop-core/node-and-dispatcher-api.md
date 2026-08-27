@@ -7,7 +7,7 @@ sidebar:
 
 This reference migrates the legacy `docs/docs/api/node.md` and
 `docs/docs/api/dispatcher.md` topics. It tracks openHop Core `dev` commit
-[`0d1dbf2`](https://github.com/openhop-dev/openhop_core/tree/0d1dbf2c10c23be07d4a3c529eee05414994b499/src/openhop_core/node).
+[`77f116a`](https://github.com/openhop-dev/openhop_core/tree/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/node).
 Current source and tests remain authoritative for exact signatures.
 
 ## MeshNode
@@ -29,7 +29,7 @@ MeshNode(
 | --- | --- |
 | `start()` | Runs the dispatcher until stopped; call from a task when other work must continue |
 | `stop()` | Idempotently disarms RX and stops the dispatcher; does not close the radio |
-| `send_packet(packet, wait_for_ack=False, **kwargs)` | Single raw-packet transport entry point |
+| `send_packet(packet, wait_for_ack=False, radio_id=None, **kwargs)` | Raw-packet transport entry point with optional RF Fabric endpoint selection |
 | `set_event_service(service)` | Replaces and propagates the event service to compatible registered handlers |
 | `dispatcher` | The owned `Dispatcher` instance |
 
@@ -43,8 +43,9 @@ The dispatcher arms/disarms receive handling, serializes TX, and tracks lifecycl
 state internally.
 
 `stop()` wakes lifecycle waits and disarms RX. It does not own physical transport
-cleanup. `cleanup()` clears internal runtime state but is not a substitute for the
-concrete radio's close/disconnect/cleanup method.
+cleanup. Synchronous `cleanup()` disarms RX and signals the stop event without
+awaiting loop exit; async callers should prefer `await stop()`. Neither replaces
+the concrete radio's close/disconnect/cleanup method.
 
 ## Sending and acknowledgements
 
@@ -63,6 +64,14 @@ identity. Timeouts and cancellation must remove waiters so later packets cannot 
 stale request.
 
 A radio returns a metadata mapping on successful send and `None` only on failure.
+With RF Fabric, `radio_id` can select an endpoint explicitly. Received packets
+are stamped with `_rx_radio_id`, while send metadata and logs identify the chosen
+default, policy-selected, or explicit endpoint. Sending does not automatically
+fan out through every configured radio.
+
+Login replies keep `admin_code` and ACL permissions separate. `admin_code=2`
+means a room-server plain guest, not admin; use `is_admin` or the ACL role helper
+rather than treating the raw value as a boolean.
 
 ## Packet routing and filtering
 
@@ -161,10 +170,10 @@ application-facing data, not serialized MeshCore packet formats.
 
 ## Exact source
 
-- [`node/node.py`](https://github.com/openhop-dev/openhop_core/blob/0d1dbf2c10c23be07d4a3c529eee05414994b499/src/openhop_core/node/node.py)
-- [`node/dispatcher.py`](https://github.com/openhop-dev/openhop_core/blob/0d1dbf2c10c23be07d4a3c529eee05414994b499/src/openhop_core/node/dispatcher.py)
-- [`node/events`](https://github.com/openhop-dev/openhop_core/tree/0d1dbf2c10c23be07d4a3c529eee05414994b499/src/openhop_core/node/events)
-- [`node/handlers`](https://github.com/openhop-dev/openhop_core/tree/0d1dbf2c10c23be07d4a3c529eee05414994b499/src/openhop_core/node/handlers)
+- [`node/node.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/node/node.py)
+- [`node/dispatcher.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/node/dispatcher.py)
+- [`node/events`](https://github.com/openhop-dev/openhop_core/tree/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/node/events)
+- [`node/handlers`](https://github.com/openhop-dev/openhop_core/tree/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/node/handlers)
 
 ## Related guides
 

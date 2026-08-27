@@ -68,6 +68,7 @@ frame protocol:
 server = CompanionFrameServer(
     bridge,
     companion_hash,
+    device_model="openHop-Companion",
     bind_address="127.0.0.1",
     port=5000,
 )
@@ -159,7 +160,7 @@ The current public data models include:
 | `MessageEvent`, `ChannelMessageEvent`, `ChannelDataEvent` | Structured callback payloads |
 
 Inspect the pinned
-[`models.py`](https://github.com/openhop-dev/openhop_core/blob/0d1dbf2c10c23be07d4a3c529eee05414994b499/src/openhop_core/companion/models.py)
+[`models.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/companion/models.py)
 for exact fields. Do not serialize object internals as a stable external schema unless
 the application owns and versions that schema.
 

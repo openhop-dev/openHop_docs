@@ -19,7 +19,12 @@ authentication does not make direct public exposure a recommended deployment.
 
 Current builds expose setup and operational views for:
 
-- system, radio, packet, neighbor, GPS, and sensor status;
+- **Monitoring:** Neighbors, Sessions, GPS, and Sensors;
+- **Analytics:** Statistics, RF Health Correlation, Neighbour Links, Packet
+  Archive, and Logs;
+- **System → Configuration → Radio:** Radio Settings, Radio Hardware, Repeater,
+  Duty Cycle, and TX Delays;
+- **Rooms, Companions:** Room Servers and Companions;
 - stored neighbour region scopes and on-demand zero-hop scope queries;
 - packet history and live WebSocket updates;
 - configuration and hardware presets;
@@ -58,7 +63,8 @@ and control endpoints can mutate state or transmit.
 
 ## Configuration and restart behavior
 
-Use the dashboard for supported live updates. Changing `radio_type`, KISS
+Use **System → Configuration → Radio → Radio Hardware** for backend changes.
+Changing `radio_type`, KISS
 transport, or USB/TCP modem transport requires a service restart. If the UI is
 unavailable, edit `/etc/openhop_repeater/config.yaml` carefully and use:
 

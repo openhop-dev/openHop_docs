@@ -38,7 +38,8 @@ through `PYTHONPATH`. Do not remove that template contract casually.
 
 1. Confirm ports 8000 and 5001–5003 are free, or change only the host-side values.
 2. Start the container once.
-3. Open `http://<unraid-ip>:8000/setup`.
+3. Open `http://<unraid-ip>:8000/` and follow the first-run browser flow, or edit
+   the mapped config file directly.
 4. Replace the seeded example admin and guest passwords immediately.
 5. Select the radio backend and verify regional frequency, power, modulation,
    antenna, and device/TCP settings before enabling transmission.
@@ -50,7 +51,7 @@ defaults during later image updates while preserving configured values.
 
 ## TCP modem
 
-A TCP modem needs no Docker device mapping. Configure `radio_type: pymc_tcp` and
+A TCP modem needs no Docker device mapping. Configure `radio_type: modem_tcp` and
 the modem's reachable LAN address/port in the Repeater setup flow. Confirm Unraid's
 container network can reach that address.
 

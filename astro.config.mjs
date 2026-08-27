@@ -7,7 +7,7 @@ export default defineConfig({
 	site: 'https://docs.openhop.dev',
 	integrations: [
 		starlight({
-			title: 'OpenHop Docs',
+			title: 'openHop Docs',
 			description: 'Documentation hub for the openHop ecosystem: Core, Repeater, Modem, Home Assistant, and Unraid projects',
 			favicon: '/favicon.png',
 			head: [
@@ -65,7 +65,7 @@ export default defineConfig({
 			},
 			customCss: ['./src/styles/brand.css'],
 			social: [
-				{ icon: 'github', label: 'OpenHop on GitHub', href: 'https://github.com/openhop-dev' },
+				{ icon: 'github', label: 'openHop on GitHub', href: 'https://github.com/openhop-dev' },
 			],
 			editLink: {
 				baseUrl: 'https://github.com/openhop-dev/openHop_docs/edit/main/',

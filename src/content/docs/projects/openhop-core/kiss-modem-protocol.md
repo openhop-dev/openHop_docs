@@ -10,7 +10,7 @@ for the firmware you actually have; “KISS” alone does not imply the MeshCore
 SetHardware extension API.
 
 This compatibility guide tracks openHop Core `dev` commit
-[`0d1dbf2`](https://github.com/openhop-dev/openhop_core/blob/0d1dbf2c10c23be07d4a3c529eee05414994b499/src/openhop_core/hardware/kiss_modem_wrapper.py)
+[`77f116a`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/hardware/kiss_modem_wrapper.py)
 and the pinned MeshCore protocol document at
 [`fb2c61f`](https://github.com/meshcore-dev/MeshCore/blob/fb2c61f862fcd4c6e08cf0f882175ca260052b13/docs/kiss_modem_protocol.md).
 That MeshCore revision includes the 255-byte MTU, single-pending-TX behavior,
@@ -109,7 +109,7 @@ Public convenience methods cover the operations above, including
 `get_identity()`, `get_random()`, `sign_data()`, `verify_signature()`,
 `encrypt_data()`, `decrypt_data()`, `key_exchange()`, `hash_data()`, radio/status
 queries, sensor queries, and asynchronous query variants. See the exact
-[`KissModemWrapper` source](https://github.com/openhop-dev/openhop_core/blob/0d1dbf2c10c23be07d4a3c529eee05414994b499/src/openhop_core/hardware/kiss_modem_wrapper.py)
+[`KissModemWrapper` source](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/hardware/kiss_modem_wrapper.py)
 for current signatures and validation.
 
 ## Data, TxDone, and RxMeta

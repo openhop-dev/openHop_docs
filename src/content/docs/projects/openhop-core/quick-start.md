@@ -7,7 +7,7 @@ sidebar:
 
 ## Requirements
 
-- Python 3.9 through 3.12
+- Python 3.10 through 3.13
 - A virtual environment on modern Debian, Ubuntu, and Raspberry Pi OS systems
 - A supported radio backend only when you are ready to receive or transmit
 

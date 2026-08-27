@@ -53,7 +53,7 @@ Open `http://<docker-host>:8000/setup` after first startup.
 
 ## Radio access
 
-- **TCP modem:** requires no device mapping; configure `radio_type: pymc_tcp` and
+- **TCP modem:** requires no device mapping; configure `radio_type: modem_tcp` and
   make sure the container can reach the modem host and port.
 - **No radio:** use `radio_type: null` for UI/API evaluation without RF I/O.
 - **USB modem or KISS:** map the host serial device, for example

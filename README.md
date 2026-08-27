@@ -1,6 +1,6 @@
-# OpenHop Docs
+# openHop Docs
 
-This repository contains the documentation site for the OpenHop ecosystem.
+This repository contains the documentation site for the openHop ecosystem.
 
 It brings together docs for:
 
@@ -17,7 +17,7 @@ The production site is:
 
 ## What This Repo Is For
 
-This repo is the central home for public-facing OpenHop docs. It is where project overviews, setup guides, configuration references, integration docs, and shared contributor-facing content live.
+This repo is the central home for public-facing openHop docs. It is where project overviews, setup guides, configuration references, integration docs, and shared contributor-facing content live.
 
 The site is built with Astro and Starlight.
 

@@ -1,6 +1,6 @@
 ---
 const specUrl = '/openapi/repeater.yaml';
-const mountId = 'pymc-openapi-viewer';
+const mountId = 'openhop-openapi-viewer';
 ---
 
 <section class="openapi-shell">
@@ -9,7 +9,7 @@ const mountId = 'pymc-openapi-viewer';
 
 <script is:inline>
   const specUrl = '/openapi/repeater.yaml';
-  const mountId = 'pymc-openapi-viewer';
+  const mountId = 'openhop-openapi-viewer';
 
   function ensureCss(href) {
     if (document.querySelector(`link[href="${href}"]`)) return;
@@ -125,7 +125,7 @@ const mountId = 'pymc-openapi-viewer';
     --openapi-input-border: #cbdcf8;
   }
 
-  #pymc-openapi-viewer {
+  #openhop-openapi-viewer {
     min-height: 80vh;
   }
 
@@ -133,14 +133,14 @@ const mountId = 'pymc-openapi-viewer';
     font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
     background: transparent;
     color: var(--openapi-text);
-    --pymc-surface: var(--openapi-surface);
-    --pymc-surface-2: var(--openapi-surface-2);
-    --pymc-border: var(--openapi-border);
-    --pymc-text: var(--openapi-text);
-    --pymc-muted: var(--openapi-muted);
-    --pymc-blue: var(--openapi-blue);
-    --pymc-blue-strong: var(--openapi-blue-strong);
-    --pymc-teal: var(--openapi-teal);
+    --openhop-surface: var(--openapi-surface);
+    --openhop-surface-2: var(--openapi-surface-2);
+    --openhop-border: var(--openapi-border);
+    --openhop-text: var(--openapi-text);
+    --openhop-muted: var(--openapi-muted);
+    --openhop-blue: var(--openapi-blue);
+    --openhop-blue-strong: var(--openapi-blue-strong);
+    --openhop-teal: var(--openapi-teal);
   }
 
   :global(.swagger-ui .topbar) {
@@ -179,7 +179,7 @@ const mountId = 'pymc-openapi-viewer';
   :global(.swagger-ui select),
   :global(.swagger-ui input),
   :global(.swagger-ui textarea) {
-    color: var(--pymc-text);
+    color: var(--openhop-text);
   }
 
   :global(.swagger-ui a),
@@ -188,11 +188,11 @@ const mountId = 'pymc-openapi-viewer';
   :global(.swagger-ui .opblock-summary-path__deprecated),
   :global(.swagger-ui .parameter__name.required span),
   :global(.swagger-ui .tab li.active button.tablinks) {
-    color: var(--pymc-blue);
+    color: var(--openhop-blue);
   }
 
   :global(.swagger-ui .opblock-tag) {
-    border-bottom-color: var(--pymc-border);
+    border-bottom-color: var(--openhop-border);
     background: linear-gradient(90deg, #10254566 0%, transparent 65%);
   }
 
@@ -202,7 +202,7 @@ const mountId = 'pymc-openapi-viewer';
   }
 
   :global(.swagger-ui .opblock-summary) {
-    border-color: var(--pymc-border);
+    border-color: var(--openhop-border);
   }
 
   :global(.swagger-ui .opblock),
@@ -217,13 +217,13 @@ const mountId = 'pymc-openapi-viewer';
   :global(.swagger-ui .response-controls),
   :global(.swagger-ui .model-container),
   :global(.swagger-ui .scheme-container) {
-    background: var(--pymc-surface);
+    background: var(--openhop-surface);
     box-shadow: none;
-    border-color: var(--pymc-border);
+    border-color: var(--openhop-border);
   }
 
   :global(.swagger-ui .scheme-container) {
-    border: 1px solid var(--pymc-border);
+    border: 1px solid var(--openhop-border);
     border-radius: 0.65rem;
     margin: 0 0 1rem;
   }
@@ -233,8 +233,8 @@ const mountId = 'pymc-openapi-viewer';
   :global(.swagger-ui .opblock.opblock-put),
   :global(.swagger-ui .opblock.opblock-delete),
   :global(.swagger-ui .opblock.opblock-patch) {
-    background: var(--pymc-surface-2);
-    border: 1px solid var(--pymc-border);
+    background: var(--openhop-surface-2);
+    border: 1px solid var(--openhop-border);
     border-radius: 0.75rem;
   }
 
@@ -291,7 +291,7 @@ const mountId = 'pymc-openapi-viewer';
   :global(.swagger-ui .response-col_links),
   :global(.swagger-ui .renderedMarkdown p),
   :global(.swagger-ui .renderedMarkdown li) {
-    color: var(--pymc-muted);
+    color: var(--openhop-muted);
   }
 
   :global(.swagger-ui .opblock-body pre),
@@ -302,7 +302,7 @@ const mountId = 'pymc-openapi-viewer';
   :global(.swagger-ui .curl-command),
   :global(.swagger-ui .response-col_description__inner div.markdown) {
     background: var(--openapi-code-bg) !important;
-    color: var(--pymc-text) !important;
+    color: var(--openhop-text) !important;
     border: 1px solid var(--openapi-code-border);
     border-radius: 0.55rem;
   }
@@ -315,7 +315,7 @@ const mountId = 'pymc-openapi-viewer';
     background: var(--openapi-input-bg);
     border: 1px solid var(--openapi-input-border);
     border-radius: 0.5rem;
-    color: var(--pymc-text);
+    color: var(--openhop-text);
   }
 
   :global(.swagger-ui input:focus),

@@ -10,7 +10,7 @@ companion clients over TCP. It wraps an existing `CompanionBridge`; it does not 
 or own a second radio.
 
 This guide tracks openHop Core `dev` commit
-[`0d1dbf2`](https://github.com/openhop-dev/openhop_core/tree/0d1dbf2c10c23be07d4a3c529eee05414994b499/src/openhop_core/companion/frame_server).
+[`77f116a`](https://github.com/openhop-dev/openhop_core/tree/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/companion/frame_server).
 
 ## When to use it
 
@@ -39,6 +39,7 @@ from openhop_core.companion import CompanionFrameServer
 server = CompanionFrameServer(
     bridge=bridge,
     companion_hash="f5",
+    device_model="openHop-Companion",
     bind_address="127.0.0.1",
     port=5000,
 )
@@ -99,7 +100,7 @@ The current command registry covers:
   frequencies.
 
 Exact command constants and payload encodings are defined in the pinned
-[`companion constants`](https://github.com/openhop-dev/openhop_core/blob/0d1dbf2c10c23be07d4a3c529eee05414994b499/src/openhop_core/companion/constants.py)
+[`companion constants`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/companion/constants.py)
 and command modules. Treat those bytes as a protocol contract; do not derive wire
 formats from this prose alone.
 
