@@ -96,4 +96,4 @@ See [Repeater Integration](/projects/openhop-modem/repeater-integration/) for th
 - If no serial port appears, try another USB cable and confirm it is a data cable.
 - If flashing starts but fails, lower the baud rate if the flasher exposes that option.
 - If the board will not enter download mode, use the board-specific boot sequence above.
-- If the modem is on Wi-Fi but Repeater cannot connect, verify `curl -u admin:password http://<modem-host>/api/stats` and TCP port `5055` from the Repeater host.
+- If the modem is on Wi-Fi but Repeater cannot connect, verify `curl -u admin:openhop http://<modem-host>/api/stats` and TCP port `5055` from the Repeater host.

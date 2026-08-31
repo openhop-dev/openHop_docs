@@ -109,7 +109,7 @@ sensors:
         endpoint: "/api/stats"
         scheme: "http"
         username: "admin"
-        password: "password"
+        password: "openhop"
         poll_interval_seconds: 60.0
         timeout_seconds: 2.0
 ```
@@ -140,7 +140,7 @@ gps:
   endpoint: "/api/stats"
   scheme: "http"
   username: "admin"
-  password: "password"
+  password: "openhop"
   poll_interval_seconds: 2.0
 
   api_fallback_to_config_location: true

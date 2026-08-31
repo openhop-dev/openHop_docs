@@ -104,15 +104,15 @@ and does not provide mDNS or WebUI firmware upload.
 Default credentials on first boot:
 
 - user: `admin`
-- password: `password`
+- password: `openhop`
 
 Change the password from the modem web UI after first setup. The same HTTP API is used by Repeater's optional `openhop_modem` sensor and `modem_http` GPS source.
 
 Useful checks:
 
 ```bash
-curl -u admin:password http://<modem-host>/api/stats
-curl -u admin:password http://<modem-host>/
+curl -u admin:openhop http://<modem-host>/api/stats
+curl -u admin:openhop http://<modem-host>/
 ```
 
 ## Network exposure
