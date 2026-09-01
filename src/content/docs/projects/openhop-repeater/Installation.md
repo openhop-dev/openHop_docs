@@ -117,21 +117,24 @@ Use these values as a starting point:
 
 Use [openHop USB/TCP Setup](/projects/openhop-repeater/openhop-usb-and-tcp-setup/) for the config details.
 
-## Proxmox LXC with CH341
+## Proxmox LXC installation
 
-The repo README now documents a Proxmox host-side installer for CH341-backed repeaters.
+The current `dev` installer creates a privileged Debian 13 LXC for CH341 radios
+or openHop Modems connected over TCP or USB. It supports architecture-matched
+templates, selectable CTID/storage/network/VLAN settings, an optional CH341 host
+udev rule, an optional openHop Console install, and an in-container `update`
+command.
+
+Run it on the Proxmox host, not inside an LXC:
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/openhop-dev/openhop_repeater/main/scripts/proxmox-install.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/openhop-dev/openhop_repeater/dev/scripts/proxmox-install.sh)"
 ```
 
-That flow is intended to run on the Proxmox host, not inside the container.
-
-Use it when:
-
-- your radio path is CH341 USB-SPI
-- you want an always-on containerized deployment
-- you do not want a dedicated Pi-class host
+Review the privileged-container, USB-passthrough, console auto-login, radio
+backend, and update behavior in the complete
+[Proxmox LXC Installation](/projects/openhop-repeater/proxmox-lxc/) guide before
+running it.
 
 ## First checks after install
 

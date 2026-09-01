@@ -28,7 +28,7 @@ a longer task-oriented index without creating a second project home page.
 - USB serial modem hosts using `radio_type: modem_usb`
 - Wi-Fi or Ethernet modem hosts using `radio_type: modem_tcp`
 - Dashboard-only or companion-only hosts using `radio_type: null`
-- Proxmox LXC deployments for CH341-backed radios
+- Proxmox LXC deployments using CH341, openHop TCP, or openHop USB radios
 
 ## Current feature areas
 

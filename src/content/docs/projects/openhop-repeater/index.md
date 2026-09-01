@@ -25,5 +25,5 @@ openHop Repeater is an always-on MeshCore infrastructure node built on top of op
 - Start with [What is openHop Repeater?](/projects/openhop-repeater/what-is-openhop-repeater/)
 - Then continue to [Setup](/projects/openhop-repeater/setup/)
 - Browse every topic in the [Documentation Directory](/projects/openhop-repeater/home/)
-- Jump straight to [Installation](/projects/openhop-repeater/installation/), [Hardware Setup](/projects/openhop-repeater/hardware-setup/), [openHop Modem](/projects/openhop-modem/), [openHop USB/TCP Setup](/projects/openhop-repeater/openhop-usb-and-tcp-setup/), [KISS Setup](/projects/openhop-repeater/kiss-setup/), or [Troubleshooting](/projects/openhop-repeater/troubleshooting/)
+- Jump straight to [Installation](/projects/openhop-repeater/installation/), [Proxmox LXC Installation](/projects/openhop-repeater/proxmox-lxc/), [Hardware Setup](/projects/openhop-repeater/hardware-setup/), [openHop Modem](/projects/openhop-modem/), [openHop USB/TCP Setup](/projects/openhop-repeater/openhop-usb-and-tcp-setup/), [KISS Setup](/projects/openhop-repeater/kiss-setup/), or [Troubleshooting](/projects/openhop-repeater/troubleshooting/)
 - For removal and data-retention choices, use [Uninstallation](/projects/openhop-repeater/uninstallation/)
