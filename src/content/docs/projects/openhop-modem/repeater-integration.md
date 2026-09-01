@@ -109,7 +109,7 @@ sensors:
         endpoint: "/api/stats"
         scheme: "http"
         username: "admin"
-        password: "openhop"
+        password: "REPLACE_WITH_PASSWORD"
         poll_interval_seconds: 60.0
         timeout_seconds: 2.0
 ```
@@ -117,7 +117,9 @@ sensors:
 Notes:
 
 - Use the modem HTTP password here, not the Repeater dashboard password.
-- Set `password: ""` only if the modem HTTP API is intentionally unauthenticated.
+- Current openHop Modem firmware always requires HTTP Basic Auth. Setting
+  `password: ""` only suppresses Repeater's Authorization header and results in
+  HTTP 401; it is not a supported unauthenticated mode.
 - Keep `poll_interval_seconds` around `60.0` for modem telemetry so stats polling does not contend with packet transport or GPS polling on weak Wi-Fi.
 - The sensor is diagnostics only. It does not make Repeater's native `/api/gps` endpoint GPS-enabled by itself.
 
@@ -140,7 +142,7 @@ gps:
   endpoint: "/api/stats"
   scheme: "http"
   username: "admin"
-  password: "openhop"
+  password: "REPLACE_WITH_PASSWORD"
   poll_interval_seconds: 2.0
 
   api_fallback_to_config_location: true

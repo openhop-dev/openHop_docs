@@ -10,7 +10,7 @@ The modem firmware owns the radio hardware and exposes a small control/data surf
 ## What this section covers
 
 - Choosing a supported modem device
-- Flashing firmware with the browser-based openHop Modem Flasher
+- Flashing firmware with the browser-based openHop MeshCore Flasher
 - Provisioning Wi-Fi or Ethernet devices for TCP mode
 - Selecting `modem_usb` or `modem_tcp` inside openHop Repeater
 - Using the authenticated modem HTTP API

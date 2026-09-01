@@ -79,7 +79,7 @@ before opening hardware.
 
 ## Sending packets
 
-`MeshNode.send_packet(packet, wait_for_ack=False, **kwargs)` forwards a constructed
+`MeshNode.send_packet(packet, *, wait_for_ack=False, **kwargs)` forwards a constructed
 packet to the dispatcher. Packet construction belongs to `PacketBuilder` or a
 higher-level companion method; avoid assembling wire bytes by hand.
 
@@ -90,9 +90,10 @@ if not sent:
     ...
 ```
 
-The dispatcher serializes transmission. A successful radio `send()` returns a
-metadata mapping, which may be empty; `None` means failure. Custom backends must not
-return `None` for a successful write.
+The dispatcher serializes transmission, and `MeshNode.send_packet()` returns a
+boolean. A lower-level radio `send()` may return a metadata mapping, which may be
+empty; `None` means transport failure. Custom backends must not return `None` for a
+successful write.
 
 Acknowledgements, direct paths, flood routing, timeout selection, airtime budgeting,
 and response correlation have protocol-specific rules. Prefer companion methods for

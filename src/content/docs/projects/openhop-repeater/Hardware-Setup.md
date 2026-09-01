@@ -147,8 +147,8 @@ modem_usb:
 When `radio_type: modem_tcp` is selected:
 
 - the modem runs on another board and exposes a TCP service over LAN, Wi-Fi, or Ethernet
-- the helper writes a placeholder host until you replace it
-- the modem host or mDNS name is set under `modem_tcp.host`
+- replace the example host before starting the service
+- set the modem LAN IP or actual board-specific mDNS name under `modem_tcp.host`
 
 Minimal transport block:
 

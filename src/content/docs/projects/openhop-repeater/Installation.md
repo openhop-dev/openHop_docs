@@ -102,11 +102,11 @@ Use this when the radio side is a board running openHop Modem firmware and expos
 1. Install the repeater normally.
 2. During first-run onboarding use `/setup`; later use the authenticated Radio
    Hardware page or edit `/etc/openhop_repeater/config.yaml`.
-3. Set `radio_type: modem_tcp` and replace the placeholder host with the modem LAN
-   address or mDNS name.
+3. Set `radio_type: modem_tcp` and replace the example host with the modem LAN
+   address or its actual board-specific mDNS name.
 4. Restart the service and confirm the repeater connects.
 
-The commented canonical config example uses:
+Use these values as a starting point:
 
 - `modem_tcp.host: REPLACE_WITH_MODEM_HOST`
 - `modem_tcp.port: 5055`

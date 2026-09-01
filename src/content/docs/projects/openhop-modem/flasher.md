@@ -3,7 +3,7 @@ title: Firmware Flasher
 description: Flash openHop Modem firmware with the browser-based Web Serial flasher.
 ---
 
-The openHop Modem Flasher is a static browser app that flashes supported modem firmware over Web Serial. It does not require a local flashing server; the browser talks directly to the device.
+The openHop MeshCore Flasher is a static browser app that flashes supported modem firmware over Web Serial. It does not require a local flashing server; the browser talks directly to the device.
 
 Open the flasher here:
 
@@ -52,9 +52,13 @@ recovery cases require esptool, PlatformIO, or nRF52 DFU instead.
 2. Open [flasher.openhop.dev](https://flasher.openhop.dev/).
 3. Select the exact device model.
 4. Select the openHop Modem firmware role/version shown by the flasher.
-5. Click the browser serial connect button and choose the board's serial port.
-6. Click **Flash** for a normal firmware update.
-7. Use **Erase Device** only for a first install, a corrupted device, or when changing layouts.
+5. For an ESP32-family target, click the browser serial connect button, choose the
+   board's serial port, and click **Flash** for a normal update.
+6. For an nRF52 target, connect to the application serial port and click
+   **Enter DFU mode**. Then click **Flash** and select the newly appearing
+   bootloader port.
+7. Use **Erase Device** only on ESP32-family targets, and only for a first install,
+   a corrupted device, or when changing layouts. It is not an nRF52 action.
 
 Do not disconnect the board while flashing. After a successful flash, reset or power-cycle the board if it does not reboot automatically.
 
@@ -63,7 +67,7 @@ Do not disconnect the board while flashing. After a successful flash, reset or p
 | Action | Meaning | When to use |
 | --- | --- | --- |
 | Flash | Writes the application firmware using the selected variant's manifest. | Normal updates on a board that already has a compatible bootloader and partition table. |
-| Erase Device | Erases and installs the selected variant's complete firmware layout. | Fresh installs, recovery, or switching a board from another firmware layout. |
+| Erase Device | On ESP32-family targets, erases and installs the selected variant's complete firmware layout. | Fresh installs, recovery, or switching an ESP32-family board from another firmware layout. |
 
 ## Board bootloader notes
 
@@ -96,4 +100,4 @@ See [Repeater Integration](/projects/openhop-modem/repeater-integration/) for th
 - If no serial port appears, try another USB cable and confirm it is a data cable.
 - If flashing starts but fails, lower the baud rate if the flasher exposes that option.
 - If the board will not enter download mode, use the board-specific boot sequence above.
-- If the modem is on Wi-Fi but Repeater cannot connect, verify `curl -u admin:openhop http://<modem-host>/api/stats` and TCP port `5055` from the Repeater host.
+- If the modem is on Wi-Fi but Repeater cannot connect, verify `curl -u admin:REPLACE_WITH_PASSWORD http://<modem-host>/api/stats` and TCP port `5055` from the Repeater host.

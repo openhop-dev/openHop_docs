@@ -64,7 +64,7 @@ modem_tcp:
   lbt_max_attempts: 5
 ```
 
-The commented canonical config example uses these TCP values:
+Use these TCP values as a starting point:
 
 - `host: REPLACE_WITH_MODEM_HOST`
 - `port: 5055`
@@ -73,10 +73,10 @@ The commented canonical config example uses these TCP values:
 - `lbt_enabled: true`
 - `lbt_max_attempts: 5`
 
-Replace the placeholder host before expecting the service to start cleanly.
-
-Use the modem LAN IP or board-specific hostname, such as
-`heltec-v4-<mac3>.local`; there is no generic `openhop-modem.local` name.
+Replace the placeholder with the modem LAN IP or its actual board-specific
+hostname, such as `heltec-v4-<mac3>.local`. The Repeater source template's
+`openhop-modem.local` value is only an example; current modem firmware generates
+board-specific names and some Ethernet targets do not advertise mDNS at all.
 
 ## Configure the backend
 

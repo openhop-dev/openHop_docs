@@ -13,6 +13,8 @@ Reference for configuring openHop Repeater using `config.yaml`, installed at
 
 - [Repeater](#repeater)
 - [Security](#security)
+- [Policy](#policy)
+- [Metrics](#metrics)
 - [GPS](#gps)
 - [Sensors](#sensors)
 - [Mesh](#mesh)
@@ -151,7 +153,10 @@ Authentication settings are nested under `repeater.security`.
 
 ### `repeater.security.max_clients`
 
-Maximum number of authenticated clients across identities. The current default is `5`.
+Maximum number of authenticated clients for the main Repeater identity. The
+current default is `5`. Room-server identities have their own
+`settings.max_clients` limits and separate ACLs; this is not a global limit
+across every hosted identity.
 
 ### `repeater.security.admin_password`
 
@@ -172,6 +177,27 @@ JWT signing secret. Leave empty to auto-generate.
 ### `repeater.security.jwt_expiry_minutes`
 
 Session lifetime before re-authentication is required.
+
+## Policy
+
+The optional `policy:` block selects the policy-engine configuration file.
+Relative paths are resolved from the directory containing `config.yaml`.
+
+```yaml
+policy:
+  policy_file: "policy.yaml"
+```
+
+## Metrics
+
+The `metrics:` block controls historical metrics storage. When `rrd_enabled` is
+true, Repeater stores history with RRDtool when it is available. When false,
+chart APIs calculate metrics from `repeater.db` instead.
+
+```yaml
+metrics:
+  rrd_enabled: true
+```
 
 ## GPS
 
@@ -222,7 +248,7 @@ gps:
   endpoint: "/api/stats"
   scheme: "http"
   username: "admin"
-  password: "openhop"
+  password: "REPLACE_WITH_PASSWORD"
   poll_interval_seconds: 2.0
 ```
 
@@ -331,7 +357,7 @@ sensors:
         endpoint: "/api/stats"
         scheme: "http"
         username: "admin"
-        password: "openhop"
+        password: "REPLACE_WITH_PASSWORD"
         poll_interval_seconds: 60.0
         timeout_seconds: 2.0
 ```
@@ -377,7 +403,9 @@ The repeater can host additional logical identities.
 
 ### `identities.room_servers`
 
-Room servers act as independent nodes with their own keys and settings.
+Room servers act as independent nodes with their own keys, ACLs, and settings.
+Use each room server's `settings.max_clients` to set its authenticated-client
+limit independently of `repeater.security.max_clients`.
 
 ### `identities.companions`
 
@@ -395,9 +423,11 @@ For key generation and imports, see [Identity Management](/projects/openhop-repe
 ## Multi-radio and RF Fabric
 
 Leave `radios:` unset to use the legacy top-level single-radio configuration.
-When `radios:` is present, each entry requires a unique `id`, a `radio_type`,
-its own `radio:` air settings, and the hardware block required by that backend.
-The top-level single-radio settings are then ignored for radio construction.
+When `radios:` is present, each entry requires a unique `id`. Entries inherit the
+top-level `radio_type`, `radio:` air settings, and hardware sections unless they
+provide replacements. If no top-level `radio_type` exists, every entry must set
+one. A section supplied by an entry replaces that complete top-level section for
+that radio; nested values are not merged individually.
 
 ```yaml
 fabric:
@@ -771,12 +801,17 @@ address, port, and worker settings belong under `http:`, not `web:`.
 ```yaml
 web:
   cors_enabled: false
+  carto_api_key: ""
   # web_path: null
 ```
 
 Key fields:
 
 - `cors_enabled`
+- `carto_api_key`: optional CARTO Basemaps browser key for theme-matched light and
+  dark tiles. The browser sends it directly to CARTO, so do not treat it as a
+  server-side secret. When unset, the UI uses light OpenStreetMap tiles in both
+  themes.
 - `web_path`
 
 ## Examples

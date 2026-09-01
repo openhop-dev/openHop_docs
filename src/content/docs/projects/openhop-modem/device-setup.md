@@ -106,13 +106,16 @@ Default credentials on first boot:
 - user: `admin`
 - password: `openhop`
 
-Change the password from the modem web UI after first setup. The same HTTP API is used by Repeater's optional `openhop_modem` sensor and `modem_http` GPS source.
+`openhop` is only the fresh/default password. Change it from the modem web UI
+after first setup. Normal firmware updates preserve the configured password; they
+do not reset it to the default. The same HTTP API is used by Repeater's optional
+`openhop_modem` sensor and `modem_http` GPS source.
 
 Useful checks:
 
 ```bash
-curl -u admin:openhop http://<modem-host>/api/stats
-curl -u admin:openhop http://<modem-host>/
+curl -u admin:REPLACE_WITH_PASSWORD http://<modem-host>/api/stats
+curl -u admin:REPLACE_WITH_PASSWORD http://<modem-host>/
 ```
 
 ## Network exposure

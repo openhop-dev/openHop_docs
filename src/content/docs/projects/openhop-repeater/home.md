@@ -54,6 +54,6 @@ a longer task-oriented index without creating a second project home page.
 
 - [openHop Repeater repository](https://github.com/openhop-dev/openhop_repeater)
 - [openHop Modem firmware](https://github.com/openhop-dev/openhop_modem)
-- [openHop Modem Flasher](https://github.com/openhop-dev/openHop-Modem-Flasher)
+- [openHop MeshCore Flasher](https://github.com/openhop-dev/openHop-Modem-Flasher)
 - [openHop Core](https://github.com/openhop-dev/openhop_core)
 - [MeshCore](https://github.com/meshcore-dev/MeshCore)

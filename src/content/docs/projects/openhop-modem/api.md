@@ -31,6 +31,7 @@ The RAK4631 WisMesh Ethernet build uses DHCP but does not advertise mDNS.
 | `GET` | `/api/radio` | Current radio parameters and RF status. |
 | `GET` | `/api/network` | Wi-Fi/Ethernet and TCP-service state. |
 | `GET` | `/api/stats` | Combined modem, radio, battery, GPS, and board diagnostics. |
+| `GET` | `/api/gps` | GPS state and parsed payload when supported by the board and firmware build. |
 | `GET` | `/api/config` | Current configurable management values. |
 
 Responses vary by board capability. Station G3 includes PA/LNA controls and

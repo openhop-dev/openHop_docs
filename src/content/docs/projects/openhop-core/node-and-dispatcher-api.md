@@ -29,7 +29,7 @@ MeshNode(
 | --- | --- |
 | `start()` | Runs the dispatcher until stopped; call from a task when other work must continue |
 | `stop()` | Idempotently disarms RX and stops the dispatcher; does not close the radio |
-| `send_packet(packet, wait_for_ack=False, radio_id=None, **kwargs)` | Raw-packet transport entry point with optional RF Fabric endpoint selection |
+| `send_packet(packet, *, wait_for_ack=False, radio_id=None, **kwargs)` | Raw-packet transport entry point with keyword-only options and optional RF Fabric endpoint selection; returns `True` on success and `False` on failure or ACK timeout |
 | `set_event_service(service)` | Replaces and propagates the event service to compatible registered handlers |
 | `dispatcher` | The owned `Dispatcher` instance |
 
@@ -63,7 +63,9 @@ ACK correlation is keyed by protocol CRC/hash behavior, not by application objec
 identity. Timeouts and cancellation must remove waiters so later packets cannot wake a
 stale request.
 
-A radio returns a metadata mapping on successful send and `None` only on failure.
+`MeshNode.send_packet()` returns a boolean. The lower-level physical radio
+`send()` contract may return a metadata mapping on success and `None` on failure,
+but the dispatcher normalizes that result before returning to `MeshNode` callers.
 With RF Fabric, `radio_id` can select an endpoint explicitly. Received packets
 are stamped with `_rx_radio_id`, while send metadata and logs identify the chosen
 default, policy-selected, or explicit endpoint. Sending does not automatically

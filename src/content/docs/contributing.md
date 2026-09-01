@@ -1,13 +1,15 @@
 ---
 title: Contributing
-description: How to add and format markdown pages in openHop Docs.
+description: How to add and format Markdown or MDX pages in openHop Docs.
 ---
 
-This site is markdown-first. Adding a page should be simple.
+This site is Markdown-first, with MDX used when a page needs components or JSX.
+Adding an ordinary page should be simple.
 
 ## Add a new page
 
-1. Create a `.md` file under one of these directories:
+1. Create a `.md` file for ordinary content, or `.mdx` only when the page needs
+   imported components or JSX, under one of these directories:
    - `src/content/docs/projects/openhop-core/`
    - `src/content/docs/projects/openhop-repeater/`
    - `src/content/docs/projects/openhop-modem/`
@@ -23,8 +25,13 @@ description: One-line summary shown in metadata and previews.
 ---
 ```
 
-3. Write content using standard Markdown.
-4. Run `npm run dev` and verify the page appears in the sidebar.
+3. Write content using standard Markdown, or MDX where required.
+4. Run `npm run dev` and verify the page appears in the sidebar. This command
+   runs the OpenAPI synchronization hook and may update the tracked
+   `public/openapi/repeater.yaml` file from a sibling Repeater checkout. Inspect
+   that diff before committing and use the exact-ref workflow in
+   [LOCAL_DEVELOPMENT.md](https://github.com/openhop-dev/openHop_docs/blob/dev/LOCAL_DEVELOPMENT.md)
+   when reproducibility matters.
 5. Open a pull request.
 
 ## Naming conventions
@@ -38,8 +45,9 @@ description: One-line summary shown in metadata and previews.
 - Use admonitions for warnings and notes.
 
 ```md
-> [!NOTE]
-> This behavior depends on hardware and region settings.
+:::note
+This behavior depends on hardware and region settings.
+:::
 ```
 
 - Use fenced code blocks with language identifiers.

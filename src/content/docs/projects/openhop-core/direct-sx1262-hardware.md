@@ -36,9 +36,14 @@ Install the hardware extra in a virtual environment:
 python -m pip install "openhop-core[hardware]"
 ```
 
-The optional `gpiod` backend is selected with `use_gpiod_backend=True` and
-requires a compatible Python libgpiod API. The default `auto` backend prefers
-`python-periphery` when available.
+The `hardware` extra installs the default `python-periphery` GPIO path. To select
+the optional `gpiod` backend with `use_gpiod_backend=True`, install both extras:
+
+```bash
+python -m pip install "openhop-core[hardware,gpiod]"
+```
+
+The default `auto` backend prefers `python-periphery` when available.
 
 ## GPIO numbering
 
