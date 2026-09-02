@@ -4,14 +4,14 @@ This site runs with Astro and Starlight.
 
 ## Requirements
 
-- Node.js `22.x`
+- Node.js `22.12.0` or newer
 - `npm`
 
 If you use `nvm`:
 
 ```bash
-nvm install 22
-nvm use 22
+nvm install 22.12.0
+nvm use 22.12.0
 ```
 
 ## Install Dependencies
@@ -75,7 +75,10 @@ public/openapi/repeater.yaml
 - Main docs content: `src/content/docs/`
 - openHop Core docs: `src/content/docs/projects/openhop-core/`
 - openHop Repeater docs: `src/content/docs/projects/openhop-repeater/`
+- openHop Modem docs: `src/content/docs/projects/openhop-modem/`
 - openHop HA Integration docs: `src/content/docs/projects/openhop-ha-integration/`
+- openHop HA Add-on docs: `src/content/docs/projects/openhop-ha-addon/`
+- openHop for Unraid docs: `src/content/docs/projects/openhop-unraid/`
 
 ## Common Commands
 

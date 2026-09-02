@@ -85,9 +85,11 @@ through to a container when applicable.
 For serial backends, confirm the configured device exists, the service user can
 open it, the baud rate is correct, and no terminal/modem-manager process owns it.
 
-For `pymc_tcp`, verify host, port, token, DNS/mDNS resolution, and routing from the
+For `modem_tcp`, verify host, port, token, DNS/mDNS resolution, and routing from the
 Repeater host. A network ping alone does not prove the modem protocol port is
-reachable. For `pymc_usb`, verify the USB-CDC device path after reconnects.
+reachable. For `modem_usb`, verify the USB serial device path after reconnects.
+Prefer `/dev/serial/by-id/...` when available; otherwise re-check the current
+`/dev/ttyACM*` or `/dev/ttyUSB*` assignment.
 
 Then compare frequency, bandwidth, spreading factor, coding rate, preamble, sync,
 LBT, and power with the modem and the mesh.

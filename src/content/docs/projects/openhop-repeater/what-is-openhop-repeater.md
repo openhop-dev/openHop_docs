@@ -5,8 +5,6 @@ sidebar:
   order: 2
 ---
 
-# What is openHop Repeater?
-
 openHop Repeater is an always-on MeshCore node that runs on a Linux host, usually a Raspberry Pi or small single-board computer, or in Docker on any host that can reach the selected radio/modem device. It listens for LoRa MeshCore traffic, forwards packets for the mesh, and provides a web dashboard and API for configuring and monitoring the node.
 
 The main use case is separating the always-on Repeater service from the radio placement problem. Put the radio where it works best, then run Repeater wherever it is easiest to power, manage, and network.
@@ -40,7 +38,7 @@ openHop Repeater can also host higher-level MeshCore services.
 
 ### Runtime policies
 
-Policies let the Repeater enforce network behavior instead of blindly forwarding everything. A policy can be used to control what the node allows, blocks, or prioritizes as the mesh grows.
+Policies let the Repeater enforce network behavior instead of blindly forwarding everything. A policy can allow or drop matching traffic as the mesh grows.
 
 Use this when you want a fixed node to have predictable rules for traffic handling rather than relying only on client-side behavior.
 
@@ -65,8 +63,8 @@ openHop Repeater is not tied to one radio carrier. You choose a radio backend in
 | Pi HAT or local SPI SX1262 | `sx1262` | The radio is wired directly to the Linux host over SPI and GPIO. |
 | CH341 USB-SPI SX1262 adapter | `sx1262_ch341` | The SX1262 is reached through a CH341 USB-SPI adapter. |
 | Serial KISS TNC | `kiss` | You already have a KISS-compatible modem or TNC. |
-| openHop Modem over USB | `pymc_usb` | A flashed ESP/nRF modem board is plugged into the Repeater host over USB-CDC. |
-| openHop Modem over LAN | `pymc_tcp` | A flashed ESP modem board is on Wi-Fi or Ethernet and exposes the modem TCP service. |
+| openHop Modem over USB | `modem_usb` | A flashed ESP/nRF modem board is plugged into the Repeater host over USB serial. |
+| openHop Modem over LAN | `modem_tcp` | A flashed ESP modem board is on Wi-Fi or Ethernet and exposes the modem TCP service. |
 | No RF hardware | `null` or `none` | You only need dashboard, API, room-server, companion, or development behavior. |
 
 This means you can run the same Repeater software with a Pi radio HAT, an outdoor SPI radio box, a USB-connected modem, or a Wi-Fi/Ethernet modem located somewhere else on the LAN.
@@ -82,7 +80,7 @@ The typical modem flow is:
 1. Choose a supported modem board.
 2. Flash it from the browser at [flasher.openhop.dev](https://flasher.openhop.dev/).
 3. Connect it to Repeater over USB, Wi-Fi, or Ethernet.
-4. Select `radio_type: pymc_usb` or `radio_type: pymc_tcp` in Repeater.
+4. Select `radio_type: modem_usb` or `radio_type: modem_tcp` in Repeater.
 5. Optionally enable modem HTTP telemetry as a Repeater sensor.
 6. Optionally use modem HTTP GPS as Repeater's native GPS source.
 
@@ -96,8 +94,8 @@ A GPS source is separate from generic sensor telemetry. If GPS is enabled, Repea
 
 For modem deployments, keep these concepts separate:
 
-- `radio_type: pymc_usb` or `pymc_tcp` selects the RF transport.
-- `type: pymc_modem` adds modem diagnostics to `/api/stats -> sensors`.
+- `radio_type: modem_usb` or `modem_tcp` selects the RF transport.
+- `type: openhop_modem` adds modem diagnostics to `/api/stats -> sensors`.
 - `gps.source: modem_http` makes the modem's GPS payload Repeater's native GPS source.
 
 ## When to use Repeater
@@ -122,4 +120,4 @@ Common deployments include:
 - [Hardware Setup](/projects/openhop-repeater/hardware-setup/) for direct radio hardware.
 - [openHop Modem](/projects/openhop-modem/) for flashing ESP/nRF modem devices.
 - [openHop USB/TCP Setup](/projects/openhop-repeater/openhop-usb-and-tcp-setup/) for modem radio config.
-- [Configuration Reference](/projects/openhop-repeater/config-file/) for all config keys.
+- [Configuration Reference](/projects/openhop-repeater/config-file/) for commonly used settings and schema guidance.

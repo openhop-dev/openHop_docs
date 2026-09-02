@@ -14,12 +14,21 @@ physical transport. Choose the highest-level layer that fits your application.
 | --- | --- | --- |
 | Protocol | `openhop_core.protocol` | Packets, builders, routing fields, identities, cryptography, transport keys, and filtering |
 | Node | `openhop_core.node` | Radio dispatch, serialized transmission, receive handlers, acknowledgements, and lifecycle |
+| RF Fabric | `openhop_core.rf_fabric` | Optional one-or-many-radio ingress, reception metadata, and a legacy-compatible radio facade |
 | Companion | `openhop_core.companion` | Contacts, channels, queues, messaging, adverts, paths, telemetry, and companion frame protocol |
 | Hardware | `openhop_core.hardware` | Direct SPI, serial, USB, TCP, and WebSocket radio implementations |
 
 `MeshNode` is intentionally a thin transport layer. Application-level contact
 lookup, message construction, response correlation, and persistence belong in the
 companion layer or in your application.
+
+`RFFabric`, `FabricRadio`, `RFIngress`, and `RadioReception` provide an optional
+coordination layer for applications that need one or more radios while retaining
+the existing `LoRaRadio` boundary. Each physical reception produces one ingress;
+Dispatcher handles cross-radio deduplication. Transmission selects one explicit,
+policy-selected, or default endpoint rather than automatically fanning out to
+every radio. Applications that need only one radio can keep using the normal
+hardware backend directly.
 
 ## Radio contract
 
@@ -38,13 +47,15 @@ does not report successful transmissions as failed.
 | Direct SX1262 | `SX1262Radio` | `hardware` | Linux SPI and GPIO |
 | KISS TNC | `KissSerialWrapper` | `hardware` | Serial |
 | MeshCore KISS modem | `KissModemWrapper` | `hardware` | Serial |
-| openHop Modem USB | `USBLoRaRadio` | `hardware` | USB-CDC |
-| openHop Modem TCP | `TCPLoRaRadio` | base dependencies plus transport requirements | TCP/IP |
+| openHop Modem USB | `USBLoRaRadio` | `hardware` | USB serial |
+| openHop Modem TCP | `TCPLoRaRadio` | base package; no optional transport extra | TCP/IP |
 | WebSocket radio | `WsRadio` | `websocket` | WebSocket (experimental) |
 
-Compatibility identifiers such as `pymc_usb`, `pymc_tcp`, and some environment
-variables remain part of the transport API even though the user-facing product is
-openHop Modem.
+The canonical transport identifiers are `modem_usb` and `modem_tcp`. Preferred
+TCP environment variables are `MODEM_TCP_HOST`, `MODEM_TCP_PORT`,
+`MODEM_TCP_TOKEN`, and `MODEM_TCP_CONNECT_TIMEOUT`; matching `PYMC_TCP_*` names
+remain compatibility fallbacks. The identifiers `pymc_usb` and `pymc_tcp` are
+compatibility aliases, not preferred examples.
 
 The current `WsRadio` implementation does not yet satisfy every dispatcher
 success-return expectation, so do not present it as a drop-in production backend

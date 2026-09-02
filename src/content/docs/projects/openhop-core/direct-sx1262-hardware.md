@@ -11,7 +11,7 @@ configuration in the host process. Use it only after matching the constructor to
 the exact board schematic and operating region.
 
 This guide tracks openHop Core `dev` commit
-[`0d1dbf2`](https://github.com/openhop-dev/openhop_core/blob/0d1dbf2c10c23be07d4a3c529eee05414994b499/src/openhop_core/hardware/sx1262_wrapper.py).
+[`77f116a`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/hardware/sx1262_wrapper.py).
 It does not define a universal pinout or radio preset.
 
 ## Supported host interfaces
@@ -25,7 +25,7 @@ The current hardware stack supports:
 - hardware chip select (`cs_pin=-1`) or a manual GPIO chip-select line.
 
 The transport abstractions are exported from the pinned
-[`hardware/transports` package](https://github.com/openhop-dev/openhop_core/tree/0d1dbf2c10c23be07d4a3c529eee05414994b499/src/openhop_core/hardware/transports).
+[`hardware/transports` package](https://github.com/openhop-dev/openhop_core/tree/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/hardware/transports).
 Direct Linux use normally opens `/dev/spidev<bus_id>.<cs_id>` and one or more
 `/dev/gpiochip*` devices. CH341 pin numbers are adapter GPIO identifiers, not
 Raspberry Pi GPIO numbers; do not mix the two schemes.
@@ -36,9 +36,14 @@ Install the hardware extra in a virtual environment:
 python -m pip install "openhop-core[hardware]"
 ```
 
-The optional `gpiod` backend is selected with `use_gpiod_backend=True` and
-requires a compatible Python libgpiod API. The default `auto` backend prefers
-`python-periphery` when available.
+The `hardware` extra installs the default `python-periphery` GPIO path. To select
+the optional `gpiod` backend with `use_gpiod_backend=True`, install both extras:
+
+```bash
+python -m pip install "openhop-core[hardware,gpiod]"
+```
+
+The default `auto` backend prefers `python-periphery` when available.
 
 ## GPIO numbering
 
@@ -77,7 +82,7 @@ Front-end and profile-specific controls:
 | `meshadv-mini` | disabled | GPIO 12 | none in example profile |
 
 Exact profile source:
-[`examples/common.py`](https://github.com/openhop-dev/openhop_core/blob/0d1dbf2c10c23be07d4a3c529eee05414994b499/examples/common.py#L266-L315).
+[`examples/common.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/examples/common.py#L266-L315).
 The current Waveshare TXEN value is GPIO 13; older prose in the source docs lists
 GPIO 6, so use the current executable profile plus the vendor schematic, not the
 legacy prose.
@@ -152,8 +157,13 @@ first. Also enable the intended SPI controller/overlay and confirm the expected
 The GPIO manager treats “permission denied” and “resource busy” as fatal setup
 errors. A busy line usually means another process or driver already owns it.
 Do not launch a second radio process against the same SPI/GPIO lines: the wrapper
-also maintains one active `SX1262Radio` instance and cleans up the previous
-instance when another is constructed in the same process.
+does not arbitrate shared physical lines for you. Multiple `SX1262Radio` instances
+can coexist when each owns distinct GPIO/SPI resources. Each instance cleans up
+only its own resources.
+
+Multiple CH341 adapters can be selected by bus/address or serial number. When
+more than one matching adapter is connected, an unqualified selection fails
+rather than silently choosing one.
 
 ## Safe lifecycle
 
@@ -180,8 +190,8 @@ finally:
 ```
 
 `cleanup()` marks shutdown, cancels the receive IRQ task, puts the radio to sleep
-when possible, releases all managed GPIO lines, and clears active-instance
-state. `MeshNode.stop()` does not replace this cleanup; the application still
+when possible, and releases that instance's managed GPIO lines.
+`MeshNode.stop()` does not replace this cleanup; the application still
 owns the radio. See [Quick Start](/projects/openhop-core/quick-start/) and
 [Node Usage](/projects/openhop-core/node-usage/).
 
@@ -221,13 +231,13 @@ vendored README identifies
 [Chandra Wijaya Sentosa's LoRaRF-Python](https://github.com/chandrawi/LoRaRF-Python)
 and links its [upstream wiki](https://github.com/chandrawi/LoRaRF-Python/wiki).
 The vendored tree carries its own
-[MIT license and 2022 copyright notice](https://github.com/openhop-dev/openhop_core/blob/0d1dbf2c10c23be07d4a3c529eee05414994b499/src/openhop_core/hardware/lora/LICENSE).
+[MIT license and 2022 copyright notice](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/hardware/lora/LICENSE).
 
 No upstream LoRaRF commit identifier is recorded in the pinned vendored README
 or license. Do not claim exact source parity with LoRaRF-Python `main`, and do
 not replace the vendored code based only on a package version. Review openHop's
 local changes and hardware tests first, including the pinned
-[SX1262 TX-power mapping tests](https://github.com/openhop-dev/openhop_core/blob/0d1dbf2c10c23be07d4a3c529eee05414994b499/tests/hardware/test_sx126x_tx_power.py).
+[SX1262 TX-power mapping tests](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/tests/hardware/test_sx126x_tx_power.py).
 
 ## Related guides
 

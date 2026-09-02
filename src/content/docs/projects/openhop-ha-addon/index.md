@@ -1,6 +1,8 @@
 ---
 title: openHop HA Add-on Overview
 description: Run openHop Repeater inside Home Assistant using the openHop HA Add-on repository.
+sidebar:
+  order: 1
 ---
 
 openHop HA Add-on packages `openhop_repeater` as Home Assistant add-ons so you can run the repeater inside Home Assistant with the same upstream config model and web UI.

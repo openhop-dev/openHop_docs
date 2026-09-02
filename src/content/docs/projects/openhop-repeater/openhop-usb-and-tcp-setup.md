@@ -1,33 +1,31 @@
 ---
 title: openHop USB/TCP Setup
-description: Configure openHop Repeater to use a pymc_usb modem over USB-CDC or over TCP.
+description: Configure openHop Repeater to use an openHop Modem over USB serial or TCP.
 sidebar:
   order: 8
 ---
 
-# openHop USB/TCP Setup
-
-Use these modes when the radio hardware is already managed by a modem running `pymc_usb` firmware rather than by local SX1262 GPIO and SPI control.
+Use these modes when the radio hardware is already managed by a modem running openHop Modem firmware rather than by local SX1262 GPIO and SPI control.
 
 For device selection, firmware flashing, HTTP diagnostics, modem sensors, and modem-backed GPS, see the [openHop Modem section](/projects/openhop-modem/).
 
 ## When to use each mode
 
-- Use `radio_type: pymc_usb` when the modem is plugged directly into the host over USB-CDC.
-- Use `radio_type: pymc_tcp` when the modem lives on another board and exposes a TCP service over LAN, Wi-Fi, or Ethernet.
+- Use `radio_type: modem_usb` when the modem is plugged directly into the host over USB serial.
+- Use `radio_type: modem_tcp` when the modem lives on another board and exposes a TCP service over LAN, Wi-Fi, or Ethernet.
 
 Both modes keep the repeater in charge of node behavior, the dashboard, API, MQTT, GPS, identities, and storage.
 
 The main config file is `/etc/openhop_repeater/config.yaml`.
 
-## openHop USB over USB-CDC
+## openHop USB over USB serial
 
 Minimal config:
 
 ```yaml
-radio_type: pymc_usb
+radio_type: modem_usb
 
-pymc_usb:
+modem_usb:
   port: "/dev/ttyACM0"
   baudrate: 921600
   lbt_enabled: true
@@ -48,17 +46,17 @@ ls -l /dev/ttyACM0
 id repeater
 ```
 
-Make sure the service user can open the USB-CDC device.
+Make sure the service user can open the USB serial device.
 
 ## openHop USB over TCP
 
 Minimal config:
 
 ```yaml
-radio_type: pymc_tcp
+radio_type: modem_tcp
 
-pymc_tcp:
-  host: "pymc-3e2834.local"
+modem_tcp:
+  host: "REPLACE_WITH_MODEM_HOST"
   port: 5055
   token: ""
   connect_timeout: 5.0
@@ -66,7 +64,7 @@ pymc_tcp:
   lbt_max_attempts: 5
 ```
 
-The commented canonical config example uses these TCP values:
+Use these TCP values as a starting point:
 
 - `host: REPLACE_WITH_MODEM_HOST`
 - `port: 5055`
@@ -75,21 +73,23 @@ The commented canonical config example uses these TCP values:
 - `lbt_enabled: true`
 - `lbt_max_attempts: 5`
 
-Replace the placeholder host before expecting the service to start cleanly.
-
-Use the modem LAN IP, hostname, or mDNS name, for example `pymc-3e2834.local`.
+Replace the placeholder with the modem LAN IP or its actual board-specific
+hostname, such as `heltec-v4-<mac3>.local`. The Repeater source template's
+`openhop-modem.local` value is only an example; current modem firmware generates
+board-specific names and some Ethernet targets do not advertise mDNS at all.
 
 ## Configure the backend
 
-Use the browser setup flow:
+During first-run onboarding, use the browser setup flow:
 
 ```text
 http://<repeater-ip>:8000/setup
 ```
 
-Alternatively, edit the `pymc_usb` or `pymc_tcp` block in
-`/etc/openhop_repeater/config.yaml`. The terminal `setup-radio-config.sh` helper
-does not currently configure these two backends.
+After onboarding, `/setup` redirects to `/login`. Use **System → Configuration →
+Radio → Radio Hardware**, or edit the `modem_usb` or `modem_tcp` block in
+`/etc/openhop_repeater/config.yaml`, then restart Repeater. The terminal
+`setup-radio-config.sh` helper does not currently configure these two backends.
 
 ## Radio settings that still matter
 
@@ -120,8 +120,8 @@ sudo journalctl -u openhop-repeater -f
 Look for:
 
 - successful modem connection
-- no placeholder-host errors for `pymc_tcp`
-- no permission errors on `/dev/ttyACM0` for `pymc_usb`
+- no placeholder-host errors for `modem_tcp`
+- no permission errors on `/dev/ttyACM0` for `modem_usb`
 
 ## Related pages
 

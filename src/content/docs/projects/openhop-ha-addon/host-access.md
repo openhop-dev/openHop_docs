@@ -1,9 +1,9 @@
 ---
 title: Host Access and Storage
 description: Hardware access, networking, and storage behavior for the openHop HA Add-on.
+sidebar:
+  order: 4
 ---
-
-# Host Access and Storage
 
 The add-on is intentionally permissive because the repeater may need SPI, GPIO, USB, serial, and host-network access depending on the chosen backend.
 
@@ -56,7 +56,7 @@ Host networking also matters for:
 
 - companion TCP listeners
 - any room-server ports
-- `pymc_tcp` modem reachability
+- `modem_tcp` modem reachability
 - broker and control-plane connectivity
 
 Because both channel add-ons use host networking and default to the same ports,

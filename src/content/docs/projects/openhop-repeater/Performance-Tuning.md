@@ -25,7 +25,8 @@ setting at a time, and observe the dashboard and logs over comparable traffic.
 - `repeater.cache_ttl` controls duplicate retention; setting it too low can allow
   repeats, while excessive values retain more entries.
 - `repeater.max_flood_hops` limits how far already-traversed floods may continue.
-- `repeater.use_score_for_tx` enables score-based filtering and adaptive timing.
+- `repeater.use_score_for_tx` shortens eligible transmission delays according to
+  packet score; it does not filter or reject packets.
 - `repeater.multi_acks` adds redundant ACK airtime and should be enabled only
   when measured reliability justifies it.
 - advert rate limits and penalty controls can reduce abusive advert bursts.

@@ -7,7 +7,7 @@ sidebar:
 
 ## Before you begin
 
-- Decide whether the host will use `sx1262`, `sx1262_ch341`, `kiss`, `pymc_usb`, `pymc_tcp`, or `null`.
+- Decide whether the host will use `sx1262`, `sx1262_ch341`, `kiss`, `modem_usb`, `modem_tcp`, or `null`.
 - Confirm hardware or serial device access.
 - Confirm network reachability if the modem lives on Wi-Fi or Ethernet.
 - For openHop Modem deployments, flash and provision the modem first. See [openHop Modem](/projects/openhop-modem/).
@@ -23,11 +23,10 @@ sudo ./manage.sh
 
 ## Reconfigure radio mode later
 
-The browser setup route covers all supported backends:
-
-```text
-http://<repeater-ip>:8000/setup
-```
+`/setup` is a first-run-only onboarding route. After setup is complete it
+redirects to `/login`. To change the backend later, sign in and open
+**System → Configuration → Radio → Radio Hardware**, save the change, and restart
+Repeater.
 
 The terminal helper is limited to direct SX1262 presets and KISS:
 
@@ -36,8 +35,8 @@ sudo bash setup-radio-config.sh /etc/openhop_repeater
 sudo systemctl restart openhop-repeater
 ```
 
-Configure `sx1262_ch341`, `pymc_usb`, `pymc_tcp`, and `null` through `/setup` or
-the config file instead.
+Configure `sx1262_ch341`, `modem_usb`, `modem_tcp`, and `null` through the
+authenticated Radio Hardware page or the config file instead.
 
 ## Dashboard
 
