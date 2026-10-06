@@ -10,7 +10,7 @@ for the firmware you actually have; “KISS” alone does not imply the MeshCore
 SetHardware extension API.
 
 This compatibility guide tracks openHop Core `dev` commit
-[`68272ce`](https://github.com/openhop-dev/openhop_core/blob/68272cec2a1312de92c7ec0df529b195d4563575/src/openhop_core/hardware/kiss_modem_wrapper.py)
+[`54f6adb3e0cd3d47a8c61827b2e0be05814a22d4`](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/hardware/kiss_modem_wrapper.py)
 and the pinned MeshCore protocol document at
 [`fb2c61f`](https://github.com/meshcore-dev/MeshCore/blob/fb2c61f862fcd4c6e08cf0f882175ca260052b13/docs/kiss_modem_protocol.md).
 That MeshCore revision includes the 255-byte MTU, single-pending-TX behavior,
@@ -57,6 +57,15 @@ accepts port 0. It caps a decoded frame at `MAX_FRAME_SIZE = 512`, resynchronize
 at the next FEND after an oversize or invalid escape, and limits MeshCore Data
 payloads to `KISS_MAX_PACKET_SIZE = 255`. Its host `send_frame()` additionally
 rejects payloads shorter than two bytes.
+
+### Reset-on-connect is opt-in
+
+`usb_reset_on_connect` is off by default and is never inferred from a serial-port
+path. The wrapper opens the port without deliberately pulsing DTR; enabling the
+option pulses DTR during startup. On ESP32 boards this can reset the modem, and a
+native-USB device can re-enumerate underneath the open port. Enable it only for a
+board and recovery procedure that explicitly require a reset, not as a generic
+connection fix.
 
 ## Standard KISS commands
 
@@ -109,7 +118,7 @@ Public convenience methods cover the operations above, including
 `get_identity()`, `get_random()`, `sign_data()`, `verify_signature()`,
 `encrypt_data()`, `decrypt_data()`, `key_exchange()`, `hash_data()`, radio/status
 queries, sensor queries, and asynchronous query variants. See the exact
-[`KissModemWrapper` source](https://github.com/openhop-dev/openhop_core/blob/68272cec2a1312de92c7ec0df529b195d4563575/src/openhop_core/hardware/kiss_modem_wrapper.py)
+[`KissModemWrapper` source](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/hardware/kiss_modem_wrapper.py)
 for current signatures and validation.
 
 ## Data, TxDone, and RxMeta

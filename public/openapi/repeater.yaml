@@ -60,6 +60,8 @@ tags:
     description: Room server messaging
   - name: Plugins
     description: External plugin install and lifecycle management
+  - name: Sensors
+    description: Sensor manager — types, configuration, and readings
 
 paths:
   # ============================================================================
@@ -321,6 +323,13 @@ paths:
                   core_version:
                     type: string
                     example: "0.5.0"
+                  modem_disconnected:
+                    type: array
+                    description: Configured USB/TCP radio labels whose live modem link is down; empty when connected or not configured.
+                    items:
+                      type: string
+                  sensors:
+                    $ref: '#/components/schemas/SensorSummary'
 
   /gps:
     get:
@@ -729,16 +738,60 @@ paths:
                     properties:
                       total_packets:
                         type: integer
-                      received:
+                      transmitted_packets:
                         type: integer
-                      transmitted:
+                        nullable: true
+                        description: >-
+                          Packets this node transmitted, counted once per packet however
+                          many radios sent it.
+                      dropped_packets:
                         type: integer
-                      dropped:
+                        nullable: true
+                      avg_rssi:
+                        type: number
+                      avg_snr:
+                        type: number
+                      avg_score:
+                        type: number
+                      avg_payload_length:
+                        type: number
+                      avg_tx_delay:
+                        type: number
+                      packet_types:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              type: integer
+                            count:
+                              type: integer
+                      drop_reasons:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            reason:
+                              type: string
+                            count:
+                              type: integer
+                      radios:
+                        type: array
+                        description: >-
+                          One entry per radio, in configured order. Present only on a
+                          node with two or more radios.
+                        items:
+                          $ref: '#/components/schemas/PacketStatsRadio'
+                      unattributed_rx_count:
                         type: integer
-                      by_type:
-                        type: object
-                      by_route:
-                        type: object
+                        description: >-
+                          Receptions whose radio could not be identified. Multi-radio
+                          nodes only.
+                      unattributed_tx_count:
+                        type: integer
+                        description: >-
+                          Transmissions whose radio could not be identified.
+                          Multi-radio nodes only.
 
   /set_duty_cycle:
     post:
@@ -858,6 +911,207 @@ paths:
                 $ref: '#/components/schemas/SuccessResponse'
 
   # ============================================================================
+  # Sensors Endpoints
+  # ============================================================================
+  /sensors_types:
+    get:
+      tags: [Sensors]
+      summary: List available sensor types
+      description: |
+        Discover installed sensor modules and return registered types with their settings schemas.
+        Compatibility aliases such as pymc_modem remain loadable from existing definitions but are omitted from add-new choices.
+      responses:
+        '200':
+          description: Sensor types list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      types:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                            name:
+                              type: string
+                            description:
+                              type: string
+                            settings:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  key:
+                                    type: string
+                                  type:
+                                    type: string
+                                    enum: [string, integer, number]
+                                  label:
+                                    type: string
+                                  default:
+                                    type: object
+                                  help:
+                                    type: string
+
+  /sensors_config:
+    get:
+      tags: [Sensors]
+      summary: Get current sensor configuration
+      description: |
+        Returns current sensor definitions. Nonempty settings.password values are
+        masked as *****; stored credentials are never included in this response.
+        Each definition also includes _original_name so the client can preserve
+        its password safely when renaming it while adding another sensor of the same type.
+      responses:
+        '200':
+          description: Sensor configuration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      enabled:
+                        type: boolean
+                      poll_interval_seconds:
+                        type: number
+                      auto_install_packages:
+                        type: boolean
+                      definitions:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            _original_name:
+                              type: string
+                              description: The stored name used for masked-password round trips; not persisted on update.
+                            type:
+                              type: string
+                            enabled:
+                              type: boolean
+                            auto_install_packages:
+                              type: boolean
+                            settings:
+                              type: object
+
+  /sensors_config_update:
+    post:
+      tags: [Sensors]
+      summary: Update sensor configuration
+      description: |
+        Update sensor definitions and persist to config.yaml under the provisioning lock.
+        Names must be unique; sensor types may repeat, including existing pymc_modem aliases.
+        Password value ***** preserves an existing secret; an empty string clears it.
+        Pass the _original_name from GET when renaming an existing sensor to preserve
+        its password, even if another sensor of the same type is added. Omit it for
+        new definitions. Always returns restart_required=true.
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+                poll_interval_seconds:
+                  type: number
+                  default: 30.0
+                auto_install_packages:
+                  type: boolean
+                  default: false
+                definitions:
+                  type: array
+                  items:
+                    type: object
+                    required: [name, type]
+                    properties:
+                      name:
+                        type: string
+                      _original_name:
+                        type: string
+                        description: Optional origin from GET for an existing definition; not persisted.
+                      type:
+                        type: string
+                      enabled:
+                        type: boolean
+                      auto_install_packages:
+                        type: boolean
+                      settings:
+                        type: object
+            example:
+              enabled: true
+              poll_interval_seconds: 30.0
+              definitions:
+                - name: living-room-temp
+                  type: bme280
+                  enabled: true
+                  settings:
+                    i2c_address: "0x76"
+                    bus_number: 0
+      responses:
+        '200':
+          description: Configuration saved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      saved:
+                        type: boolean
+                      restart_required:
+                        type: boolean
+                      message:
+                        type: string
+
+  /sensors_read:
+    post:
+      tags: [Sensors]
+      summary: Trigger one-shot sensor read
+      description: Triggers an immediate read of all configured sensors and returns results.
+      responses:
+        '200':
+          description: Sensor readings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      readings:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SensorReading'
+                      summary:
+                        $ref: '#/components/schemas/SensorSummary'
+
+  # ============================================================================
   # Packet Endpoints
   # ============================================================================
   /recent_packets:
@@ -958,6 +1212,51 @@ paths:
             application/json:
               schema:
                 type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      hours:
+                        type: integer
+                      period:
+                        type: string
+                      data_source:
+                        type: string
+                      route_totals:
+                        $ref: '#/components/schemas/RouteTotals'
+                      total_packets:
+                        type: integer
+                      radios:
+                        type: array
+                        description: >-
+                          Route mix of each radio's receptions, in configured order.
+                          Present only on a node with two or more radios.
+                        items:
+                          type: object
+                          properties:
+                            radio_id:
+                              type: string
+                            route_totals:
+                              $ref: '#/components/schemas/RouteTotals'
+                            total_packets:
+                              type: integer
+                      originated:
+                        type: object
+                        description: >-
+                          Packets this node sent itself, which no radio received.
+                          Multi-radio nodes only.
+                        properties:
+                          route_totals:
+                            $ref: '#/components/schemas/RouteTotals'
+                          total_packets:
+                            type: integer
+                      unattributed_count:
+                        type: integer
+                        description: >-
+                          Receptions whose radio could not be identified. Multi-radio
+                          nodes only.
 
   /filtered_packets:
     get:
@@ -1079,6 +1378,20 @@ paths:
             type: integer
             minimum: 60
           description: Bucket width in seconds; the answer carries `buckets` instead of `rows`.
+        - name: radio_id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Only observations heard by this radio.
+        - name: by_radio
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: >-
+            With `bucket_seconds`, split each bucket per receiving radio; every bucket
+            then carries `radio_id`.
       responses:
         '200':
           description: Neighbour link history
@@ -1269,6 +1582,8 @@ paths:
         Notes:
         - LBT total attempts are derived as `lbt_attempts + 1` from stored packet metadata.
         - Buckets are bounded and aggregated server-side for efficient dashboard refresh.
+        - On a node with two or more radios the response also carries `radios`, the same
+          summary and bucket shape per radio, counting physical transmissions.
       parameters:
         - name: hours
           in: query
@@ -1322,7 +1637,12 @@ paths:
     get:
       tags: [Noise Floor]
       summary: Get noise floor history
-      description: Retrieve historical noise floor measurements
+      description: >-
+        Historical noise floor measurements, oldest first. On a node with two or more
+        radios every sample names the radio it was read from, and radio_id pages that
+        radio's samples on their own; offset paging over the combined series is stable
+        only while nothing is filtered out. Samples stored before per-radio sampling,
+        and every sample on a single-radio node, carry no radio id.
       parameters:
         - name: hours
           in: query
@@ -1332,6 +1652,24 @@ paths:
             minimum: 1
             maximum: 168
           description: Time range in hours
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000000
+          description: Maximum samples to return. Defaults to 300 per hour, at least 2000.
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: radio_id
+          in: query
+          schema:
+            type: string
+          description: Return only samples read from this radio.
       responses:
         '200':
           description: Noise floor history
@@ -1343,15 +1681,32 @@ paths:
                   success:
                     type: boolean
                   data:
-                    type: array
-                    items:
-                      type: object
+                    type: object
+                    properties:
+                      history:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/NoiseFloorSample'
+                      hours:
+                        type: integer
+                      count:
+                        type: integer
+                      limit:
+                        type: integer
+                      offset:
+                        type: integer
+                      radio_id:
+                        type: string
+                        description: Echoed back only when the request named a radio.
 
   /noise_floor_stats:
     get:
       tags: [Noise Floor]
       summary: Get noise floor statistics
-      description: Statistical analysis of noise floor measurements
+      description: >-
+        Statistical analysis of noise floor measurements. Without radio_id on a node
+        with two or more radios this averages two receivers on two bands, which
+        describes neither; name a radio there.
       parameters:
         - name: hours
           in: query
@@ -1359,6 +1714,11 @@ paths:
             type: integer
             default: 24
           description: Time range in hours
+        - name: radio_id
+          in: query
+          schema:
+            type: string
+          description: Summarise only samples read from this radio.
       responses:
         '200':
           description: Noise floor statistics
@@ -1372,14 +1732,24 @@ paths:
                   data:
                     type: object
                     properties:
-                      min:
-                        type: number
-                      max:
-                        type: number
-                      avg:
-                        type: number
-                      current:
-                        type: number
+                      stats:
+                        type: object
+                        properties:
+                          measurement_count:
+                            type: integer
+                          avg_noise_floor:
+                            type: number
+                          min_noise_floor:
+                            type: number
+                          max_noise_floor:
+                            type: number
+                          hours:
+                            type: integer
+                      hours:
+                        type: integer
+                      radio_id:
+                        type: string
+                        description: Echoed back only when the request named a radio.
 
   /noise_floor_chart_data:
     get:
@@ -2745,7 +3115,27 @@ paths:
                               example: 100
                             authenticated_clients:
                               type: integer
+                              description: |
+                                Entries that logged in or sent a message since
+                                they were loaded. Entries provisioned with
+                                setperm and not yet used are not counted.
                               example: 5
+                            store_error:
+                              type: string
+                              nullable: true
+                              description: |
+                                Set while the stored ACL cannot be read (at
+                                startup, and until a later login or change
+                                reads it): stored entries cannot log in, and
+                                the entries listed are not the stored ones.
+                            acl_entries:
+                              type: integer
+                              description: All entries in the ACL, sessions and provisioned
+                              example: 7
+                            stored_entries:
+                              type: integer
+                              description: Entries kept across restarts
+                              example: 2
                             has_admin_password:
                               type: boolean
                               example: true
@@ -2766,7 +3156,10 @@ paths:
     get:
       tags: [ACL]
       summary: List ACL clients
-      description: Get list of authenticated clients in access control list for an identity
+      description: |
+        List the entries in an identity's access control list: sessions from
+        logins, and entries provisioned with setperm or /acl_set_permissions
+        that may not have logged in yet (last_activity 0).
       parameters:
         - name: identity_hash
           in: query
@@ -2801,10 +3194,24 @@ paths:
                       count:
                         type: integer
                         description: Number of clients returned
+                      store_errors:
+                        type: object
+                        additionalProperties:
+                          type: string
+                        description: |
+                          Identity name to error, for identities whose stored ACL
+                          cannot be read now; their list is not the stored one.
                       filter:
-                        type: string
+                        type: object
                         nullable: true
                         description: Filter applied (if any)
+                        properties:
+                          identity_hash:
+                            type: string
+                            nullable: true
+                          identity_name:
+                            type: string
+                            nullable: true
               examples:
                 success:
                   value:
@@ -2835,22 +3242,25 @@ paths:
           application/json:
             schema:
               type: object
-              required: [identity_hash, client_pubkey]
+              required: [client_pubkey]
               properties:
+                identity_name:
+                  type: string
+                  description: |
+                    Identity name ("repeater" or a room server's name). Preferred
+                    over identity_hash, which two identities can share. With
+                    neither, the client is removed from every ACL.
+                  example: "repeater"
                 identity_hash:
                   type: string
                   pattern: '^0x[0-9a-fA-F]{2}$'
                   description: Identity hash
                   example: "0x42"
-                identity_name:
-                  type: string
-                  description: Identity name (alternative to hash)
-                  example: "General"
                 client_pubkey:
                   type: string
                   pattern: '^[0-9a-fA-F]{64}$'
-                  description: Client public key to remove
-                  example: "abc123def456..."
+                  description: Client public key to remove. Its stored entry is removed too.
+                  example: "03ccf3bb0bed9a5109868a1e33ed020519aab6dbb30e42df3b11a21d21416fff"
       responses:
         '200':
           description: Client removed from ACL
@@ -2858,6 +3268,74 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuccessResponse'
+
+  /acl_set_permissions:
+    post:
+      tags: [ACL]
+      summary: Add or change an ACL entry
+      description: |
+        The web equivalent of the `setperm` CLI command. The entry is stored, so
+        the key logs in with a blank password after a restart. A room server
+        stores admins only, as MeshCore firmware does; other roles there last
+        until a restart (`persisted: false`). To remove an entry, use
+        /acl_remove_client.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [identity_name, client_pubkey, permissions]
+              properties:
+                identity_name:
+                  type: string
+                  description: Identity name ("repeater" or a room server's name)
+                  example: "repeater"
+                client_pubkey:
+                  type: string
+                  pattern: '^[0-9a-fA-F]{64}$'
+                  description: Full client public key
+                  example: "03ccf3bb0bed9a5109868a1e33ed020519aab6dbb30e42df3b11a21d21416fff"
+                permissions:
+                  type: integer
+                  minimum: 1
+                  maximum: 255
+                  description: |
+                    Permissions byte. The low two bits are the role: 1 read-only,
+                    2 read-write, 3 admin; 0 (guest) is refused here.
+                  example: 3
+      responses:
+        '200':
+          description: Entry set, or an error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  error:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      identity_name:
+                        type: string
+                      identity_type:
+                        type: string
+                        enum: [repeater, room_server]
+                      client_pubkey:
+                        type: string
+                      permissions:
+                        type: string
+                        enum: [admin, read_write, read_only, guest]
+                      permissions_value:
+                        type: integer
+                      persisted:
+                        type: boolean
+                        description: Whether the entry survives a restart
 
   /acl_stats:
     get:
@@ -2877,10 +3355,26 @@ paths:
                   data:
                     type: object
                     properties:
-                      total_entries:
+                      total_identities:
                         type: integer
-                      by_identity:
+                        description: Identities with an access list (the repeater and room servers)
+                      total_clients:
+                        type: integer
+                        description: ACL entries across them, sessions and provisioned alike
+                      admin_clients:
+                        type: integer
+                      guest_clients:
+                        type: integer
+                        description: Entries that are not admins (any other role)
+                      by_identity_type:
                         type: object
+                        additionalProperties:
+                          type: object
+                          properties:
+                            count:
+                              type: integer
+                            clients:
+                              type: integer
 
   /room_messages:
     get:
@@ -3748,6 +4242,55 @@ paths:
               schema:
                 type: object
 
+  /radio_packet_rates:
+    get:
+      tags: [Charts]
+      summary: Get per-radio packet counts over time
+      description: >-
+        Receptions and transmissions per radio per time bucket. A relayed packet is a
+        reception on its ingress radio and a transmission on every radio that sent it,
+        so a relay fanned out across a bridge counts once on each radio.
+      parameters:
+        - name: hours
+          in: query
+          schema:
+            type: integer
+            default: 24
+            minimum: 1
+            maximum: 168
+        - name: bucket_seconds
+          in: query
+          description: Bucket width. Defaults to 300 for windows up to 6 hours, else 3600.
+          schema:
+            type: integer
+            minimum: 60
+            maximum: 86400
+      responses:
+        '200':
+          description: Per-radio packet counts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      hours:
+                        type: integer
+                      bucket_seconds:
+                        type: integer
+                      radios:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/RadioPacketRateSeries'
+                      unattributed_rx_count:
+                        type: integer
+                      unattributed_tx_count:
+                        type: integer
+
   /airtime_chart_data:
     get:
       tags: [Charts]
@@ -3768,21 +4311,28 @@ paths:
             default: 60
         - name: sf
           in: query
+          description: >-
+            Fallback spreading factor. Ignored whenever the server can read its own
+            radio profiles, which are authoritative and are never applied across
+            two Fabric radios.
           schema:
             type: integer
             default: 9
         - name: bw_hz
           in: query
+          description: Fallback bandwidth in Hz. See `sf`.
           schema:
             type: integer
             default: 62500
         - name: cr
           in: query
+          description: Fallback coding-rate denominator (5-8). See `sf`.
           schema:
             type: integer
             default: 5
         - name: preamble
           in: query
+          description: Fallback preamble length in symbols. See `sf`.
           schema:
             type: integer
             default: 17
@@ -3793,6 +4343,58 @@ paths:
             application/json:
               schema:
                 type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      bucket_seconds:
+                        type: integer
+                        description: Width of each bucket in seconds.
+                      buckets:
+                        type: array
+                        description: >-
+                          Combined series across every radio, retained for UI builds
+                          that predate `radios`.
+                        items:
+                          $ref: '#/components/schemas/AirtimeBucket'
+                      rx_total:
+                        type: integer
+                        description: Reception events across every radio in the window.
+                      tx_total:
+                        type: integer
+                        description: Transmission events across every radio in the window.
+                      radios:
+                        type: array
+                        description: >-
+                          One series per active radio, in configured order. A relayed
+                          packet appears as RX on its ingress radio and TX on every
+                          radio that successfully transmitted it.
+                        items:
+                          type: object
+                          properties:
+                            radio_id:
+                              type: string
+                            profile:
+                              $ref: '#/components/schemas/AirtimeRadioProfile'
+                            buckets:
+                              type: array
+                              items:
+                                $ref: '#/components/schemas/AirtimeBucket'
+                            rx_total:
+                              type: integer
+                            tx_total:
+                              type: integer
+                      unattributed_rx_count:
+                        type: integer
+                        description: >-
+                          Receptions on a multi-radio node whose radio could not be
+                          identified (history predating radio attribution, or a radio
+                          no longer configured). Never guessed onto another radio.
+                      unattributed_tx_count:
+                        type: integer
+                        description: Transmissions with no identifiable radio. See above.
 
   /adverts_count_by_contact_type:
     get:
@@ -3832,12 +4434,21 @@ paths:
     get:
       tags: [System]
       summary: Get CRC error count
+      description: >-
+        Total CRC errors in the window. radio_id narrows it to one radio's counter;
+        errors recorded before per-radio sampling carry no radio id and are counted
+        only by the unfiltered call.
       parameters:
         - name: hours
           in: query
           schema:
             type: integer
             default: 24
+        - name: radio_id
+          in: query
+          schema:
+            type: string
+          description: Count only errors from this radio's counter.
       responses:
         '200':
           description: CRC error count
@@ -3845,11 +4456,27 @@ paths:
             application/json:
               schema:
                 type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      crc_error_count:
+                        type: integer
+                      hours:
+                        type: integer
+                      radio_id:
+                        type: string
+                        description: Echoed back only when the request named a radio.
 
   /crc_error_history:
     get:
       tags: [System]
       summary: Get CRC error history
+      description: >-
+        CRC error batches in the window, oldest first. On a node with two or more
+        radios every batch names the radio whose counter it came from.
       parameters:
         - name: hours
           in: query
@@ -3860,6 +4487,11 @@ paths:
           in: query
           schema:
             type: integer
+        - name: radio_id
+          in: query
+          schema:
+            type: string
+          description: Return only errors from this radio's counter.
       responses:
         '200':
           description: CRC error records
@@ -3867,6 +4499,23 @@ paths:
             application/json:
               schema:
                 type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      history:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/CrcErrorSample'
+                      hours:
+                        type: integer
+                      count:
+                        type: integer
+                      radio_id:
+                        type: string
+                        description: Echoed back only when the request named a radio.
 
   /memory_debug:
     get:
@@ -5155,6 +5804,118 @@ components:
                 enum: [unknown]
   schemas:
 
+    SensorMetricDescriptor:
+      type: object
+      description: One snapshot's local, bounded measurement metadata; identity is configured sensor name plus source-path id.
+      required: [id, source_path, data_key, label, unit, kind, category, available]
+      properties:
+        id:
+          type: string
+          description: RFC6901 JSON Pointer relative to the modem stats response.
+        source_path:
+          type: string
+        data_key:
+          type: string
+          description: Exact key in the flat data object; generic keys begin with modem:.
+        label:
+          type: string
+        unit:
+          type: string
+          nullable: true
+        kind:
+          type: string
+          enum: [number, boolean]
+        category:
+          type: string
+          enum: [measurement, diagnostic, configuration, status]
+        available:
+          type: boolean
+        reason:
+          type: string
+          enum: ['null', missing, source_unavailable, invalid, read_failed]
+    SensorReading:
+      type: object
+      required: [name, type, ok, timestamp, data]
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        ok:
+          type: boolean
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+          description: Flat plugin-specific values. Discovered modem values may be null when unavailable; historical fields may be omitted.
+          additionalProperties: true
+        error:
+          type: string
+        metrics:
+          type: array
+          description: Optional snapshot descriptors; absent for unchanged plug-ins. No sensor history or RF telemetry implied.
+          items:
+            $ref: '#/components/schemas/SensorMetricDescriptor'
+    SensorSummary:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        poll_interval_seconds:
+          type: number
+        configured:
+          type: integer
+        loaded:
+          type: integer
+        running:
+          type: boolean
+        readings:
+          type: array
+          items:
+            $ref: '#/components/schemas/SensorReading'
+
+    AirtimeBucket:
+      type: object
+      properties:
+        timestamp:
+          type: integer
+          description: Unix start of the bucket, floored to bucket_seconds.
+        rx_ms:
+          type: number
+          description: Receive time-on-air in this bucket, in milliseconds.
+        tx_ms:
+          type: number
+          description: Transmit time-on-air in this bucket, in milliseconds.
+        rx_count:
+          type: integer
+        tx_count:
+          type: integer
+
+    AirtimeRadioProfile:
+      type: object
+      description: >-
+        Air settings this radio's time-on-air was computed with. A null field means
+        the setting could not be read; airtime is reported as zero rather than
+        estimated from a default that was never on the air.
+      properties:
+        frequency_hz:
+          type: integer
+          nullable: true
+        bandwidth_hz:
+          type: integer
+          nullable: true
+        spreading_factor:
+          type: integer
+          nullable: true
+        coding_rate:
+          type: integer
+          nullable: true
+          description: Coding-rate denominator (5 = 4/5 ... 8 = 4/8).
+        preamble_length:
+          type: integer
+          nullable: true
+
     PluginStatus:
       type: object
       properties:
@@ -5225,6 +5986,126 @@ components:
           type: number
           description: Epoch seconds of the most recent query
 
+    PacketStatsRadio:
+      type: object
+      properties:
+        radio_id:
+          type: string
+        received:
+          type: integer
+          description: Packets this radio received, duplicates included.
+        duplicates:
+          type: integer
+        dropped:
+          type: integer
+          description: Receptions on this radio that the node did not forward.
+        transmissions:
+          type: integer
+          description: Physical transmissions on this radio.
+        avg_rssi:
+          type: number
+          nullable: true
+        avg_snr:
+          type: number
+          nullable: true
+
+    RouteTotals:
+      type: object
+      description: Packet count per route type name.
+      additionalProperties:
+        type: integer
+
+    RadioPacketRateBucket:
+      type: object
+      properties:
+        timestamp:
+          type: integer
+          description: Bucket start (Unix timestamp).
+        rx_count:
+          type: integer
+        tx_count:
+          type: integer
+
+    NoiseFloorSample:
+      type: object
+      properties:
+        timestamp:
+          type: number
+        noise_floor_dbm:
+          type: number
+        radio_id:
+          type: string
+          nullable: true
+          description: >-
+            The radio this sample was read from. Present only on a node with two or
+            more radios; null there for a sample stored before per-radio sampling or
+            read from a radio that is no longer configured.
+
+    CrcErrorSample:
+      type: object
+      properties:
+        timestamp:
+          type: number
+        count:
+          type: integer
+          description: Errors counted since the previous sample of this radio.
+        radio_id:
+          type: string
+          nullable: true
+          description: >-
+            The radio whose counter these errors came from. Present only on a node
+            with two or more radios.
+
+    RadioPacketRateSeries:
+      type: object
+      properties:
+        radio_id:
+          type: string
+        rx_total:
+          type: integer
+        tx_total:
+          type: integer
+        buckets:
+          type: array
+          description: Non-empty buckets, oldest first.
+          items:
+            $ref: '#/components/schemas/RadioPacketRateBucket'
+
+    NeighborLinkRadioStats:
+      type: object
+      description: One neighbour as heard by one radio.
+      properties:
+        radio_id:
+          type: string
+        sample_count:
+          type: integer
+        duplicate_sample_count:
+          type: integer
+        first_seen:
+          type: number
+        last_seen:
+          type: number
+        age_seconds:
+          type: number
+        active:
+          type: boolean
+        last_rssi:
+          type: number
+        last_snr:
+          type: number
+        last_score:
+          type: number
+        ewma_rssi:
+          type: number
+        ewma_snr:
+          type: number
+        ewma_score:
+          type: number
+        best_score:
+          type: number
+        worst_score:
+          type: number
+
     NeighborLinkSnapshot:
       type: object
       properties:
@@ -5262,6 +6143,13 @@ components:
           type: number
         worst_score:
           type: number
+        radios:
+          type: array
+          description: >-
+            Stats per receiving radio, configured radios first. Present only on a node
+            with two or more radios.
+          items:
+            $ref: '#/components/schemas/NeighborLinkRadioStats'
 
     NeighborLinksData:
       type: object
@@ -5271,6 +6159,8 @@ components:
           items:
             $ref: '#/components/schemas/NeighborLinkSnapshot'
         active_within_seconds:
+          type: number
+        limit:
           type: integer
         count:
           type: integer
@@ -5308,6 +6198,9 @@ components:
         path_hop_count:
           type: integer
           nullable: true
+        rx_radio_id:
+          type: string
+          description: Radio that heard it; absent when not recorded.
 
     NeighborLinkHistoryData:
       type: object
@@ -5326,6 +6219,8 @@ components:
           items:
             $ref: '#/components/schemas/NeighborLinkHistoryRow'
         bucket_seconds: {type: integer, description: Bucket width in seconds; only when requested}
+        radio_id: {type: string, description: The radio filter; only when requested}
+        by_radio: {type: boolean, description: Buckets are split per radio; only when requested}
         buckets:
           type: array
           description: One summary per non-empty bucket, oldest first; only when `bucket_seconds` was requested.
@@ -5344,6 +6239,7 @@ components:
         score: {type: number, nullable: true, description: Mean score}
         rssi: {type: number, nullable: true, description: Mean RSSI}
         snr: {type: number, nullable: true, description: Mean SNR}
+        radio_id: {type: string, nullable: true, description: Receiving radio; only with by_radio}
 
     NeighborLinkHistoryResponse:
       type: object
@@ -5395,6 +6291,36 @@ components:
           type: array
           items:
             type: string
+        radios:
+          type: array
+          description: >-
+            Present only on a node with two or more radios. One entry per configured
+            radio, counting physical transmissions from the packet_egress table, so a
+            packet fanned out across a bridge is counted on each radio it left by and a
+            send that failed on one radio is counted there. The combined summary and
+            buckets above are unchanged and still count each packet once. Per-radio
+            entries carry no rf block (the RRD series behind it is node-wide) and no
+            packet-type breakdown.
+          items:
+            $ref: '#/components/schemas/LbtRadioSeries'
+        unattributed_transmissions:
+          type: integer
+          description: >-
+            Physical sends whose radio is no longer configured. Present alongside
+            radios; counted here rather than blamed on another radio's contention.
+
+    LbtRadioSeries:
+      type: object
+      required: [radio_id, summary, buckets]
+      properties:
+        radio_id:
+          type: string
+        summary:
+          $ref: '#/components/schemas/LbtSummary'
+        buckets:
+          type: array
+          items:
+            $ref: '#/components/schemas/LbtBucket'
 
     LbtPacketTypeSummary:
       type: object
@@ -5909,7 +6835,7 @@ components:
           example: 1766065148
         last_login_success:
           type: integer
-          description: Unix timestamp of last successful login
+          description: Unix timestamp of last successful login, 0 if none. Kept across restarts for entries that persist; last_activity resets to 0.
           example: 1766065146
         last_timestamp:
           type: integer
@@ -5929,6 +6855,32 @@ components:
           pattern: '^0x[0-9a-fA-F]{2}$'
           description: Hash of the identity
           example: "0xC5"
+        client_name:
+          type: string
+          nullable: true
+          description: |
+            The client's advertised name, from an advert the repeater heard or
+            else a companion's contact for it; null when neither knows it.
+          example: "Howl"
+        client_type:
+          type: string
+          nullable: true
+          description: Contact type from the client's advert (e.g. "Chat Node"), when heard
+          example: "Chat Node"
+        identity_pubkey:
+          type: string
+          pattern: '^[0-9a-fA-F]{64}$'
+          description: Full public key of the identity, unique where the hash is not
+        permissions_value:
+          type: integer
+          description: The whole permissions byte; the role is its low two bits
+          example: 3
+        persisted:
+          type: boolean
+          description: |
+            Whether the entry is stored and survives a restart. The repeater
+            stores every entry with permissions, a room server admins only.
+          example: true
 
   securitySchemes:
     BearerAuth:

@@ -34,7 +34,9 @@ a longer task-oriented index without creating a second project home page.
 
 - GPS receiver support and GPS time sync
 - [managed application and service plugins](/projects/openhop-repeater/plugins/) with a catalogue, updates, logs, and persistent settings
-- built-in sensor modules exposed through `/api/stats`
+- [Sensor Manager and live Sensors](/projects/openhop-repeater/sensors/) with modem metric discovery and reading groups
+- [multi-radio RF Fabric](/projects/openhop-repeater/hardware-setup/#multiple-radios) with optional two-radio relay/originated fan-out
+- [browser Terminal and per-radio analytics](/projects/openhop-repeater/web-dashboard/)
 - openHop Modem HTTP GPS and `openhop_modem` sensor telemetry
 - `mqtt_brokers` based publishing
 - openHop Glass control-plane integration

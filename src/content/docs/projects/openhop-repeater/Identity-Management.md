@@ -102,6 +102,58 @@ updating, deleting, or importing an identity changes persistent state and may
 affect clients, contacts, queues, and advertised identity. Export a backup before
 destructive changes.
 
+## Mesh client permissions and stored ACLs
+
+Mesh client access lists are separate from dashboard accounts, JWTs, and API
+keys. Each repeater or room-server identity has its own ACL, stored under its
+full public key rather than only the one-byte identity hash.
+
+An administrator can grant a client access using the MeshCore remote CLI:
+
+```text
+setperm <full-client-public-key-hex> 3
+get acl
+```
+
+Replace the placeholder with the client's complete 64-character hexadecimal
+**public** key, not a private key or a shortened identity hash. The permissions
+byte's low two bits select the role: `1` read-only, `2` read-write, `3` admin.
+`get acl` lists permission bytes in hexadecimal. In `setperm`, a role of `0`
+removes a matching entry; use a full key to avoid ambiguous prefix removal.
+An invalid nonnumeric permissions argument can also become zero, so check the
+command carefully before sending it.
+
+- The primary repeater stores nonzero-permission entries across restarts.
+- Room servers store admin entries only; other room roles are session state and
+  do not survive a restart.
+- A stored client can log in with a blank password while retaining its granted
+  role. Blank login still requires the client's cryptographic identity; it is
+  not permission for an arbitrary client to become an administrator.
+- Removing a stored entry removes its persistent grant too. Changing a shared
+  password is not a substitute for revoking already stored client permissions.
+
+For automation, authenticated `POST /api/acl_set_permissions` takes
+`identity_name`, `client_pubkey`, and `permissions`. Its `persisted` result tells
+whether that entry survives restart. Use `POST /api/acl_remove_client` for
+removal; prefer an explicit `identity_name` to a potentially colliding hash.
+Omitting both identity selectors removes the client from every ACL. See the
+[API Reference](/projects/openhop-repeater/api-reference/) for request schemas.
+
+A provisioned or reloaded ACL entry may have `last_activity: 0` until used.
+Consequently the ACL entry count can exceed the authenticated/active-client
+count. A `store_error` or `store_errors` response means the stored ACL could not
+be read—not that it is empty. Investigate database access and recover the store
+before replacing grants. Include the persistent database in identity backups;
+config and key files alone do not preserve these permissions.
+
+:::caution[Blank-password guest access]
+For the primary repeater, an empty guest password permits a new client's blank
+login as a guest even when `allow_read_only` is false. A configured guest password
+and the separate read-only setting change this path. Room servers retain their
+own password and read-only rules. Set deliberate access policy rather than
+assuming that an empty guest password disables guest access.
+:::
+
 ## Plugins and identity access
 
 Installing an external [Plugin](/projects/openhop-repeater/plugins/) does not
@@ -154,5 +206,7 @@ See [First Boot](/projects/openhop-repeater/first-boot/),
 
 ## Implementation references
 
-- [Identity config loading](https://github.com/openhop-dev/openhop_repeater/blob/ffd239d/repeater/config.py)
-- [Identity collision regression tests](https://github.com/openhop-dev/openhop_repeater/blob/ffd239d/tests/test_identity_collision_preflight.py)
+- [Identity config loading](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/config.py)
+- [Identity collision regression tests](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/tests/test_identity_collision_preflight.py)
+- [ACL persistence and login rules](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/handler_helpers/acl.py)
+- [Remote CLI permissions](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/handler_helpers/mesh_cli.py)

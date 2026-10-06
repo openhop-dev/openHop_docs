@@ -11,7 +11,7 @@ configuration in the host process. Use it only after matching the constructor to
 the exact board schematic and operating region.
 
 This guide tracks openHop Core `dev` commit
-[`77f116a`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/hardware/sx1262_wrapper.py).
+[`54f6adb3e0cd3d47a8c61827b2e0be05814a22d4`](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/hardware/sx1262_wrapper.py).
 It does not define a universal pinout or radio preset.
 
 ## Supported host interfaces
@@ -25,7 +25,7 @@ The current hardware stack supports:
 - hardware chip select (`cs_pin=-1`) or a manual GPIO chip-select line.
 
 The transport abstractions are exported from the pinned
-[`hardware/transports` package](https://github.com/openhop-dev/openhop_core/tree/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/hardware/transports).
+[`hardware/transports` package](https://github.com/openhop-dev/openhop_core/tree/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/hardware/transports).
 Direct Linux use normally opens `/dev/spidev<bus_id>.<cs_id>` and one or more
 `/dev/gpiochip*` devices. CH341 pin numbers are adapter GPIO identifiers, not
 Raspberry Pi GPIO numbers; do not mix the two schemes.
@@ -82,7 +82,7 @@ Front-end and profile-specific controls:
 | `meshadv-mini` | disabled | GPIO 12 | none in example profile |
 
 Exact profile source:
-[`examples/common.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/examples/common.py#L266-L315).
+[`examples/common.py`](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/examples/common.py).
 The current Waveshare TXEN value is GPIO 13; older prose in the source docs lists
 GPIO 6, so use the current executable profile plus the vendor schematic, not the
 legacy prose.
@@ -201,6 +201,44 @@ when interrupt-backed receive delivery is required. The GPIO edge callback uses
 RX-sensitive operations with asyncio locks and exposes `perform_cad()` for
 channel-activity detection.
 
+## Runtime retuning
+
+From coroutine code, use `await radio.configure_radio_async(...)`. It awaits the
+TX lock with a bounded timeout and holds it while retuning, without blocking the
+event loop. Omitted parameters retain their current values; `False` indicates
+uninitialized hardware, a TX-wait timeout, or failed application.
+
+On the radio's event-loop thread during TX, synchronous `configure_radio()` returns
+`True` when a retune is **queued**, not confirmed. `pending_configure` exposes that
+task; a newer retune or cleanup supersedes a queued request. Prefer
+`await companion.set_radio_params_async(freq_hz, bw_hz, sf, cr)` for owned-radio
+companion changes so callers can act on the applied result. Backends without an
+async configure method fall back to their synchronous behavior.
+
+## CAD and RSSI dwell safety
+
+`perform_cad()` and `measure_rssi_dwell()` default to `respect_tx_lock=True`.
+Keep that protection enabled unless the caller already owns the lock and can
+serialize every radio operation. Both drain latched packet-bearing receive IRQ
+state before reusing the RX buffer. CAD is channel-activity detection, not proof
+that a channel is interference-free or that transmission is legally permitted;
+a non-calibration `False` can also mean a TX-lock timeout.
+
+`await radio.measure_rssi_dwell(freq_hz, ...)` temporarily retunes into continuous
+RX, suppresses off-channel IRQ delivery, and holds the TX lock. Normal mesh
+reception is unavailable during the dwell; schedule sweeps as deliberate service
+interruptions. The configured `radio.frequency` continues to report the mesh
+frequency, not the temporary measurement frequency. A `finally` path attempts to
+restore the mesh frequency and RX routes and releases the acquired lock, including
+on cancellation/error; restoration failures are logged.
+
+Successful measurements return raw samples and counts, not an average. Unsettled
+or out-of-range readings at or above -1 dBm or at or below -126 dBm are discarded.
+A lock timeout returns an error mapping rather than valid samples. Check that
+result and restoration logs before resuming diagnostics.
+
+Source: [SX1262 retune, CAD, and dwell implementation](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/hardware/sx1262_wrapper.py).
+
 ## Antenna, frequency, region, and TX safety
 
 Before `begin()` or any send:
@@ -231,13 +269,13 @@ vendored README identifies
 [Chandra Wijaya Sentosa's LoRaRF-Python](https://github.com/chandrawi/LoRaRF-Python)
 and links its [upstream wiki](https://github.com/chandrawi/LoRaRF-Python/wiki).
 The vendored tree carries its own
-[MIT license and 2022 copyright notice](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/hardware/lora/LICENSE).
+[MIT license and 2022 copyright notice](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/hardware/lora/LICENSE).
 
 No upstream LoRaRF commit identifier is recorded in the pinned vendored README
 or license. Do not claim exact source parity with LoRaRF-Python `main`, and do
 not replace the vendored code based only on a package version. Review openHop's
 local changes and hardware tests first, including the pinned
-[SX1262 TX-power mapping tests](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/tests/hardware/test_sx126x_tx_power.py).
+[SX1262 TX-power mapping tests](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/tests/hardware/test_sx126x_tx_power.py).
 
 ## Related guides
 

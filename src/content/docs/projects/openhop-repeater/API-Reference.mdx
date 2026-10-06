@@ -8,7 +8,7 @@ sidebar:
 import OpenApiViewer from '../../../../components/OpenApiViewer.astro';
 
 This reference is synchronized from
-[`repeater/web/openapi.yaml`](https://github.com/openhop-dev/openhop_repeater/blob/dev/repeater/web/openapi.yaml).
+[`repeater/web/openapi.yaml`](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/web/openapi.yaml).
 Download the [raw specification](/openapi/repeater.yaml) for client generation.
 Check your installed Repeater version before relying on a newer endpoint.
 
@@ -67,6 +67,19 @@ The runtime `noise_floor_history` endpoint also accepts `hours`, `limit`, and a
 non-negative `offset`. Its response echoes the normalized `limit` and `offset`,
 which lets a client page through dense samples. The upstream OpenAPI form does
 not yet expose all of these pagination fields.
+
+## Built-in sensor configuration
+
+`GET /api/sensors_types` returns registered types/settings; `GET /api/sensors_config` returns the current definitions with passwords masked.
+`POST /api/sensors_config_update` saves the complete sensor section, including
+its entire definitions list, and returns `saved: true`, `restart_required: true`
+on success. Restart the service to apply it to the poller; do not interpret
+persistence as hot reload. `POST /api/sensors_read` performs a one-shot read,
+whereas `GET /api/stats` exposes the running manager's cached readings.
+
+These authenticated runtime routes use underscores; `POST /api/sensors_config`
+is not the save route. See the dashboard-first
+[Sensor Manager guide](/projects/openhop-repeater/sensors/) before automating them.
 
 ## Interactive API Docs
 

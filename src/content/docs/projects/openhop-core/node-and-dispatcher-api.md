@@ -7,7 +7,7 @@ sidebar:
 
 This reference migrates the legacy `docs/docs/api/node.md` and
 `docs/docs/api/dispatcher.md` topics. It tracks openHop Core `dev` commit
-[`68272ce`](https://github.com/openhop-dev/openhop_core/tree/68272cec2a1312de92c7ec0df529b195d4563575/src/openhop_core/node).
+[`54f6adb3e0cd3d47a8c61827b2e0be05814a22d4`](https://github.com/openhop-dev/openhop_core/tree/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/node).
 Current source and tests remain authoritative for exact signatures.
 
 ## MeshNode
@@ -140,8 +140,11 @@ or forwarding.
 `TextMessageHandler` publishes `text`, `txt_type`, and `sender_timestamp` in
 `packet.decrypted`. The timestamp is the sender's clock, useful for application
 replay policy, not a trusted wall-clock measurement. CLI_COMMAND (`3`) is
-delivered to the application rather than executed by Core, and unsupported text
-types are dropped. Server owners may supply a side-effect-free
+delivered to the application rather than executed by this low-level handler, and
+unsupported text types are dropped. A companion consuming the event can execute
+it for a contact explicitly allowed remote CLI access; see
+[CLI text and privileges](/projects/openhop-core/companion-recipes/#send-results-and-cli-text).
+Server owners may supply a side-effect-free
 `should_ack_fn(sender_pubkey, txt_type, sender_timestamp)` veto; an exception
 withholds the ACK rather than claiming acceptance.
 
@@ -195,10 +198,10 @@ application-facing data, not serialized MeshCore packet formats.
 
 ## Exact source
 
-- [`node/node.py`](https://github.com/openhop-dev/openhop_core/blob/68272cec2a1312de92c7ec0df529b195d4563575/src/openhop_core/node/node.py)
-- [`node/dispatcher.py`](https://github.com/openhop-dev/openhop_core/blob/68272cec2a1312de92c7ec0df529b195d4563575/src/openhop_core/node/dispatcher.py)
-- [`node/events`](https://github.com/openhop-dev/openhop_core/tree/68272cec2a1312de92c7ec0df529b195d4563575/src/openhop_core/node/events)
-- [`node/handlers`](https://github.com/openhop-dev/openhop_core/tree/68272cec2a1312de92c7ec0df529b195d4563575/src/openhop_core/node/handlers)
+- [`node/node.py`](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/node/node.py)
+- [`node/dispatcher.py`](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/node/dispatcher.py)
+- [`node/events`](https://github.com/openhop-dev/openhop_core/tree/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/node/events)
+- [`node/handlers`](https://github.com/openhop-dev/openhop_core/tree/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/node/handlers)
 
 ## Related guides
 

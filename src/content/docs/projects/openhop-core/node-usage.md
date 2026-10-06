@@ -12,7 +12,7 @@ request/response applications should use
 [Companion Applications](/projects/openhop-core/companion-applications/) instead.
 
 This guide tracks openHop Core `dev` commit
-[`77f116a`](https://github.com/openhop-dev/openhop_core/tree/77f116a8dab097642d04a16c8aaf097c0dd33cc3).
+[`54f6adb3e0cd3d47a8c61827b2e0be05814a22d4`](https://github.com/openhop-dev/openhop_core/tree/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4).
 
 ## Constructor and ownership
 
