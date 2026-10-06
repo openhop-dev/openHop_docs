@@ -91,6 +91,6 @@ chat, gateway, bridge, diagnostics, and channel patterns are in
 
 The companion API evolves quickly. Start with the central
 [API Reference](/projects/openhop-core/api-reference/#companion-apis), then use the
-[current companion source](https://github.com/openhop-dev/openhop_core/tree/dev/src/openhop_core/companion)
+[current companion source](https://github.com/openhop-dev/openhop_core/tree/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/companion)
 and tests for implementation-level behavior. The API reference states which branch
 it tracks rather than presenting mutable source as a versioned release contract.

@@ -38,10 +38,20 @@ Both `TXT_TYPE_CLI_DATA` and `TXT_TYPE_CLI_COMMAND` bypass delivery-ACK waiting 
 ACK for a CLI operation. `send_repeater_command()` defaults to `TXT_TYPE_CLI_DATA`
 for older repeater compatibility; use its `txt_type=TXT_TYPE_CLI_COMMAND` option
 when addressing a newer companion that requires explicit command messages.
-Replies still use CLI_DATA. Core delivers incoming CLI_COMMAND text to the
-application; it does not execute a local command automatically.
+Replies still use CLI_DATA. At the low-level node layer, `TextMessageHandler`
+delivers CLI_COMMAND (`3`) to the application without executing it. The companion
+layer adds privileged execution: a known contact with `CONTACT_FLAG_REMOTE_CLI`
+(`0x10`) set runs the companion CLI through `run_cli_command()` instead of entering
+the normal message queue or firing `message_event`. Other senders' CLI_COMMAND
+messages remain ordinary queued/callback messages. Grant that contact flag only to
+trusted operators; it authorizes command execution, not just message delivery.
+Nonempty command replies are sent asynchronously as CLI_DATA without delivery-ACK
+waiting, using a known direct path or the companion's flood scope. Stopping the
+companion cancels delayed remote replies.
 
-Source: [current send operations](https://github.com/openhop-dev/openhop_core/blob/68272cec2a1312de92c7ec0df529b195d4563575/src/openhop_core/companion/base_send.py).
+Source: [companion message processing](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/companion/base_events.py).
+
+Source: [current send operations](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/companion/base_send.py).
 
 ## Sensor or automation gateway
 
@@ -153,7 +163,7 @@ owned by the component being stopped. `clear_push_callbacks()` removes every
 subscriber, including other applications, SSE streams, or plugins sharing the
 companion; reserve it for whole-companion teardown.
 
-Source: [callback ownership](https://github.com/openhop-dev/openhop_core/blob/68272cec2a1312de92c7ec0df529b195d4563575/src/openhop_core/companion/base_callbacks.py).
+Source: [callback ownership](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/companion/base_callbacks.py).
 
 ## Preferences, scope, and radio controls
 
@@ -171,6 +181,34 @@ direct-path failure, use the companion's own scope policy. They are not forced
 unscoped merely because they are retries; a bridge's host must not overwrite the
 companion's resolved region decision.
 
+### Per-message channel scope
+
+Both companion classes support
+`send_channel_message(channel_idx, text, timestamp=None, *, flood_scope_key=None)`.
+A supplied key must be exactly 16 bytes and not all zeros; malformed keys raise
+`ValueError` before packet construction rather than returning a send-failure
+`False`. The key is attached to that packet alone and does not change preferences,
+transient scope, the sticky unscoped flag, or dispatcher defaults. Concurrent sends
+can therefore use different keys safely.
+
+```python
+from openhop_core.protocol import get_auto_key_for
+
+sent = await companion.send_channel_message(
+    1, "hello", flood_scope_key=get_auto_key_for("#USA")
+)
+```
+
+Region names are case-sensitive: `#USA` and `#usa` produce different keys. With
+`None`, the existing resolution remains force-unscoped, transient override,
+persisted default, then plain flood. Omitting the key does **not** force unscoped
+when a scope is configured, and an all-zero override is rejected. There is no
+per-message force-unscoped option; changing sticky unscoped state affects other
+sends.
+
+Source: [send implementation](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/companion/base_send.py)
+and [complete OHREG2 frame extension contract](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/docs/openhop-frame-extensions.md).
+
 ## Models
 
 The current public data models include:
@@ -187,7 +225,7 @@ The current public data models include:
 | `MessageEvent`, `ChannelMessageEvent`, `ChannelDataEvent` | Structured callback payloads |
 
 Inspect the pinned
-[`models.py`](https://github.com/openhop-dev/openhop_core/blob/68272cec2a1312de92c7ec0df529b195d4563575/src/openhop_core/companion/models.py)
+[`models.py`](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/companion/models.py)
 for exact fields. Do not serialize object internals as a stable external schema unless
 the application owns and versions that schema.
 

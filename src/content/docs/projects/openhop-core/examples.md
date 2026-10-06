@@ -10,7 +10,7 @@ radio, join a mesh, receive traffic, transmit RF, or send captured packets to an
 host. Read the whole script and its selected transport before running it.
 
 This inventory tracks openHop Core `dev` commit
-[`77f116a`](https://github.com/openhop-dev/openhop_core/tree/77f116a8dab097642d04a16c8aaf097c0dd33cc3/examples).
+[`54f6adb3e0cd3d47a8c61827b2e0be05814a22d4`](https://github.com/openhop-dev/openhop_core/tree/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/examples).
 
 ## Safe verification before hardware
 
@@ -56,7 +56,7 @@ Before any example that creates a radio:
 ## Transport selection
 
 The current shared factory supports several radio names. Inspect
-[`examples/common.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/examples/common.py)
+[`examples/common.py`](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/examples/common.py)
 before relying on a name because each path has different arguments and side effects.
 
 Current families include:

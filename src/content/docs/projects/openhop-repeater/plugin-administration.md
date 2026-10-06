@@ -110,8 +110,16 @@ plugins:
 it is not the same as disabling one installed plugin. Apply startup/path changes
 by restarting the affected service(s) or recreating the container; do not assume
 live reload. Repeater and manager must resolve the **same** root and socket.
-Prefer absolute custom paths, and use a short socket path on systems with Unix
-socket pathname limits. The socket is created with mode `0660`; membership of
+Prefer absolute custom paths. If the resolved configured socket path (or default
+storage-based socket path) exceeds **92 characters**, the resolver instead uses
+`openhop-plugin-{digest}.sock` in Python's `tempfile.gettempdir()` directory. The
+digest is the first 16 hexadecimal characters of SHA-256 of the resolved
+candidate's POSIX path. This applies even to an explicitly configured socket.
+Ensure Repeater and manager resolve the same candidate **and temporary directory**;
+different `TMPDIR` environments can break IPC. Check the resolved location rather
+than assuming the socket exists under storage, or configure a short absolute path.
+
+The socket is created with mode `0660`; membership of
 its service group is a management privilege, not a read-only permission.
 
 Repeater can operate without the manager. Missing/unreachable manager IPC yields
@@ -190,8 +198,16 @@ preserves the enabled flag, but local install is not the stop/swap/restart updat
 workflow: stop or disable an existing runtime before replacing its wheel and
 explicitly start/enable it afterwards. Do not overwrite running code in place.
 Local installation does not apply catalogue checksum approval. New local-only
-installs lack repository metadata, so catalogue update checks are unavailable;
-upload a reviewed replacement wheel or deliberately install from the catalogue.
+installs lack repository metadata. Their manager update check reports repository
+unknown, but a matching catalogue entry can still produce a dashboard **Update
+available** badge. The update operation then returns HTTP 400:
+`update unavailable: plugin has no repository metadata (reinstall from catalogue or set repository)`.
+Upload a reviewed replacement wheel after disabling the runtime, or back up data,
+uninstall without deleting persistent data, and install the same ID from the
+catalogue. There is no dashboard catalogue-reinstall action while the plugin is
+installed. Advanced automation can deliberately use `catalogue_install` for that
+ID after disabling the runtime; it records provenance and enables the plugin.
+Do not edit `state.json` as a normal recovery step.
 
 Runtime wheels get a version-specific venv. UI-only wheels have their assets
 extracted without a Python runtime venv. Dependency resolution may need network
@@ -257,7 +273,7 @@ same authentication as `enable`:
 | Endpoint under `/api/plugins/` | Effect |
 | --- | --- |
 | `enable` | Persist enabled=true; start a runtime; expose an application UI. |
-| `disable` | Stop runtime and persist enabled=false; hide its application UI. |
+| `disable` | Stop runtime and persist enabled=false; block its `/plugins/{id}/` UI; does not necessarily block a selected root UI. |
 | `start` | Start an already-enabled runtime. Disabled plugins must be enabled first. |
 | `stop` | Stop runtime without clearing enabled; it can start again on manager boot. UI exposure is unchanged. |
 | `restart` | Stop and start an enabled runtime. |
@@ -277,12 +293,40 @@ An optional plugin-written `data/runtime.json` can be read with
 `GET /api/plugins/runtime?id={id}`. It is application data, not a manager health
 probe; a missing snapshot is not by itself a failure.
 
+### Primary frontend and disable boundary
+
+Follow the [dashboard frontend selection flow](/projects/openhop-repeater/plugins/#use-a-plugin-as-the-primary-frontend)
+under **System → Configuration → Access → Web Options → Web Frontend**.
+The primary frontend is configured through `web.web_path`; the stable plugin
+selector is `plugin:{id}`, not a version-specific release directory. Selecting
+**Default Frontend** clears it to `null`. The backend resolves the plugin's
+current UI subtree so a release update need not pin the old asset path.
+
+All installed application UIs can be offered, subject to enabled/assets checks;
+this is not a guarantee of complete Repeater management or root-path compatibility.
+The `/plugins/{id}/` handler checks enabled state, but the primary frontend
+resolver does not. Switch away **before** disabling a selected plugin and check
+both `/` and `/plugins/{id}/`. If the replacement has no recovery controls,
+reset `web.web_path` to `null` through authenticated configuration access or host
+configuration and apply/restart as needed; a dashboard route alone does not
+bypass the selected root frontend.
+
 ## Updates, progress, and backups
 
 Before upgrading, stop/disable the plugin if necessary and back up its persistent
 `data/`, including settings, using the plugin's own database-consistency guidance.
 Retain the old wheel and record the installed version. The manager does not
 migrate or roll back application-owned data for you.
+
+Repeater's **Backup & Restore** page uses `/api/config_export`, which exports
+Repeater's configuration object only. Neither **Export Settings** nor the full
+backup includes plugin `data/config.json`, runtime snapshots, databases, wheels,
+manager state, or logs. Back these up separately; preserve the full plugin storage
+volume if you need installed code/state as well as application data. Use the
+publisher's consistency/restore procedure rather than copying a live database
+blindly. Plugin configuration and data may contain secrets. Redacted Repeater
+exports redact selected known fields, not arbitrary credentials: inspect and
+redact them before sharing rather than treating them as fully secret-free.
 
 ```bash
 curl --fail-with-body -H "X-API-Key: $OPENHOP_API_KEY" \
@@ -390,8 +434,15 @@ created outside its plugin directory. Removing one plugin is separate from
 
 ## Implementation references
 
-- [Upstream plugin guide](https://github.com/openhop-dev/openhop_repeater/blob/dev/docs/plugins.md)
-- [Configuration defaults](https://github.com/openhop-dev/openhop_repeater/blob/dev/config.yaml.example)
-- [API handlers](https://github.com/openhop-dev/openhop_repeater/blob/dev/repeater/web/plugin_endpoints.py) and [OpenAPI](https://github.com/openhop-dev/openhop_repeater/blob/dev/repeater/web/openapi.yaml)
-- [Lifecycle manager](https://github.com/openhop-dev/openhop_repeater/blob/dev/repeater/plugins/manager.py), [runtime](https://github.com/openhop-dev/openhop_repeater/blob/dev/repeater/plugins/runtime.py), and [storage](https://github.com/openhop-dev/openhop_repeater/blob/dev/repeater/plugins/storage.py)
-- [Native provisioning](https://github.com/openhop-dev/openhop_repeater/blob/dev/manage.sh), [service unit](https://github.com/openhop-dev/openhop_repeater/blob/dev/openhop-plugin-manager.service), and [container supervisor](https://github.com/openhop-dev/openhop_repeater/blob/dev/repeater/plugins/container_supervisor.py)
+Behavior checked against Repeater development snapshot `3c4bf3a9586d1e0b3871091649bc3fd09da3b662` and
+RepeaterUI development snapshot `334e302cc9eff1f6c08ab4093bd5599f58861715`.
+
+- [Frontend selection and recovery controls](https://github.com/openhop-dev/openHop_RepeaterUI/blob/334e302cc9eff1f6c08ab4093bd5599f58861715/src/components/configuration/WebSettings.vue) and [dashboard navigation](https://github.com/openhop-dev/openHop_RepeaterUI/blob/334e302cc9eff1f6c08ab4093bd5599f58861715/src/config/navigation.ts)
+- [Primary and plugin-path static serving](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/web/http_server.py)
+- [Frontend configuration and configuration-only export](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/web/api_endpoints.py) and [Backup & Restore UI](https://github.com/openhop-dev/openHop_RepeaterUI/blob/334e302cc9eff1f6c08ab4093bd5599f58861715/src/components/configuration/BackupRestore.vue)
+
+- [Upstream plugin guide](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/docs/plugins.md)
+- [Configuration defaults](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/config.yaml.example)
+- [API handlers](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/web/plugin_endpoints.py) and [OpenAPI](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/web/openapi.yaml)
+- [Lifecycle manager](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/plugins/manager.py), [runtime](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/plugins/runtime.py), and [storage](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/plugins/storage.py)
+- [Native provisioning](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/manage.sh), [service unit](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/openhop-plugin-manager.service), and [container supervisor](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/plugins/container_supervisor.py)

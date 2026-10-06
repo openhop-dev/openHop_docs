@@ -116,6 +116,12 @@ sx1262:
   use_dio2_rf: true
 ```
 
+This CH341 snippet is a **wiring fragment**, not a runnable full configuration.
+Also supply `sx1262.bus_id`, `cs_id`, `txen_pin`, and `rxen_pin` (use `-1` only
+for unused enable pins), plus the complete required `radio` air settings from the
+[Configuration Reference](/projects/openhop-repeater/config-file/#radio-parameters).
+A native SX1262 host likewise needs both complete hardware and air sections.
+
 For a common E22 mapping, the repo README uses:
 
 | Function | CH341 GPIO |
@@ -180,18 +186,61 @@ support. See the commented multi-radio examples in the
 
 - Give native radios distinct chip-select/control pins and CH341 radios distinct
   USB selectors; do not let two entries open the same hardware.
-- Omitted sections inherit the top-level section. An entry's `radio`, `sx1262`,
-  or transport block **replaces** that whole section rather than deep-merging
-  individual fields; provide a complete block when overriding it.
-- Configure `fabric.default_radio` and `fabric.tx_mode` deliberately. `default`
-  uses the default radio, `sticky` uses the last receiving radio, and `bridge`
-  selects another radio (intended for a two-radio backhaul, not broadcast-to-all).
+- Omitted sections inherit the top-level section. Per-entry mapping sections
+  **shallow-overlay keys**, so a frequency-only override retains other air
+  settings. Explicit `false`/`null` override inherited values, and a non-mapping
+  section replaces the whole section (possibly making it invalid). See the
+  [overlay reference](/projects/openhop-repeater/config-file/#multi-radio-and-rf-fabric).
+- With ingress-aware Core, `default` uses the default radio, `sticky` uses the
+  packet's own ingress radio, and `bridge` selects another radio. Locally
+  originated traffic uses the default radio unless originated fan-out is enabled.
+  Older Core versions fall back to most recent RX at send time; with three or
+  more radios, ordinary bridge selects the first other radio, not all of them.
 - `fabric.use_fabric: true` can wrap a single radio too. Put this key under
   `fabric`, not inside the `radios` sequence.
-- Back up and edit YAML deliberately, restart, and check each radio's startup.
-  The legacy helper is not a multi-radio editor. To isolate software without RF,
-  remove the active `radios` list from the diagnostic config as well as selecting
-  top-level `radio_type: null`.
+- The dashboard has a multi-radio editor; the legacy terminal helper does not.
+  To isolate software without RF, remove the active `radios` list from the
+  diagnostic config as well as selecting top-level `radio_type: null`.
+
+### Dashboard RF Fabric workflow
+
+1. Back up first and keep an unverified installation in `no_tx`. Open **System →
+   Configuration → Radio → Radio Hardware**, then **Enable multi-radio**.
+   This creates a local draft, not a saved config.
+2. Use the **Currently editing** selector or radio cards to configure each
+   radio's **Over-the-air settings** and **Hardware**. Set unique hardware
+   endpoints/pins and complete air parameters, including MeshCore `sync_word:
+   0x12` for modems. **HW ready** is form readiness, not a successful device probe.
+   Use **Add radio id → Add radio** only when another radio is needed; do not
+   clone an endpoint that is already in use.
+3. Set **Default TX radio** and **Fabric TX mode**. Despite the sticky option's
+   “last RX” label, ingress-aware Core uses each packet's own ingress. Start
+   with normal bridge behavior for a two-radio local/link deployment.
+4. Optionally enable **RF relay fan-out → Repeat on ingress** for **exactly two
+   radios** in **bridge** mode: RX local → TX link then local; RX link → TX local
+   then link. For node-originated adverts, room-server/companion traffic, and
+   protocol replies, choose **Originated traffic TX → all — send on every radio**
+   only if both channels need it. This also requires exactly two radios but does
+   not require bridge. Defaults are repeat off and originated `default`.
+5. Click **Save multi-radio config** for a membership draft, or **Save Changes**
+   for existing settings. Resolve any duplicate hardware/validation error before
+   retrying. Nothing is written until save succeeds. Accept the restart prompt
+   only after success; saving fan-out does not change the running stack. If the
+   page says **Saved fan-out settings are not live yet — restart to apply them**,
+   restart and reconnect before judging behavior.
+6. Confirm both radios initialize without reconnect loops in **Analytics → Logs**
+   or service logs. Use **Analytics → Statistics**, **RF Health Correlation**, and
+   **Neighbour Links** with the appropriate radio selected. Inspect packet RX/TX
+   attribution in the archive. Verify normal reception before enabling TX or
+   sending an advert; every deliberate test transmission consumes airtime.
+
+Fan-out runs packet validation/deduplication/path changes once, then serializes
+physical sends. Each radio's duty-cycle gate can refuse its send independently;
+one successful send does not prove the other succeeded. Node totals count a
+relay once, whereas per-radio totals count physical sends. Keep fan-out disabled
+unless the measured coverage benefit justifies added airtime. To undo an
+unsaved edit use **Cancel**; **Disable multi-radio** is staged until saving and
+requires a restart too.
 
 ## Board-specific notes
 
@@ -263,3 +312,9 @@ config directly, then restart Repeater.
 - [openHop USB/TCP Setup](/projects/openhop-repeater/openhop-usb-and-tcp-setup/)
 - [KISS Setup](/projects/openhop-repeater/kiss-setup/)
 - [Troubleshooting](/projects/openhop-repeater/troubleshooting/)
+
+## Implementation references
+
+- [Radio factory, shallow overlays, and RF Fabric validation](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/config.py)
+- [Ingress routing, overlay, and fan-out regressions](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/tests/test_multi_radio_stack.py)
+- [Dashboard hardware editor and saved/live fan-out state](https://github.com/openhop-dev/openHop_RepeaterUI/blob/334e302cc9eff1f6c08ab4093bd5599f58861715/src/components/configuration/RadioHardwareSettings.vue)

@@ -137,6 +137,36 @@ Enabled UI assets are public browser content at your Repeater's origin. API
 requests still require authentication. Do not place secrets in application assets
 or treat a plugin UI as isolated from other same-origin browser code.
 
+## Use a plugin as the primary frontend
+
+1. Install and configure the UI app under **System → Plugins**, then **Enable** it.
+2. Open it with **Open UI** first and check that it works. Check the publisher's
+   guidance: every installed application UI may be offered, but not every app
+   replaces the dashboard's administration features or supports serving at `/`.
+3. In the built-in dashboard, expand **System → Configuration → Access → Web Options**.
+4. Under **Web Frontend**, select the application's radio option. Disabled or
+   unavailable plugins cannot be selected; enable them under Plugins first.
+5. Selection saves immediately—there is no separate frontend Save step. When the
+   primary frontend changes, the dashboard shows **Changing interface and
+   refreshing page…** and reloads. Verify the app now loads at your Repeater's `/`;
+   its enabled `/plugins/{id}/` URL remains available too.
+
+To return to the built-in dashboard, select **Default Frontend** in the same
+**Web Frontend** section while you can still access that setting. Do this **before
+disabling or removing** a selected UI plugin. Do not assume that visiting
+`/configuration?tab=web` bypasses a replacement frontend: it uses the selected
+root application too. If it has no management/recovery controls, an administrator
+must reset `web.web_path` to `null` through authenticated configuration access or
+the host configuration, then apply/restart as needed.
+
+:::caution[Disable does not reliably remove a selected root UI]
+Disable stops a plugin service and blocks its `/plugins/{id}/` assets. However,
+the current primary-frontend resolver does **not** check the enabled flag: a
+previously selected plugin can still serve at `/` while installed but disabled.
+Disabling is not a frontend switch or an access-control boundary. Switch to
+**Default Frontend**, then disable the plugin, and verify both URLs.
+:::
+
 ## Understand status and controls
 
 The installed table shows version, state, and whether the plugin is a Service,
@@ -146,7 +176,7 @@ tooltip. On a narrow screen, scroll the installed table horizontally to reach
 
 | Action | How to recognize it | What it does |
 | --- | --- | --- |
-| **Enable / Disable** | Labelled power button | Enable starts a service and exposes its UI. Disable stops the service and hides its UI without uninstalling it. |
+| **Enable / Disable** | Labelled power button | Enable starts a service and exposes its UI. Disable stops the service and blocks its `/plugins/{id}/` UI without uninstalling it; a selected root UI needs a separate frontend switch (see above). |
 | **Start** | Play triangle; tooltip Start | Starts an enabled service that is stopped. |
 | **Stop** | Square; tooltip Stop | Stops the service for now but leaves it enabled; it can start again when the manager restarts. Its UI remains enabled. |
 | **Restart** | Circular arrow; tooltip Restart | Stops and starts an enabled service. |
@@ -190,7 +220,10 @@ record; captured output is bounded.
 ## Update a plugin
 
 1. Back up the plugin's persistent data using its publisher's backup guidance.
-   The Plugins page does not provide a data export or rollback button.
+   The Plugins page does not provide a data export or rollback button. Repeater's
+   **Backup & Restore** configuration exports do not include plugin settings,
+   databases, or other plugin data, even when using its full-backup option.
+   Preserve plugin data separately and protect it as potentially secret-bearing.
 2. Open **Catalogue** and click its **Refresh** button.
 3. Find the installed plugin's card with **Update available**, compare the
    installed and latest versions, and read any upgrade instructions via
@@ -209,6 +242,26 @@ If an operation times out or reports an **unknown outcome**, do not immediately
 click Install or Update again. It may still finish. Use Refresh, check the
 installed version/state and logs, then decide whether another attempt is needed.
 Closing a browser tab or losing progress output is not cancellation.
+
+### Local-wheel update metadata error
+
+A plugin first installed with **Install wheel** may match a catalogue entry and
+show **Update available**, yet **Update** fails with:
+
+```text
+update unavailable: plugin has no repository metadata (reinstall from catalogue or set repository)
+```
+
+The badge compares versions; it does not prove that the installation has the
+repository provenance required by the update operation. The dashboard has **no
+reinstall-from-catalogue button** for an already-installed entry.
+
+Either disable it and upload a reviewed replacement with **Install wheel**, or
+back up its data, use **Uninstall** with **Also delete persistent data directory**
+**unchecked**, then install the same plugin ID from **Catalogue**. Catalogue
+installation records repository metadata and enables the plugin immediately;
+review retained settings and verify its version, state, and application afterward.
+Do not hand-edit manager state merely because the error mentions setting a repository.
 
 ## Uninstall without losing settings
 
@@ -250,7 +303,14 @@ startup switches, storage, and service diagnostics, use the
 
 ## Further reference
 
+Behavior checked against Repeater development snapshot `3c4bf3a9586d1e0b3871091649bc3fd09da3b662` and
+RepeaterUI development snapshot `334e302cc9eff1f6c08ab4093bd5599f58861715`.
+
+- [Frontend selection and recovery controls](https://github.com/openhop-dev/openHop_RepeaterUI/blob/334e302cc9eff1f6c08ab4093bd5599f58861715/src/components/configuration/WebSettings.vue) and [dashboard navigation](https://github.com/openhop-dev/openHop_RepeaterUI/blob/334e302cc9eff1f6c08ab4093bd5599f58861715/src/config/navigation.ts)
+- [Primary and plugin-path static serving](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/web/http_server.py)
+- [Frontend configuration and configuration-only export](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/web/api_endpoints.py) and [Backup & Restore UI](https://github.com/openhop-dev/openHop_RepeaterUI/blob/334e302cc9eff1f6c08ab4093bd5599f58861715/src/components/configuration/BackupRestore.vue)
+
 - [Advanced Plugin Administration](/projects/openhop-repeater/plugin-administration/): host setup, API automation, storage, backups, and recovery.
 - [Plugin Development](/projects/openhop-repeater/plugin-development/): create and package a service or application.
 - [Security and Authentication](/projects/openhop-repeater/security-and-authentication/): access and credential boundaries.
-- [Dashboard implementation](https://github.com/openhop-dev/openHop_RepeaterUI/blob/f1a5fb5/src/views/Plugins.vue): source for the controls described here.
+- [Dashboard implementation](https://github.com/openhop-dev/openHop_RepeaterUI/blob/334e302cc9eff1f6c08ab4093bd5599f58861715/src/views/Plugins.vue): source for the controls described here.

@@ -169,7 +169,7 @@ Authentication settings are nested under `repeater.security`.
 ### `repeater.security.max_clients`
 
 Maximum number of authenticated clients for the main Repeater identity. The
-current default is `5`. Room-server identities have their own
+current default is `32`. Room-server identities have their own
 `settings.max_clients` limits and separate ACLs; this is not a global limit
 across every hosted identity.
 
@@ -312,6 +312,11 @@ The sensor subsystem polls host or I2C data sources and exposes them under
 voltage as battery voltage. Telemetry replies include available INA219-style bus
 voltage, current, and power before temperature and humidity channels.
 
+Use [Sensor Manager and Sensors](/projects/openhop-repeater/sensors/) for the
+normal dashboard workflow, modem discovery controls, and reading groups.
+Sensor configuration saves require a restart; saved definitions are not proof
+that the running poller loaded them.
+
 ### Top-level controls
 
 ```yaml
@@ -451,11 +456,23 @@ For key generation and imports, see [Identity Management](/projects/openhop-repe
 ## Multi-radio and RF Fabric
 
 Leave `radios:` unset to use the legacy top-level single-radio configuration.
-When `radios:` is present, each entry requires a unique `id`. Entries inherit the
-top-level `radio_type`, `radio:` air settings, and hardware sections unless they
-provide replacements. If no top-level `radio_type` exists, every entry must set
-one. A section supplied by an entry replaces that complete top-level section for
-that radio; nested values are not merged individually.
+A nonempty `radios:` list requires a unique `id` for each entry. Omitted
+`radio_type`, `radio`, `sx1262`, `ch341`, `kiss`, `modem_tcp`, and `modem_usb`
+sections inherit top-level defaults. If both the top-level section and entry
+section are mappings, entry keys **shallow-overlay** the inherited mapping:
+`radio: {frequency: 864200000}` changes only frequency, retaining other air
+settings. This is one level deep, not a recursive merge.
+
+Explicit values such as `false` or `null` override inherited values; they do not
+mean “inherit.” A non-mapping section override replaces the section completely
+and can fail backend validation. Scalar `radio_type` overrides too, so
+`radio_type: null` disables that entry. If no top-level `radio_type` exists,
+every entry must supply it. Alternative spellings (`en_pin`/`en_pins`, CH341
+`address`/`device_address`, `serial_number`/`serial`) clear the inherited alias
+when an entry supplies either spelling, preventing an inherited alias from winning.
+
+The following is an RF/transport fragment, not a complete deployment config.
+Set power explicitly and retain your security, identity, storage, and policy settings.
 
 ```yaml
 fabric:
@@ -486,9 +503,42 @@ radios:
       port: 5055
 ```
 
-`fabric.tx_mode` selects the default radio, the most recent receive radio
-(`sticky`), or the opposite radio (`bridge`). It does not broadcast every packet
-through every configured radio.
+With an ingress-aware Core, `fabric.tx_mode` routes **the packet in hand**:
+
+- `default`: transmit on `fabric.default_radio` (or the first registered radio).
+- `sticky`: transmit on that packet's ingress radio, not whichever radio most
+  recently received another packet.
+- `bridge`: transmit on a different radio than that packet's ingress. Two radios
+  give local ↔ link behavior; with three or more, the first other radio in
+  registration order is selected, not all radios.
+
+Locally originated traffic has no ingress and uses the default radio. Older
+Core versions instead use the most recent RX at send time for sticky/bridge,
+including locally originated traffic. Keep Core and Repeater versions compatible.
+
+Optional fan-out is **only valid with exactly two radios**:
+
+```yaml
+fabric:
+  default_radio: local
+  tx_mode: bridge
+  repeat_on_ingress: true
+  origin_tx: all
+```
+
+`repeat_on_ingress` defaults to `false` and additionally requires `tx_mode:
+bridge`: it attempts the other radio first, then the ingress radio.
+`origin_tx` defaults to `default`; `all` sends node-originated traffic once per
+radio, default radio first, and works with any of the three TX modes.
+`local_tx_mode` is an accepted older spelling of `origin_tx`; conflicting values
+are rejected. Do not use `tx_mode: all` (invalid).
+
+Validation/deduplication/path updates happen once; the same bytes are then sent
+serially, not simultaneously. Each radio has its own duty-cycle gate. One send
+can succeed while another is refused; a relay counts as forwarded if at least
+one sends, and directed companion traffic still waits for one ACK from either
+radio. Fan-out adds airtime and is not a promise of two successful transmissions.
+See the [dashboard RF Fabric workflow](/projects/openhop-repeater/hardware-setup/#multiple-radios).
 
 ## Radio Backend Selection
 
@@ -608,6 +658,7 @@ radio:
   spreading_factor: 8
   coding_rate: 8
   preamble_length: 32
+  sync_word: 0x12
   implicit_header: false
 ```
 
@@ -620,6 +671,17 @@ Important keys:
 - `coding_rate`: LoRa coding rate
 - `preamble_length`
 - `implicit_header`
+- `sync_word`: `0x12` for MeshCore. USB/TCP modem backends pass the configured
+  value to the modem and **warn**, rather than reject or repair, an incompatible
+  value (including an inherited one). A modem can connect and transmit yet hear
+  no MeshCore traffic. Do not use `0x1424` for MeshCore.
+
+The template's explicit power/preamble are `14` dBm / `32`. If those keys are
+omitted, the USB/TCP modem factory uses **`22` dBm / `16`**, not the template
+values. Native SX1262/CH341 construction requires `frequency`, `tx_power`,
+`bandwidth`, `spreading_factor`, `coding_rate`, and `preamble_length`; its
+`sync_word` defaults to `0x12`. Set air parameters explicitly for predictable
+operation and legal power limits.
 
 ## SX1262 Hardware
 
@@ -896,6 +958,12 @@ external providers; an offline Repeater does not imply offline basemaps.
 
 ## Examples
 
+All examples below are **fragments**, to merge into an existing full config.
+The basic SX1262 and CH341 snippets omit required hardware/air keys: use the
+complete [Radio Parameters](#radio-parameters) and [SX1262 Hardware](#sx1262-hardware)
+blocks or a verified board preset. CH341 also needs its adapter block. Do not
+replace a working deployment config with these fragments.
+
 ### Basic SX1262 host
 
 ```yaml
@@ -1027,8 +1095,10 @@ sx1262:
 
 ## Implementation references
 
-- [Commented configuration](https://github.com/openhop-dev/openhop_repeater/blob/ffd239d/config.yaml.example)
-- [Plugin path and catalogue defaults](https://github.com/openhop-dev/openhop_repeater/blob/ffd239d/repeater/plugins/storage.py)
-- [Live-update regression coverage](https://github.com/openhop-dev/openhop_repeater/blob/ffd239d/tests/test_flood_rx_delay_wiring.py)
-- [RepeaterUI navigation](https://github.com/openhop-dev/openHop_RepeaterUI/blob/f1a5fb5/src/config/navigation.ts)
-- [Keyless map implementation](https://github.com/openhop-dev/openHop_RepeaterUI/blob/f1a5fb5/src/utils/mapTiles.ts)
+- [Commented configuration](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/config.yaml.example)
+- [Radio factory and RF Fabric overlays/routing](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/config.py)
+- [Multi-radio overlay and fan-out regressions](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/tests/test_multi_radio_stack.py)
+- [Plugin path and catalogue defaults](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/plugins/storage.py)
+- [Live-update regression coverage](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/tests/test_flood_rx_delay_wiring.py)
+- [RepeaterUI navigation](https://github.com/openhop-dev/openHop_RepeaterUI/blob/334e302cc9eff1f6c08ab4093bd5599f58861715/src/config/navigation.ts)
+- [Keyless map implementation](https://github.com/openhop-dev/openHop_RepeaterUI/blob/334e302cc9eff1f6c08ab4093bd5599f58861715/src/utils/mapTiles.ts)

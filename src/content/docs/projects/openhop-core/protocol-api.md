@@ -7,7 +7,7 @@ sidebar:
 
 This page migrates the legacy `docs/docs/api/core.md` and
 `docs/docs/api/protocol.md` topics. It tracks openHop Core `dev` commit
-[`77f116a`](https://github.com/openhop-dev/openhop_core/tree/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/protocol).
+[`54f6adb3e0cd3d47a8c61827b2e0be05814a22d4`](https://github.com/openhop-dev/openhop_core/tree/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/protocol).
 Use current source/tests for exact signatures and wire-format changes.
 
 ## Packet
@@ -20,7 +20,7 @@ Packet bytes are a wire contract. Do not insert fields, change path interpretati
 or alter hash inputs without independent firmware vectors.
 
 Exact source:
-[`packet.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/protocol/packet.py)
+[`packet.py`](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/protocol/packet.py)
 
 ## PacketBuilder
 
@@ -38,7 +38,7 @@ or hashes. A builder creates protocol structure; it does not decide whether the
 frequency, route, recipient, or application action is safe.
 
 Exact source:
-[`packet_builder.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/protocol/packet_builder.py)
+[`packet_builder.py`](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/protocol/packet_builder.py)
 
 ## PacketFilter and the internal hash cache
 
@@ -52,7 +52,7 @@ can allow recently seen traffic to be processed again; expose that as an intenti
 operator action rather than routine maintenance.
 
 Exact source:
-[`packet_filter.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/protocol/packet_filter.py)
+[`packet_filter.py`](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/protocol/packet_filter.py)
 
 ## Packet utilities
 
@@ -86,8 +86,8 @@ capabilities.
 
 Exact sources:
 
-- [`identity.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/protocol/identity.py)
-- [`modem_identity.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/protocol/modem_identity.py)
+- [`identity.py`](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/protocol/identity.py)
+- [`modem_identity.py`](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/protocol/modem_identity.py)
 
 ## CryptoUtils
 
@@ -100,14 +100,14 @@ Do not replace algorithms or change encoded inputs based on API shape alone. Add
 independent firmware vectors and negative/tamper tests for protocol crypto changes.
 
 Exact source:
-[`crypto.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/protocol/crypto.py)
+[`crypto.py`](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/protocol/crypto.py)
 
 ## Routing regions and transport scope
 
 The package exports region/scope support including:
 
 - `RegionMap` and `RegionEntry`;
-- receive-region capture and reply-scope application;
+- `capture_recv_region()`, `choose_reply_scope()`, and `apply_reply_scope()`;
 - automatic transport-key derivation;
 - transport-code calculation;
 - packet scoping.
@@ -116,6 +116,25 @@ Transport keys and region names affect packet propagation and interoperability. 
 log keys or present one region's value as a universal default. Preserve unscoped/null
 behavior when an application intentionally needs it.
 
+### Flooded reply scope
+
+`choose_reply_scope(request_scope_known, request_was_unscoped_flood,
+default_scope_known)` prefers a known request region, mirrors a known unscoped
+flood as unscoped, then selects the default when known, otherwise none.
+`capture_recv_region()` distinguishes a matched region from an allowed unscoped
+flood and from unknown scope (for example direct traffic or an unresolved transport
+code). A region-map-free receive leaves scope uncaptured.
+
+`apply_reply_scope()` finalizes the known-region and known-unscoped cases so the
+send defaults cannot overwrite them. It computes a scoped reply's transport code
+from the reply payload, never by copying the request code. Unknown or uncaptured
+scope defers to the normal dispatcher/companion send resolver, which honors its
+current unscoped flag, transient override, and default. Send replies through that
+resolver, not by serializing directly to the physical radio. A previously resolved
+receive-region decision survives later region-map changes.
+
+Source: [region capture and reply policy](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/protocol/region_map.py).
+
 ## Constants
 
 `protocol/constants.py` defines packet sizes, route/payload types, hash/path limits,
@@ -123,7 +142,7 @@ and other wire values. Constants are not user preferences. Changing one can alte
 serialization or firmware compatibility even when Python tests still pass.
 
 Exact source:
-[`constants.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/protocol/constants.py)
+[`constants.py`](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/protocol/constants.py)
 
 Current public ClientACL helpers are `PERM_ACL_GUEST=0`,
 `PERM_ACL_READ_ONLY=1`, `PERM_ACL_READ_WRITE=2`, `PERM_ACL_ADMIN=3`,
@@ -150,7 +169,7 @@ Cayenne LPP helpers include `encode_barometric_pressure(channel, hpa)`.
 ## Exact public exports
 
 The canonical protocol export list is
-[`protocol/__init__.py`](https://github.com/openhop-dev/openhop_core/blob/77f116a8dab097642d04a16c8aaf097c0dd33cc3/src/openhop_core/protocol/__init__.py).
+[`protocol/__init__.py`](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/protocol/__init__.py).
 Optional/internal helpers not exported there should not be presented as stable public
 API merely because they can be imported by path.
 

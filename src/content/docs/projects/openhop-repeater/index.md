@@ -13,7 +13,8 @@ openHop Repeater is an always-on MeshCore infrastructure node built on top of op
 - Runtime architecture and service behavior
 - Hardware and radio backend options, including CH341, KISS, openHop USB, and openHop TCP
 - Managed application and service plugins: catalogue installation, configuration, updates, and recovery
-- Built-in sensor modules, GPS, MQTT, and companion service configuration
+- [Sensor Manager and live readings](/projects/openhop-repeater/sensors/), GPS, MQTT, and companion service configuration
+- [Multi-radio RF Fabric](/projects/openhop-repeater/hardware-setup/#multiple-radios), relay/originated fan-out, and per-radio monitoring
 - openHop Modem RF, sensor, and GPS integration
 - Operations, logs, and troubleshooting entry points
 

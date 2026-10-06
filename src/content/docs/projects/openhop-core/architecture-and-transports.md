@@ -30,6 +30,23 @@ policy-selected, or default endpoint rather than automatically fanning out to
 every radio. Applications that need only one radio can keep using the normal
 hardware backend directly.
 
+### Ingress-aware transmit selection
+
+An explicit `radio_id` wins over the RF Fabric TX selector; a selector result of
+`None` falls back to the default endpoint. Legacy `selector(data)` callbacks remain
+supported. To use ingress context, explicitly name a keyword-capable parameter:
+`selector(data, *, rx_radio_id=None)`. Merely accepting `**kwargs` or adding an
+unrelated optional positional parameter does not opt in.
+
+`rx_radio_id` describes this packet's ingress (or is `None` for locally originated
+or unknown ingress), not whichever radio received most recently. Use it rather
+than mutable `last_rx_radio_id` for delayed forwarding decisions. The dispatcher
+captures ingress at receive-callback entry and passes packet context to compatible
+send/selection methods. Selection still sends through one endpoint, not all radios.
+
+Source: [RF Fabric selection](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/rf_fabric/fabric.py)
+and [dispatcher ingress/send handling](https://github.com/openhop-dev/openhop_core/blob/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/node/dispatcher.py).
+
 ## Radio contract
 
 Radio implementations follow the `LoRaRadio` interface. They initialize the
@@ -95,4 +112,4 @@ Do not treat example frequencies or pin maps as universal presets.
 - [MeshCore KISS Modem Protocol Compatibility](/projects/openhop-core/kiss-modem-protocol/)
 - [API Reference](/projects/openhop-core/api-reference/)
 - [openHop Repeater Hardware Setup](/projects/openhop-repeater/hardware-setup/)
-- [Source hardware package](https://github.com/openhop-dev/openhop_core/tree/dev/src/openhop_core/hardware)
+- [Source hardware package](https://github.com/openhop-dev/openhop_core/tree/54f6adb3e0cd3d47a8c61827b2e0be05814a22d4/src/openhop_core/hardware)

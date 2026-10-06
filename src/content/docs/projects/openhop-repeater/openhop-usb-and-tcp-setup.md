@@ -20,7 +20,7 @@ The main config file is `/etc/openhop_repeater/config.yaml`.
 
 ## openHop Modem over USB serial
 
-Minimal config:
+Transport-only fragment (retain the rest of your configuration and explicitly configure air settings below):
 
 ```yaml
 radio_type: modem_usb
@@ -57,7 +57,7 @@ the serial character device needs its own passthrough and permissions.
 
 ## openHop Modem over TCP
 
-Minimal config:
+Transport-only fragment (retain the rest of your configuration and explicitly configure air settings below):
 
 ```yaml
 radio_type: modem_tcp
@@ -114,14 +114,33 @@ Even though the modem firmware owns the radio hardware, these repeater settings 
 - `radio.spreading_factor`
 - `radio.coding_rate`
 - `radio.preamble_length`
+- `radio.sync_word`: explicitly use `0x12` for MeshCore. USB/TCP backends warn
+  on other values but still pass them to the modem; successful connection is not
+  proof that it can receive MeshCore traffic. Per-radio mappings inherit
+  top-level air settings, including a stray sync word.
 
-The canonical Repeater config currently defaults to:
+The canonical Repeater template explicitly sets:
 
 - `tx_power: 14`
 - `preamble_length: 32`
 
-Hardware presets may intentionally override these values. Match the actual mesh
-and regional rules rather than assuming either set is universal.
+These are template values, not the omitted-key modem defaults: without explicit
+`tx_power`/`preamble_length`, both USB and TCP factories use **22 dBm / 16**.
+Set these keys deliberately, for example:
+
+```yaml
+radio:
+  frequency: 869618000
+  tx_power: 14
+  bandwidth: 62500
+  spreading_factor: 8
+  coding_rate: 8
+  preamble_length: 32
+  sync_word: 0x12
+```
+
+This is an air-settings fragment, not a universal channel prescription. Hardware
+presets may override it. Match the actual mesh and regional rules.
 
 ## Restart and verify
 
@@ -143,3 +162,8 @@ Look for:
 - [Configuration Reference](/projects/openhop-repeater/config-file/)
 - [openHop Modem Repeater Integration](/projects/openhop-modem/repeater-integration/)
 - [KISS Setup](/projects/openhop-repeater/kiss-setup/)
+
+## Implementation references
+
+- [Modem factory defaults and sync-word warnings](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/config.py)
+- [Explicit template air settings](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/config.yaml.example)

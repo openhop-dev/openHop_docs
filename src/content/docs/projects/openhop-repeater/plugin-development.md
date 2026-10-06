@@ -32,7 +32,7 @@ third-party SDK.
 
 Sensor drivers use a different, in-process extension mechanism. See
 [Development](/projects/openhop-repeater/development/) and the
-[sensor guide](https://github.com/openhop-dev/openhop_repeater/blob/dev/docs/adding_sensors.md).
+[sensor guide](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/docs/adding_sensors.md).
 
 ## Manifest schema 1
 
@@ -273,6 +273,27 @@ isolation. Plugin UIs are applications, not dashboard widgets. For UI-only wheel
 the manager extracts assets and does not create/install a Python runtime venv;
 `enabled: true` with state `STOPPED` is expected.
 
+### Support both frontend bases deliberately
+
+The dashboard can offer any installed application UI as a primary frontend,
+not just full dashboard replacements. Declare whether your app supports that use;
+being selectable is not proof that its administration/recovery features are complete.
+Primary selection uses `web.web_path`, with the stable selector `plugin:{id}`
+resolving the current release's UI subtree. Avoid version-specific release paths.
+
+Test the same packaged app at **both** `/plugins/{id}/` and `/`. A hard-coded
+`/plugins/{id}/` router or asset base may fail when served at `/`; a hard-coded
+root base can fail at the plugin URL or request assets from the selected primary
+frontend instead. Use a deliberate base strategy and test asset URLs, navigation,
+deep-link reloads, API/authentication paths, and switching back to **Default
+Frontend**. A plugin app need not implement all management screens, but document
+how operators retain/recover administrative access.
+
+The dedicated `/plugins/{id}/` handler blocks disabled plugins; the root frontend
+resolver currently does **not** check enabled state. Acceptance tests must verify
+both URLs after disabling a selected UI and after switching back to the default.
+Do not advertise disable as removing all public assets from a selected root UI.
+
 ## Build and inspect your wheel
 
 In your own plugin checkout, use an isolated build environment:
@@ -376,8 +397,10 @@ Check all of these before release:
 - Required API/Companion/upstream connections actually succeed; retry loops are not readiness.
 - Stop and disable remove ordinary child workers, and disable survives manager restart.
 - Invalid settings produce an actionable error without leaking credentials.
-- UI assets load at the plugin base path, deep links work, disabled UIs are hidden,
-  and private runtime/default/data files are not served.
+- UI assets and deep links work at both the plugin base and `/` when primary
+  frontend use is supported; verify the selected-root disable limitation and
+  default-frontend recovery. Disabled `/plugins/{id}/` assets and private
+  runtime/default/data files are not served.
 - A versioned upgrade preserves settings/data, stops old runtime code, and starts
   the new runtime; failed install and interrupted rebuild recovery are tested.
 - Default uninstall retains data, reinstall reuses it, and explicit data deletion
@@ -419,7 +442,7 @@ so tests cannot signal real host processes. For changes to API dispatch, test
 actual HTTP query handling as well as direct handler calls.
 
 The repository also contains
-[`scripts/docker-plugin-smoke.sh`](https://github.com/openhop-dev/openhop_repeater/blob/dev/scripts/docker-plugin-smoke.sh).
+[`scripts/docker-plugin-smoke.sh`](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/scripts/docker-plugin-smoke.sh).
 It is an integration harness, **not** a read-only check: it creates and removes
 containers/volumes and performs plugin operations. Review it and run only with
 an explicitly designated disposable image/environment. Follow the broader
@@ -464,12 +487,19 @@ them. Test against a controlled dependency source when reproducibility matters.
 
 ## Source reference
 
-- [Upstream plugin guide](https://github.com/openhop-dev/openhop_repeater/blob/dev/docs/plugins.md)
-- [Manifest validator](https://github.com/openhop-dev/openhop_repeater/blob/dev/repeater/plugins/manifest.py)
-- [Runtime installer and process contract](https://github.com/openhop-dev/openhop_repeater/blob/dev/repeater/plugins/runtime.py)
-- [Manager lifecycle/settings/update implementation](https://github.com/openhop-dev/openhop_repeater/blob/dev/repeater/plugins/manager.py)
-- [Filesystem contract](https://github.com/openhop-dev/openhop_repeater/blob/dev/repeater/plugins/storage.py)
-- [Manager CLI](https://github.com/openhop-dev/openhop_repeater/blob/dev/repeater/plugins/__main__.py) and [internal IPC](https://github.com/openhop-dev/openhop_repeater/blob/dev/repeater/plugins/ipc.py)
-- [Static serving](https://github.com/openhop-dev/openhop_repeater/blob/dev/repeater/web/http_server.py) and [plugin HTTP API](https://github.com/openhop-dev/openhop_repeater/blob/dev/repeater/web/plugin_endpoints.py)
-- [Catalogue validation](https://github.com/openhop-dev/openhop_repeater/blob/dev/repeater/plugins/catalogue.py)
-- [Regression tests](https://github.com/openhop-dev/openhop_repeater/tree/dev/tests) and [Repeater package metadata](https://github.com/openhop-dev/openhop_repeater/blob/dev/pyproject.toml)
+Behavior checked against Repeater development snapshot `3c4bf3a9586d1e0b3871091649bc3fd09da3b662` and
+RepeaterUI development snapshot `334e302cc9eff1f6c08ab4093bd5599f58861715`.
+
+- [Frontend selection and recovery controls](https://github.com/openhop-dev/openHop_RepeaterUI/blob/334e302cc9eff1f6c08ab4093bd5599f58861715/src/components/configuration/WebSettings.vue) and [dashboard navigation](https://github.com/openhop-dev/openHop_RepeaterUI/blob/334e302cc9eff1f6c08ab4093bd5599f58861715/src/config/navigation.ts)
+- [Primary and plugin-path static serving](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/web/http_server.py)
+- [Frontend configuration and configuration-only export](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/web/api_endpoints.py) and [Backup & Restore UI](https://github.com/openhop-dev/openHop_RepeaterUI/blob/334e302cc9eff1f6c08ab4093bd5599f58861715/src/components/configuration/BackupRestore.vue)
+
+- [Upstream plugin guide](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/docs/plugins.md)
+- [Manifest validator](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/plugins/manifest.py)
+- [Runtime installer and process contract](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/plugins/runtime.py)
+- [Manager lifecycle/settings/update implementation](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/plugins/manager.py)
+- [Filesystem contract](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/plugins/storage.py)
+- [Manager CLI](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/plugins/__main__.py) and [internal IPC](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/plugins/ipc.py)
+- [Static serving](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/web/http_server.py) and [plugin HTTP API](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/web/plugin_endpoints.py)
+- [Catalogue validation](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/repeater/plugins/catalogue.py)
+- [Regression tests](https://github.com/openhop-dev/openhop_repeater/tree/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/tests) and [Repeater package metadata](https://github.com/openhop-dev/openhop_repeater/blob/3c4bf3a9586d1e0b3871091649bc3fd09da3b662/pyproject.toml)
